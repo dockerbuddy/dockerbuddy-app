@@ -26,6 +26,18 @@ services:
         depends_on: 
             - influxdb
 
+    frontend:
+        image: "node:16-alpine"
+        user: "node"
+        working_dir: /app/frontend
+        volumes: 
+            - ./frontend:/app/frontend
+        command: "yarn start"
+        depends_on: 
+            - proxy
+        ports: 
+            - '3000:3000'
+
         
 volumes:
     influxdb-storage:
