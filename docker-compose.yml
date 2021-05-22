@@ -22,6 +22,7 @@ services:
             - ./proxy:/app
         environment:
             - INFLUXDB_TOKEN=${INFLUXDB_ADMIN_TOKEN}
+            - FLASK_ENV=development
         depends_on: 
             - influxdb
 
