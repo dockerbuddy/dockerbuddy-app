@@ -12,6 +12,19 @@ services:
             - DOCKER_INFLUXDB_INIT_PASSWORD=${INFLUXDB_PASSWORD}
             - DOCKER_INFLUXDB_INIT_ORG=${INFLUXDB_ORGANIZATION}
             - DOCKER_INFLUXDB_INIT_BUCKET=${INFLUXDB_BUCKET}
+            - DOCKER_INFLUXDB_INIT_ADMIN_TOKEN=${INFLUXDB_ADMIN_TOKEN}
+
+    proxy:
+        build: ./proxy
+        ports:
+            - '5000:5000'
+        volumes:
+            - ./proxy:/app
+        environment:
+            - INFLUXDB_TOKEN=${INFLUXDB_ADMIN_TOKEN}
+        depends_on: 
+            - influxdb
+
         
 volumes:
     influxdb-storage:
