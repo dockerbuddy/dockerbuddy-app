@@ -12,5 +12,6 @@
   <li>In terminal type docker-compose up</li>
   <li>On http://localhost:5000 should be simple json with your toke</li>
   <li>On http://localhost:8086 should be login screen to influx</li>
+  <li>On http://localhost:3000 should be frontend</li>
   <li>To log in to influx you need to type in credentials from .env</li>
 </ol>
