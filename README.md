@@ -6,7 +6,7 @@
   <li>Change its name to .env</li>
   <li>Change mock variables to your own. TOKEN can be a random sequence of char, you can use this https://randomkeygen.com/</li>
   <li>Save .env</li>
-  <li> cd /frontned </li>
+  <li> cd frontned/ </li>
   <li> yarn install (if you don't have yarn npm install --global yarn) </li>
   <li> cd .. </li>
   <li>In terminal type docker-compose up</li>
