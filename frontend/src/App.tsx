@@ -1,11 +1,12 @@
-import React from 'react';
+import React from "react";
 
-function App() {
+const App: React.FC = () => {
   return (
     <div>
-      asdasdasadasd
+      asdasdasdasd
+      {console.log("asdadasd")}
     </div>
   );
-}
+};
 
 export default App;
