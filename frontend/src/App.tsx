@@ -1,11 +1,11 @@
+import { Box, Container } from "@material-ui/core";
 import React from "react";
 
 const App: React.FC = () => {
   return (
-    <div>
-      asdasdasdasd
-      {console.log("asdadasd")}
-    </div>
+    <Container>
+      <Box>asdads</Box>
+    </Container>
   );
 };
 
