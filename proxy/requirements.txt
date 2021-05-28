@@ -1,2 +1,2 @@
-influxdb_client~=1.17.0
 Flask~=2.0.1
+requests
