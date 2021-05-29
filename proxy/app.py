@@ -1,6 +1,5 @@
 from flask import Flask, jsonify, request
-import bucket_resolvers
-import organization_resolvers
+from resolvers import bucket_resolvers, organization_resolvers
 from utils import INFLUXDB_TOKEN
 import json
 
@@ -27,7 +26,7 @@ def get_all_buckets():
 
 
 # returns all organizations form InfluxDB
-@app.route(f'api/{API_VERSION}/orgs')
+@app.route(f'/api/{API_VERSION}/orgs')
 def get_all_organizations():
     organizations = organization_resolvers.fetch_all_organizations()
     return app.response_class(
@@ -38,8 +37,8 @@ def get_all_organizations():
 
 
 # creates bucket with given name
-# returns bucket info
-@app.route(f'/api/{API_VERSION}/bucket', methods=['POST'])
+# returns bucket info and access token
+@app.route(f'/api/{API_VERSION}/buckets', methods=['POST'])
 def create_bucket_for_host():
     data = request.json
 
@@ -57,12 +56,15 @@ def create_bucket_for_host():
     name = data['bucket_name']  # name of a bucket to create
     # host_ip = data['ip_address']  # host's ip address
     org_id = data['org_id']  # organization's id: bucket will be assigned to it
-    retention = data['retention']  # retention of data (in seconds)
+    retention = data['retention']  # retention of data in bucket (in seconds)
 
     bucket = bucket_resolvers.create_bucket(name, org_id, retention)
 
     return app.response_class(
         content_type=CONTENT_TYPE,
-        response=json.dumps(bucket),
+        response=json.dumps({
+            'access_token': INFLUXDB_TOKEN,
+            'bucket': bucket
+        }),
         status=201
     )

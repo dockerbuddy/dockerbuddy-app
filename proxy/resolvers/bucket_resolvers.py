@@ -25,15 +25,17 @@ def create_bucket(name, org_id, retention):
         headers={
             'Authorization': f'Token {INFLUXDB_TOKEN}'
         },
-        json=json.dumps({
-            'name': name,
+
+        json={
             'orgID': org_id,
+            'name': name,
             'retentionRules': [
                 {
+                    'type': 'expire',
                     'everySeconds': retention
                 }
             ]
-        })
+        }
     )
     bucket = json.loads(response.content.decode(ENCODING))
     print(bucket, flush=True)
