@@ -37,6 +37,8 @@ def create_bucket(name, org_id, retention):
             ]
         }
     )
+
+    # FIXME filter system buckets
     bucket = json.loads(response.content.decode(ENCODING))
     print(bucket, flush=True)
     return bucket

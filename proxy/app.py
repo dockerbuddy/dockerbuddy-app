@@ -46,17 +46,20 @@ def create_bucket_for_host():
         return 'Incorrect data format. Only application/json accepted', 400
     if 'bucket_name' not in data:
         return 'Missing bucket_name', 400
-    # if 'ip_address' not in data:
-    #     return 'Missing ip_address', 400
-    if 'org_id' not in data:
-        return 'Missing org_id', 400
+    if 'ip_address' not in data:
+        return 'Missing ip_address', 400
     if 'retention' not in data:
         return 'Missing retention', 400
 
     name = data['bucket_name']  # name of a bucket to create
-    # host_ip = data['ip_address']  # host's ip address
-    org_id = data['org_id']  # organization's id: bucket will be assigned to it
+    host_ip = data['ip_address']  # host's ip address
+    try:
+        org_id = data['org_id']  # organization's id: bucket will be assigned to it
+    except KeyError:
+        org_id = organization_resolvers.fetch_all_organizations()['orgs'][0]['id']  # FIXME ?temporary solution?
     retention = data['retention']  # retention of data in bucket (in seconds)
+
+    name = name + " " + host_ip
 
     bucket = bucket_resolvers.create_bucket(name, org_id, retention)
 
