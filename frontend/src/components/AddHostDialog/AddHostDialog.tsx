@@ -37,6 +37,7 @@ const AddHostDialog: React.FC<AddHostDialogProps> = ({
                 id="ip"
                 label="IP address"
                 type="text"
+                variant="outlined"
                 fullWidth={true}
               />
             </Grid>
@@ -46,6 +47,7 @@ const AddHostDialog: React.FC<AddHostDialogProps> = ({
                 id="hostName"
                 label="Host name"
                 type="text"
+                variant="outlined"
                 fullWidth={true}
               />
             </Grid>
