@@ -48,8 +48,6 @@ def create_bucket_for_host():
         return 'Missing bucket_name', 400
     if 'ip_address' not in data:
         return 'Missing ip_address', 400
-    if 'retention' not in data:
-        return 'Missing retention', 400
 
     name = data['bucket_name']  # name of a bucket to create
     host_ip = data['ip_address']  # host's ip address
@@ -57,7 +55,11 @@ def create_bucket_for_host():
         org_id = data['org_id']  # organization's id: bucket will be assigned to it
     except KeyError:
         org_id = organization_resolvers.fetch_all_organizations()['orgs'][0]['id']  # FIXME ?temporary solution?
-    retention = data['retention']  # retention of data in bucket (in seconds)
+    
+    try:
+        retention = data['retention']  # retention of data in bucket (in seconds)
+    except KeyError:
+        retention = 0
 
     name = name + " " + host_ip
 
