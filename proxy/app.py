@@ -2,10 +2,13 @@ from flask import Flask, jsonify, request
 from resolvers import bucket_resolvers, organization_resolvers
 from utils import INFLUXDB_TOKEN
 import json
+from flask_cors import CORS
 
 app = Flask(__name__)
+CORS(app)
 CONTENT_TYPE = 'application/json'
 API_VERSION = 'v1'
+
 
 
 # return token for InfluxDB
@@ -65,11 +68,16 @@ def create_bucket_for_host():
 
     bucket = bucket_resolvers.create_bucket(name, org_id, retention)
 
+    status = 201
+    if "code" in bucket and bucket['code'] == "conflict":
+        status = 409
+        bucket["message"] = "Bucket with provided IP or name already exists"
+
     return app.response_class(
         content_type=CONTENT_TYPE,
         response=json.dumps({
             'access_token': INFLUXDB_TOKEN,
             'bucket': bucket
         }),
-        status=201
+        status=status,
     )
