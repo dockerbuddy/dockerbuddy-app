@@ -39,5 +39,4 @@ def create_bucket(name, org_id, retention):
     )
 
     bucket = json.loads(response.content.decode(ENCODING))
-    print(bucket, flush=True)
     return bucket

@@ -17,29 +17,59 @@ def get_influxdb_token():
 
 
 # returns first 20 buckets by default
-@app.route(f'/api/{API_VERSION}/buckets')
+# each bucket is represented by:
+# - id
+# - name
+# - organization id
+@app.route(f'/api/{API_VERSION}/buckets', methods=['GET'])
 def get_all_buckets():
     buckets = bucket_resolvers.fetch_all_buckets()
-    return app.response_class(
-        content_type=CONTENT_TYPE,
-        response=json.dumps(buckets),
-        status=200
-    )
+
+    if 'code' in buckets and buckets['code'][0] != 2:
+        return create_error_response(buckets['message'], buckets['code'])
+
+    parsed_buckets = []
+
+    for bucket in buckets['buckets']:
+        parsed_buckets.append({
+            'id': bucket['id'],
+            'name': bucket['name'],
+            'org_id': bucket['orgID']
+        })
+
+    response = {
+        'buckets': parsed_buckets
+    }
+
+    return create_response(response, 200)
 
 
-# returns all organizations form InfluxDB
-@app.route(f'/api/{API_VERSION}/orgs')
+# returns all organizations form InfluxDB.
+# each bucket is represented by id and name
+@app.route(f'/api/{API_VERSION}/orgs', methods=['GET'])
 def get_all_organizations():
-    organizations = organization_resolvers.fetch_all_organizations()
-    return app.response_class(
-        content_type=CONTENT_TYPE,
-        response=json.dumps(organizations),
-        status=200
-    )
+    orgs = organization_resolvers.fetch_all_organizations()
+
+    if 'code' in orgs and orgs['code'][0] != 2:
+        return create_error_response(orgs['message'], orgs['code'])
+
+    parsed_orgs = []
+
+    for org in orgs['orgs']:
+        parsed_orgs.append({
+            'id': org['id'],
+            'name': org['name']
+        })
+
+    response = {
+        'orgs': parsed_orgs
+    }
+
+    return create_response(response, 200)
 
 
 # creates bucket corresponding particular host
-# returns bucket info :
+# returns bucket info:
 #  - bucket id
 #  - bucket name
 #  - organization id
@@ -47,36 +77,42 @@ def get_all_organizations():
 @app.route(f'/api/{API_VERSION}/hosts', methods=['POST'])
 def create_bucket_for_host():
     data = request.json
+    status = 201
 
     if not data:
-        return 'Incorrect data format. Only application/json accepted', 400
+        err_msg = 'Incorrect data format. Only application/json accepted'
+        status = 400
+        return create_error_response(err_msg, status)
     if 'bucket_name' not in data:
-        return 'Missing bucket_name', 400
+        err_msg = 'Missing bucket_name'
+        status = 400
+        return create_error_response(err_msg, status)
     if 'ip_address' not in data:
-        return 'Missing ip_address', 400
+        err_msg = 'Missing ip_address'
+        status = 400
+        return create_error_response(err_msg, status)
 
     name = data['bucket_name']  # name of a bucket to create
     host_ip = data['ip_address']  # host's ip address
+
     try:
         org_id = data['org_id']  # organization's id: bucket will be assigned to it
     except KeyError:
-        org_id = organization_resolvers.fetch_all_organizations()['orgs'][0]['id']  # FIXME ?temporary solution?
+        org_id = organization_resolvers.fetch_all_organizations()['orgs'][0]['id']
     
     try:
         retention = data['retention']  # retention of data in bucket (in seconds)
     except KeyError:
-        retention = 0
+        retention = 0  # default: 0 (never expire)
 
-    name = name + " " + host_ip
+    name = name + " " + host_ip  # TODO return error response when name already contains spaces
 
     bucket = bucket_resolvers.create_bucket(name, org_id, retention)
 
-    status = 201
-    if "code" in bucket and bucket['code'] == "conflict":
-        status = 409
-        bucket["message"] = "Bucket with provided IP or name already exists"
+    if "code" in bucket:
+        return create_error_response(bucket['message'], bucket['code'])
 
-    msg = {
+    response = {
         'id': bucket['id'],
         'name': bucket['name'],
         'org_id': bucket['orgID']
@@ -86,7 +122,7 @@ def create_bucket_for_host():
         content_type=CONTENT_TYPE,
         response=json.dumps({
             'access_token': INFLUXDB_TOKEN,
-            'bucket': msg
+            'bucket': response
         }),
         status=status,
     )
@@ -97,11 +133,13 @@ def create_bucket_for_host():
 def get_hosts():
     buckets = bucket_resolvers.fetch_all_buckets()['buckets']
 
+    if 'code' in buckets and buckets['code'][0] != 2:
+        return create_error_response(buckets['message'], buckets['code'])
+
     host_names = []
 
     for bucket in buckets:
         bucket_name = bucket['name']
-        print(bucket_name, flush=True)
         if ' ' in bucket_name:
             name, ip = bucket_name.split(' ')
         else:
@@ -112,11 +150,28 @@ def get_hosts():
             'ip': ip
         })
 
+    response = {
+            'hosts': host_names
+        }
+
+    return create_response(response, 200)
+
+
+# return error response in an unified format
+def create_error_response(err_msg, status):
     return app.response_class(
         content_type=CONTENT_TYPE,
         response=json.dumps({
-            'hosts': host_names
+            'error': err_msg
         }),
-        status=200
+        status=status
     )
 
+
+# returns response in json format
+def create_response(data: dict, status):
+    return app.response_class(
+        content_type=CONTENT_TYPE,
+        response=json.dumps(data),
+        status=status
+    )
