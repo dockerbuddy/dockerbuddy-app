@@ -10,7 +10,6 @@ CONTENT_TYPE = 'application/json'
 API_VERSION = 'v1'
 
 
-
 # return token for InfluxDB
 @app.route('/', methods=['GET'])
 def get_influxdb_token():
@@ -39,9 +38,13 @@ def get_all_organizations():
     )
 
 
-# creates bucket with given name
-# returns bucket info and access token
-@app.route(f'/api/{API_VERSION}/buckets', methods=['POST'])
+# creates bucket corresponding particular host
+# returns bucket info :
+#  - bucket id
+#  - bucket name
+#  - organization id
+# and access token
+@app.route(f'/api/{API_VERSION}/hosts', methods=['POST'])
 def create_bucket_for_host():
     data = request.json
 
@@ -73,11 +76,17 @@ def create_bucket_for_host():
         status = 409
         bucket["message"] = "Bucket with provided IP or name already exists"
 
+    msg = {
+        'id': bucket['id'],
+        'name': bucket['name'],
+        'org_id': bucket['orgID']
+    }
+
     return app.response_class(
         content_type=CONTENT_TYPE,
         response=json.dumps({
             'access_token': INFLUXDB_TOKEN,
-            'bucket': bucket
+            'bucket': msg
         }),
         status=status,
     )
