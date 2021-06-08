@@ -81,3 +81,23 @@ def create_bucket_for_host():
         }),
         status=status,
     )
+
+
+# returns names (and IPs) of all hosts (buckets) from InfluxDB
+@app.route(f'/api/{API_VERSION}/hosts', methods=['GET'])
+def get_hosts():
+    buckets = bucket_resolvers.fetch_all_buckets()['buckets']
+
+    host_names = []
+
+    for bucket in buckets:
+        host_names.append(bucket['name'])
+
+    return app.response_class(
+        content_type=CONTENT_TYPE,
+        response=json.dumps({
+            'hosts': host_names
+        }),
+        status=200
+    )
+
