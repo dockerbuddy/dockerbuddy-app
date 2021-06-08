@@ -41,12 +41,21 @@ const AddHostDialog: React.FC<AddHostDialogProps> = ({ onClose, isOpen }) => {
     setError("");
     setSuccess("");
 
+    let isError = false;
     if (formData.bucket_name === "") {
       setFormErros((prev) => ({
         ...prev,
         bucket_name: "Host name is required",
       }));
-      return;
+      isError = true;
+    }
+
+    if (/\s/g.test(formData.bucket_name)) {
+      setFormErros((prev) => ({
+        ...prev,
+        bucket_name: "White space is not allowed in the name",
+      }));
+      isError = true;
     }
 
     if (formData.ip_address === "") {
@@ -54,7 +63,7 @@ const AddHostDialog: React.FC<AddHostDialogProps> = ({ onClose, isOpen }) => {
         ...prev,
         ip_address: "IP address is required",
       }));
-      return;
+      isError = true;
     }
 
     if (!/^(?:[0-9]{1,3}\.){3}[0-9]{1,3}$/.test(formData.ip_address)) {
@@ -62,8 +71,10 @@ const AddHostDialog: React.FC<AddHostDialogProps> = ({ onClose, isOpen }) => {
         ...prev,
         ip_address: "IP address is incorrect",
       }));
-      return;
+      isError = true;
     }
+
+    if (isError) return;
 
     //TODO TYPE THE RESPONSE!
     const response = await fetch(`${proxy}/buckets`, {
