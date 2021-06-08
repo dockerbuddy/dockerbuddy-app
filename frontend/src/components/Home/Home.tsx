@@ -17,7 +17,7 @@ const Home: React.FC = () => {
         </Button>
       </Box>
       <AddHostDialog isOpen={isOpen} handleClose={() => setIsOpen(false)} />
-      <Dashboard/>
+      <Dashboard />
     </Container>
   );
 };
