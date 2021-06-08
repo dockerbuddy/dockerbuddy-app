@@ -4,6 +4,11 @@ import AddHostDialog from "../AddHostDialog/AddHostDialog";
 
 const Home: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false);
+
+  const handleClose = () => {
+    setIsOpen(false);
+  };
+
   return (
     <Container maxWidth="xl">
       <Box my={4}>
@@ -15,7 +20,7 @@ const Home: React.FC = () => {
           Add host
         </Button>
       </Box>
-      <AddHostDialog isOpen={isOpen} handleClose={() => setIsOpen(false)} />
+      <AddHostDialog isOpen={isOpen} onClose={handleClose} />
     </Container>
   );
 };
