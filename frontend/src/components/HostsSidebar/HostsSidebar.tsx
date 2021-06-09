@@ -1,18 +1,24 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 import React, { useEffect, useState } from "react";
 import {
   makeStyles,
   Drawer,
-  Theme,
   Toolbar,
   List,
   ListItem,
   ListItemText,
+  Grid,
 } from "@material-ui/core";
+import { Alert } from "@material-ui/lab";
 import { proxy } from "../../common/api";
+import { capitalizeFirstLetter } from "../../util/util";
+
+interface HostData {
+  name: string;
+  ip: string;
+}
 
 const drawerWidth = 240;
-const useStyles = makeStyles((theme: Theme) => ({
+const useStyles = makeStyles(() => ({
   sideBar: {
     width: drawerWidth,
     flexShrink: 0,
@@ -22,18 +28,11 @@ const useStyles = makeStyles((theme: Theme) => ({
     backgroundColor: "#2A2B2F",
     width: drawerWidth,
   },
-  drawerContainer: {
-    overflow: "auto",
-  },
-  content: {
-    flexGrow: 1,
-    padding: theme.spacing(3),
-  },
 }));
 
 const HostsSidebar: React.FC = () => {
-  const [hosts, setHosts] = useState([]);
-  const [error, setError] = useState(false);
+  const [hosts, setHosts] = useState({ hosts: [] });
+  const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(true);
 
   const classes = useStyles();
@@ -45,13 +44,13 @@ const HostsSidebar: React.FC = () => {
           "Content-Type": "application/json",
         },
       });
+      const json = await response.json();
       if (response.ok) {
-        const json = await response.json();
         setIsLoading(false);
         setHosts(json);
       } else {
         setIsLoading(false);
-        setError(true);
+        setError(json);
         throw new Error(`Response code is ${response.status}`);
       }
     }
@@ -59,7 +58,7 @@ const HostsSidebar: React.FC = () => {
     asyncFetch();
   }, []);
 
-  console.log(hosts);
+  console.log(hosts["hosts"]);
 
   return (
     <Drawer
@@ -70,15 +69,23 @@ const HostsSidebar: React.FC = () => {
       }}
     >
       <Toolbar />
-      <div className={classes.drawerContainer}>
-        <List>
-          {["TMP"].map((text, index) => (
-            <ListItem button key={text}>
-              <ListItemText primary={text} />
+      {error && (
+        <Grid item>
+          <Alert severity="error">{capitalizeFirstLetter(error)}</Alert>
+        </Grid>
+      )}
+      {isLoading && <p>LOADING</p>}
+      <List>
+        {hosts["hosts"].map((obj: HostData) => {
+          const name = obj["name"];
+          const ip = obj["ip"];
+          return (
+            <ListItem button key={ip}>
+              <ListItemText primary={`${name} | ${ip}`} />
             </ListItem>
-          ))}
-        </List>
-      </div>
+          );
+        })}
+      </List>
     </Drawer>
   );
 };
