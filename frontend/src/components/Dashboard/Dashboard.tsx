@@ -1,11 +1,8 @@
 import React from "react";
-import HostsDisplay from "./HostsDisplay";
 
 const Dashboard: React.FC = () => {
   return (
-    <>
-      <HostsDisplay />
-    </>
+    <p>WIP</p>
   );
 };
 

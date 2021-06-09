@@ -11,6 +11,7 @@ import React from "react";
 const useStyles = makeStyles((theme) => ({
   appBar: {
     backgroundColor: theme.palette.background.paper,
+    zIndex: theme.zIndex.drawer + 1,
   },
 }));
 
@@ -19,9 +20,9 @@ const Header: React.FC = () => {
 
   return (
     <Box>
-      <AppBar position="static" className={classes.appBar}>
+      <AppBar position="fixed" className={classes.appBar}>
         <Toolbar>
-          <Typography variant="h4" color="primary">
+          <Typography variant="h5" color="primary">
             DockerBuddy
           </Typography>
         </Toolbar>
