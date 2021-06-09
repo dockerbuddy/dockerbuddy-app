@@ -1,11 +1,22 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import React, { useEffect, useState } from "react";
+import { makeStyles, Box, Typography, Drawer } from "@material-ui/core";
 import { proxy } from "../../common/api";
+
+const useStyles = makeStyles((theme) => ({
+  sideBar: {
+    backgroundColor: "rgba(60,61,65,0.37)",
+    height: "90vh",
+    width: "20vw",
+  },
+}));
 
 const HostsDisplay: React.FC = () => {
   const [hosts, setHosts] = useState([]);
   const [error, setError] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+
+  const classes = useStyles();
 
   useEffect(() => {
     fetch(`${proxy}/hosts`, {
@@ -30,7 +41,13 @@ const HostsDisplay: React.FC = () => {
 
   console.log(hosts);
 
-  return <></>;
+  return (
+    <Box className={classes.sideBar} p={4}>
+      <Typography variant="h4" color="primary">
+        HOSTY
+      </Typography>
+    </Box>
+  );
 };
 
 export default HostsDisplay;
