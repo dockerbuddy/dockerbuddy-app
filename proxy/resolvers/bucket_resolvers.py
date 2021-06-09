@@ -13,7 +13,7 @@ def fetch_all_buckets():
         }
     )
     buckets_dict = json.loads(response.content.decode(ENCODING))
-    print(buckets_dict, flush=True)
+    buckets_dict['buckets'] = [b for b in buckets_dict['buckets'] if b['name'][0] != '_']
     return buckets_dict
 
 
@@ -38,7 +38,5 @@ def create_bucket(name, org_id, retention):
         }
     )
 
-    # FIXME filter system buckets
     bucket = json.loads(response.content.decode(ENCODING))
-    print(bucket, flush=True)
     return bucket
