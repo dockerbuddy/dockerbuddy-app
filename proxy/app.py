@@ -1,5 +1,5 @@
 from flask import Flask, jsonify, request
-from resolvers import bucket_resolvers, organization_resolvers
+from resolvers import bucket_resolvers, organization_resolvers, query_resolvers
 from utils import INFLUXDB_TOKEN
 import json
 from flask_cors import CORS
@@ -8,7 +8,6 @@ app = Flask(__name__)
 CORS(app)
 CONTENT_TYPE = 'application/json'
 API_VERSION = 'v1'
-
 
 
 # return token for InfluxDB
@@ -83,21 +82,47 @@ def create_bucket_for_host():
     )
 
 
-# returns names (and IPs) of all hosts (buckets) from InfluxDB
+# returns names stats for each host: containers' stats, disk and virtual_memory
 @app.route(f'/api/{API_VERSION}/hosts', methods=['GET'])
 def get_hosts():
+    try:
+        start = request.args['start']  # query parameter 'start': relative start time of measurements (eg. -1h)
+        resolution = request.args['res']  # query parameter 'res': resolution of measurements (eg. 10s) (but not sure)
+    except KeyError as ke:
+        pass
     buckets = bucket_resolvers.fetch_all_buckets()['buckets']
+    hosts = {}
 
-    host_names = []
+    # transforms flat list of measurement; groups points by: host, _measurement, _field
+    def _filter_stats(list_of_data: list):
+        res = {}
+
+        for point in list_of_data:
+            _mes = point['_measurement']
+            _field = point['_field']
+            if _mes not in res.keys():
+                res[_mes] = {}
+            _mes_dict = res[_mes]
+            if _field not in _mes_dict.keys():
+                _mes_dict[_field] = []
+            _field_list = _mes_dict[_field]
+            del point['_measurement']  # remove from point to avoid redundancy (information already present as nested)
+            del point['_field']  # remove from point to avoid redundancy (information already present as nested)
+            _field_list.append(point)
+
+        return res
 
     for bucket in buckets:
-        host_names.append(bucket['name'])
+        bucket_name = bucket['name']
+        stats = query_resolvers.fetch_stats_for_host(host=bucket_name, start=start, resolution=resolution)
+        data = _filter_stats(stats)
+        hosts[bucket_name] = data
 
     return app.response_class(
         content_type=CONTENT_TYPE,
-        response=json.dumps({
-            'hosts': host_names
-        }),
+        response=json.dumps(
+            hosts
+        ),
         status=200
     )
 
