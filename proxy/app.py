@@ -3,6 +3,7 @@ from resolvers import bucket_resolvers, organization_resolvers, query_resolvers
 from utils import INFLUXDB_TOKEN
 import json
 from flask_cors import CORS
+from werkzeug.exceptions import BadRequestKeyError
 
 app = Flask(__name__)
 CORS(app)
@@ -128,7 +129,6 @@ def create_bucket_for_host():
     )
 
 
-
 # returns names stats for each host: containers' stats, disk and virtual_memory
 @app.route(f'/api/{API_VERSION}/hosts', methods=['GET'])
 def get_hosts():
@@ -137,8 +137,9 @@ def get_hosts():
     try:
         start = request.args['start']  # query parameter 'start': relative start time of measurements (eg. -1h)
         resolution = request.args['res']  # query parameter 'res': resolution of measurements (eg. 10s) (but not sure)
-    except KeyError as ke:
-        pass
+    except BadRequestKeyError as brke:
+        return create_error_response(f"Missing query parameter(s). ({brke})", 400)
+
     buckets = bucket_resolvers.fetch_all_buckets()['buckets']
     hosts = {}
 
