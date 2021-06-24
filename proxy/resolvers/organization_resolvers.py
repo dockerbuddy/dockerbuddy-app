@@ -13,5 +13,4 @@ def fetch_all_organizations():
         }
     )
     organizations_dict = json.loads(response.content.decode(ENCODING))
-    print(organizations_dict, flush=True)
     return organizations_dict
