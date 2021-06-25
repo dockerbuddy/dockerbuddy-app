@@ -1,3 +1,4 @@
+from influx_settings import alerts_settings
 from flask import Flask, jsonify, request
 from resolvers import bucket_resolvers, organization_resolvers, query_resolvers
 from utils import INFLUXDB_TOKEN
@@ -10,6 +11,16 @@ CORS(app)
 CONTENT_TYPE = 'application/json'
 API_VERSION = 'v1'
 
+@app.before_first_request
+def init():
+    try:
+        settings_provider = alerts_settings.SettingsProvider()
+        settings_provider.get_organization_id()
+        settings_provider.setup_notification_endpoint()
+        settings_provider.setup_crit_rule()
+        settings_provider.setup_warn_rule()
+    except Exception:
+        pass
 
 # return token for InfluxDB
 @app.route('/', methods=['GET'])
@@ -127,6 +138,11 @@ def create_bucket_for_host():
         }),
         status=status,
     )
+
+@app.route(f'/hook/notifications', methods=['POST'])
+def push_notification():
+    print(request)
+    return "ok"
 
 
 # returns names stats for each host: containers' stats, disk and virtual_memory
