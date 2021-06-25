@@ -15,19 +15,11 @@ def fetch_stats_for_host(host, org='agh-utc', start="-1h", resolution="10s"):
             'Authorization': f'Token {INFLUXDB_TOKEN}'
         },
         json={
-            # "query": f"from(bucket: \"{host}\")\n"
-            #          f"|> range(start: {start})\n"
-            #          f"|> filter(fn: (r) => r[\"_measurement\"] == \"containers\" or r[\"_measurement\"] == \"disk\" or "
-            #             f"r[\"_measurement\"] == \"virtual_memory\")\n|> filter(fn: (r) => r[\"_field\"] == \"used\" or "
-            #             f"r[\"_field\"] == \"total\" or r[\"_field\"] == \"status\" or r[\"_field\"] == \"percent\" or "
-            #             f"r[\"_field\"] == \"name\" or r[\"_field\"] == \"memory_usage\" or r[\"_field\"] == \"image\" or "
-            #             f"r[\"_field\"] == \"id\" or r[\"_field\"] == \"cpu_percentage\")\n"
-            #          f"|> aggregateWindow(every: {resolution}, fn: last, createEmpty: false)\n|> yield(name:\"last\")"
             "query": f"from(bucket: \"{host}\")\n"
                      f"|> range(start: {start})\n"
                      f"|> filter(fn: (r) => r[\"_measurement\"] == \"containers\" or r[\"_measurement\"] == \"disk\" or "
                      f"r[\"_measurement\"] == \"virtual_memory\")\n|> aggregateWindow(every: {resolution}, "
-                        f"fn: last, createEmpty: false)\n|> yield(name:\"last\")"
+                        f"fn: last, createEmpty: false)\n|> last()\n|> yield(name:\"last\")"
         }
     )
 
@@ -38,8 +30,5 @@ def fetch_stats_for_host(host, org='agh-utc', start="-1h", resolution="10s"):
     for row in reader:
         json_data.append(row)
     print(json_data)
-    # print(list(reader))
-    # json_data = eval(json.dumps(list(reader)))
-    # print(json_data)
 
     return json_data
