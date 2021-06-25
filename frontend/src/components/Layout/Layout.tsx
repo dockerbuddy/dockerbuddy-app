@@ -13,6 +13,7 @@ const useStyles = makeStyles((_theme) =>
     },
     content: {
       flexGrow: 1,
+      padding: _theme.spacing(2),
     },
   })
 );
