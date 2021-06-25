@@ -28,7 +28,8 @@ def fetch_stats_for_host(host, org='agh-utc', start="-1h", resolution="10s"):
     reader = csv.DictReader(io.StringIO(csv_data))
     json_data = []
     for row in reader:
+        print(row)
         json_data.append(row)
-    print(json_data)
+    # print(json_data)
 
     return json_data

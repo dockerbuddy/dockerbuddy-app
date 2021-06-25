@@ -129,7 +129,7 @@ def create_bucket_for_host():
     )
 
 
-# returns names stats for each host: containers' stats, disk and virtual_memory
+# returns stats for each host: containers (with stats), disk and virtual_memory
 @app.route(f'/api/{API_VERSION}/hosts', methods=['GET'])
 def get_hosts():
     start = resolution = None
@@ -153,14 +153,25 @@ def get_hosts():
         for point in list_of_data:
             _mes = point['_measurement']
             _field = point['_field']
+            if _mes == '_measurement':
+                continue
             if _mes not in res.keys():
                 res[_mes] = {}
             _mes_dict = res[_mes]
+            # if _mes == 'containers':
+            #     pass
+            # else:
             if _field not in _mes_dict.keys():
                 _mes_dict[_field] = []
             _field_list = _mes_dict[_field]
-            del point['_measurement']  # remove from point to avoid redundancy (information already present as nested)
-            del point['_field']  # remove from point to avoid redundancy (information already present as nested)
+
+            # remove unnecessary key-value pairs
+            del point['_measurement']
+            del point['_field']
+            del point['']
+            del point['result']
+            del point['table']
+            point = {k: v for k, v in point.items() if v}
             _field_list.append(point)
 
         return res
@@ -169,6 +180,8 @@ def get_hosts():
         bucket_name = bucket['name']
         stats = query_resolvers.fetch_stats_for_host(host=bucket_name, start=start, resolution=resolution)
         data = _filter_stats(stats)
+        if ' ' in bucket_name:  # TODO: do not tolerate buckets that don't follow naming convention
+            data['name'], data['ip'] = bucket_name.split()
         hosts[bucket_name] = data
 
     return create_response(hosts, 200)
