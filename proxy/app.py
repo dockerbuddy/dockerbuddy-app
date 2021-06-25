@@ -11,6 +11,9 @@ CORS(app)
 CONTENT_TYPE = 'application/json'
 API_VERSION = 'v1'
 
+
+# set up of endpoints and rules for notifications
+# runs once at the start of application
 @app.before_first_request
 def init():
     try:

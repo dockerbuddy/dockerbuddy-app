@@ -99,7 +99,7 @@ class SettingsProvider:
                 "endpointID": self.endpoint_id,
                 "statusRules":[
                     {
-                        "currentLevel":"CRIT"
+                        "currentLevel":"WARN"
                     }
                 ]    
             }
