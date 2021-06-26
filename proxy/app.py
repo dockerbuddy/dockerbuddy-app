@@ -1,6 +1,6 @@
 from influx_settings import alerts_settings
 from flask import Flask, jsonify, request
-from resolvers import bucket_resolvers, organization_resolvers, query_resolvers
+from resolvers import bucket_resolvers, organization_resolvers, query_resolvers, notification_check_resolvers
 from utils import INFLUXDB_TOKEN
 import json
 from flask_cors import CORS
@@ -24,6 +24,7 @@ def init():
         settings_provider.setup_warn_rule()
     except Exception:
         pass
+
 
 # return token for InfluxDB
 @app.route('/', methods=['GET'])
@@ -114,7 +115,7 @@ def create_bucket_for_host():
         org_id = data['org_id']  # organization's id: bucket will be assigned to it
     except KeyError:
         org_id = organization_resolvers.fetch_all_organizations()['orgs'][0]['id']
-    
+
     try:
         retention = data['retention']  # retention of data in bucket (in seconds)
     except KeyError:
@@ -123,6 +124,10 @@ def create_bucket_for_host():
     name = name + " " + host_ip  # TODO return error response when name already contains spaces
 
     bucket = bucket_resolvers.create_bucket(name, org_id, retention)
+    app.logger.info(org_id)
+    app.logger.info(type(name))
+    notification_check_resolvers.create_check_for_bucket(name, "virtual_memory", org_id)
+
 
     if "code" in bucket:
         return create_error_response(bucket['message'], bucket['code'])
@@ -142,11 +147,11 @@ def create_bucket_for_host():
         status=status,
     )
 
+
 @app.route(f'/hook/notifications', methods=['POST'])
 def push_notification():
     print(request)
     return "ok"
-
 
 # returns names stats for each host: containers' stats, disk and virtual_memory
 @app.route(f'/api/{API_VERSION}/hosts', methods=['GET'])

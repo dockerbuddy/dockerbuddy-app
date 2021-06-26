@@ -77,7 +77,7 @@ const AddHostDialog: React.FC<AddHostDialogProps> = ({ onClose, isOpen }) => {
     if (isError) return;
 
     //TODO TYPE THE RESPONSE!
-    const response = await fetch(`${proxy}/buckets`, {
+    const response = await fetch(`${proxy}/hosts`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
