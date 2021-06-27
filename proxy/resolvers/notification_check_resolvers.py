@@ -47,7 +47,7 @@ def create_check_for_bucket(bucket, resource, org_id):
                     }
                 }
             },
-            "statusMessageTemplate": "${ r._check_name };${ r._level }",
+            "statusMessageTemplate": "${ r._check_name };${ r._level };${ string(v: r.percent) }",
             "every": "5s",
             "offset": "0s",
 

@@ -5,11 +5,17 @@ from utils import INFLUXDB_TOKEN
 import json
 from flask_cors import CORS
 from werkzeug.exceptions import BadRequestKeyError
+from notification_module import notifications_handler as notifications_handler_module
+from flask_socketio import SocketIO
+
 
 app = Flask(__name__)
 CORS(app)
 CONTENT_TYPE = 'application/json'
 API_VERSION = 'v1'
+socketio = SocketIO(app, cors_allowed_origins='*')
+notifications_handler = notifications_handler_module.NotificationHandler(app.logger, socketio)
+
 
 
 # set up of endpoints and rules for notifications
@@ -20,8 +26,7 @@ def init():
         settings_provider = alerts_settings.SettingsProvider()
         settings_provider.get_organization_id()
         settings_provider.setup_notification_endpoint()
-        settings_provider.setup_crit_rule()
-        settings_provider.setup_warn_rule()
+        settings_provider.setup_any_rule()
     except Exception:
         pass
 
@@ -150,7 +155,7 @@ def create_bucket_for_host():
 
 @app.route(f'/hook/notifications', methods=['POST'])
 def push_notification():
-    print(request)
+    notifications_handler.handle_influx_message(request.json)
     return "ok"
 
 # returns names stats for each host: containers' stats, disk and virtual_memory

@@ -52,7 +52,7 @@ class SettingsProvider:
         result = json.loads(response.content.decode(ENCODING))
         self.endpoint_id = result["id"]
 
-    def setup_crit_rule(self):
+    def setup_any_rule(self):
         response = requests.post(
             url='http://influxdb:8086/api/v2/notificationRules',
             headers={
@@ -64,42 +64,13 @@ class SettingsProvider:
                 "every":"5s",
                 "offset":"0s",
                 "orgID": self.organization_id,
-                "name":"crit-rule",
+                "name":"any-rule",
                 "activeStatus":"active",
                 "status":"active",
                 "endpointID": self.endpoint_id,
                 "statusRules":[
                     {
-                        "currentLevel":"CRIT"
-                    }
-                ]    
-            }
-        )
-
-        if not response.ok:
-            raise ValueError
-
-        return
-
-    def setup_warn_rule(self):
-        response = requests.post(
-            url='http://influxdb:8086/api/v2/notificationRules',
-            headers={
-                'Authorization': f'Token {INFLUXDB_TOKEN}'
-            },
-
-            json={
-                "type":"http",
-                "every":"5s",
-                "offset":"0s",
-                "orgID": self.organization_id,
-                "name":"warn-rule",
-                "activeStatus":"active",
-                "status":"active",
-                "endpointID": self.endpoint_id,
-                "statusRules":[
-                    {
-                        "currentLevel":"WARN"
+                        "currentLevel":"ANY"
                     }
                 ]    
             }
