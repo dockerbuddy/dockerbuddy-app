@@ -7,7 +7,7 @@ class NotificationHandler:
 
     def handle_influx_message(self, message):
         level = message['_level']
-        self.socketio.emit('notification', message, broadcast=True)
+
         if level == self.previous_level:
             return
         self.previous_level = level
@@ -16,7 +16,4 @@ class NotificationHandler:
             return
         # send message to frontend
         self.app_logger.info(level)
-
-
-    def push_message(self, message):
-        pass
+        self.socketio.emit('notification', message, broadcast=True)
