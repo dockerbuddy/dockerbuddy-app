@@ -132,6 +132,7 @@ def create_bucket_for_host():
     app.logger.info(org_id)
     app.logger.info(type(name))
     notification_check_resolvers.create_check_for_bucket(name, "virtual_memory", org_id)
+    notification_check_resolvers.create_check_for_bucket(name, "disk", org_id)
 
 
     if "code" in bucket:

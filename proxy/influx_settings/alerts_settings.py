@@ -61,7 +61,7 @@ class SettingsProvider:
 
             json={
                 "type":"http",
-                "every":"5s",
+                "every":"1s",
                 "offset":"0s",
                 "orgID": self.organization_id,
                 "name":"any-rule",

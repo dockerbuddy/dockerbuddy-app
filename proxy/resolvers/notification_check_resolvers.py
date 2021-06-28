@@ -14,7 +14,7 @@ def create_check_for_bucket(bucket, resource, org_id):
             "name": f'{bucket};{resource}',
             "orgID": org_id,
             "query": {
-                "text": f"from(bucket: \"{bucket}\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r[\"_measurement\"] == \"virtual_memory\")\n  |> filter(fn: (r) => r[\"_field\"] == \"percent\")\n  |> aggregateWindow(every: 5s, fn: last, createEmpty: false)\n  |> yield(name: \"last\")",
+                "text": f"from(bucket: \"{bucket}\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r[\"_measurement\"] == \"{resource}\")\n  |> filter(fn: (r) => r[\"_field\"] == \"percent\")\n  |> aggregateWindow(every: 1s, fn: last, createEmpty: false)\n  |> yield(name: \"last\")",
                 "editMode": "builder",
                 "builderConfig": {
                     "buckets": [
@@ -42,13 +42,13 @@ def create_check_for_bucket(bucket, resource, org_id):
                         }
                     ],
                     "aggregateWindow": {
-                        "period": "5s",
+                        "period": "1s",
                         "fillValues": False
                     }
                 }
             },
             "statusMessageTemplate": "${ r._check_name };${ r._level };${ string(v: r.percent) }",
-            "every": "5s",
+            "every": "1s",
             "offset": "0s",
 
             "thresholds": [
