@@ -131,10 +131,8 @@ def create_bucket_for_host():
     bucket = bucket_resolvers.create_bucket(name, org_id, retention)
     app.logger.info(org_id)
     app.logger.info(type(name))
-    min_alerts = data['min']
-    max_alerts = data['max']
-    notification_check_resolvers.create_check_for_bucket(name, "virtual_memory", org_id, min_alerts, max_alerts)
-    notification_check_resolvers.create_check_for_bucket(name, "disk", org_id, min_alerts, max_alerts)
+    notification_check_resolvers.create_check_for_bucket(name, "virtual_memory", org_id, data['virtual_range']['min'], data['virtual_range']['max'])
+    notification_check_resolvers.create_check_for_bucket(name, "disk", org_id, data['disk_range']['min'], data['disk_range']['max'])
 
 
     if "code" in bucket:

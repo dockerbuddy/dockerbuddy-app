@@ -32,7 +32,8 @@ const AddHostDialog: React.FC<AddHostDialogProps> = ({ onClose, isOpen }) => {
     ip_address: "",
   });
 
-  const [ranges, setRanges] = useState([50, 80]);
+  const [virtualRange, setVirtualRange] = useState([50, 80]);
+  const [diskRange, setDiskRange] = useState([50, 80]);
 
   const [formData, setFormData] = useState<FormData>({
     bucket_name: "",
@@ -82,8 +83,14 @@ const AddHostDialog: React.FC<AddHostDialogProps> = ({ onClose, isOpen }) => {
     //TODO TYPE THE RESPONSE!
     console.log({
       ...formData,
-      min: ranges[0],
-      max: ranges[1],
+      disk_range: {
+        min: diskRange[0],
+        max: diskRange[1],
+      },
+      virtual_range: {
+        min: virtualRange[0],
+        max: virtualRange[1],
+      },
     });
     const response = await fetch(`${proxy}/hosts`, {
       method: "POST",
@@ -92,8 +99,14 @@ const AddHostDialog: React.FC<AddHostDialogProps> = ({ onClose, isOpen }) => {
       },
       body: JSON.stringify({
         ...formData,
-        min: ranges[0],
-        max: ranges[1],
+        disk_range: {
+          min: diskRange[0],
+          max: diskRange[1],
+        },
+        virtual_range: {
+          min: virtualRange[0],
+          max: virtualRange[1],
+        },
       }),
     });
 
@@ -198,7 +211,12 @@ const AddHostDialog: React.FC<AddHostDialogProps> = ({ onClose, isOpen }) => {
                     />
                   </Grid>
                   <Grid item>
-                    <RangePicker ranges={ranges} setRanges={setRanges} />
+                    <RangePicker
+                      virtualRange={virtualRange}
+                      setVirtualRange={setVirtualRange}
+                      diskRange={diskRange}
+                      setDiskRange={setDiskRange}
+                    />
                   </Grid>
                 </>
               )}
