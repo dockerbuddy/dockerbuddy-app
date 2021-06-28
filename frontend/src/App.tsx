@@ -15,7 +15,13 @@ const App: React.FC = () => {
       <ThemeProvider theme={theme}>
         <HostsDataProvider>
           <WebSocketProvider>
-            <SnackbarProvider maxSnack={4}>
+            <SnackbarProvider
+              maxSnack={4}
+              anchorOrigin={{
+                vertical: "bottom",
+                horizontal: "right",
+              }}
+            >
               <NotificationComponent>
                 <CssBaseline />
                 <Layout>

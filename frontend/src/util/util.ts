@@ -3,6 +3,7 @@ export function capitalizeFirstLetter(string: string): string {
 }
 
 export function humanFileSize(size: string): string {
+  if (size === "0") return "0";
   const i = Math.floor(Math.log(+size) / Math.log(1024));
   const y: any = +size / Math.pow(1024, i); //TODO number throw error
   return y.toFixed(2) * 1 + " " + ["B", "kB", "MB", "GB", "TB"][i];
