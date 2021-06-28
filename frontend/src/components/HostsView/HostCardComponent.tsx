@@ -1,4 +1,3 @@
-/* eslint-disable */
 import React from "react";
 import {
   makeStyles,
@@ -62,9 +61,18 @@ const HostCardComponent: React.FC<{ host: HostData }> = (props) => {
         }
       />
       <CardContent>
-        <ProgressBarComponent name="Disk" used={diskUsed} total={diskMax} percent={diskPercent} />
-        <ProgressBarComponent name="VMEM" used={humanFileSize(vmem.used)} total={humanFileSize(vmem.total)} percent={vmem.percent} />  
-
+        <ProgressBarComponent
+          name="Disk"
+          used={diskUsed}
+          total={diskMax}
+          percent={diskPercent}
+        />
+        <ProgressBarComponent
+          name="Vmem"
+          used={humanFileSize(vmem.used)}
+          total={humanFileSize(vmem.total)}
+          percent={vmem.percent}
+        />
         <Grid container spacing={2}>
           <Grid item xs={12}>
             <Typography variant="h6" style={{ display: "inline-block" }}>
@@ -79,7 +87,6 @@ const HostCardComponent: React.FC<{ host: HostData }> = (props) => {
             );
           })}
         </Grid>
-
       </CardContent>
     </Card>
   );

@@ -1,4 +1,3 @@
-/* eslint-disable */
 import React from "react";
 import {
   makeStyles,
@@ -6,12 +5,8 @@ import {
   CardHeader,
   CardContent,
   Typography,
-  IconButton,
-  Grid,
 } from "@material-ui/core";
-import SettingsIcon from "@material-ui/icons/Settings";
-import { humanFileSize, getLatestStats } from "../../util/util";
-import ProgressBarComponent from "./ProgressBarComponent";
+import { humanFileSize } from "../../util/util";
 
 const useStyles = makeStyles((theme) => ({
   card: {
@@ -44,7 +39,9 @@ const ContainerCardComponent: React.FC<{ container: Container }> = (props) => {
         }
       />
       <CardContent>
-        <Typography variant="subtitle2">{"Mem: " + humanFileSize(mem)}</Typography>
+        <Typography variant="subtitle2">
+          {"MEM: " + humanFileSize(mem)}
+        </Typography>
         <Typography variant="subtitle2">{"CPU: " + cpu}</Typography>
       </CardContent>
     </Card>
