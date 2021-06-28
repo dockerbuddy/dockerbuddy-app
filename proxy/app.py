@@ -1,8 +1,9 @@
 from flask import Flask, jsonify, request
-from resolvers import bucket_resolvers, organization_resolvers
+from resolvers import bucket_resolvers, organization_resolvers, query_resolvers
 from utils import INFLUXDB_TOKEN
 import json
 from flask_cors import CORS
+from werkzeug.exceptions import BadRequestKeyError
 
 app = Flask(__name__)
 CORS(app)
@@ -128,33 +129,82 @@ def create_bucket_for_host():
     )
 
 
-# returns names and IPs of all hosts (buckets) from InfluxDB
+# returns stats for each host: containers (with stats), disk and virtual_memory
 @app.route(f'/api/{API_VERSION}/hosts', methods=['GET'])
 def get_hosts():
+    start = resolution = None
+
+    # for the MVP scope this part is redundant (we only get latest value(s))
+    # try:
+    #     start = request.args['start']  # query parameter 'start': relative start time of measurements (eg. -1h)
+    #     resolution = request.args['res']  # query parameter 'res': resolution of measurements (eg. 10s) (but not sure)
+    # except BadRequestKeyError as brke:
+    #     return create_error_response(f"Missing query parameter(s): \'start\' and \'res\' are required ({brke})", 400)
+
     buckets = bucket_resolvers.fetch_all_buckets()['buckets']
+    hosts = {}
 
     if 'code' in buckets and buckets['code'][0] != 2:
         return create_error_response(buckets['message'], buckets['code'])
 
-    host_names = []
+    # transforms flat list of measurement; groups points by: host, _measurement, _field
+    def _transform_stats(list_of_data: list):
+        res = {}
+
+        # rearrange data into correct structure
+        for point in list_of_data:
+            _field_list = []
+            _mes = point['_measurement']
+            _field = point['_field']
+            if _mes == '_measurement':  # drop redundant values
+                continue
+            if _mes not in res.keys():
+                res[_mes] = {}
+            _mes_dict = res[_mes]
+            if _mes == 'containers':
+                container_id = point['id']
+                if container_id not in _mes_dict.keys():
+                    _mes_dict[container_id] = {}
+                container_dict = _mes_dict[container_id]
+                container_dict['id'] = container_id
+                container_dict['name'] = point['name']
+                container_dict['image'] = point['image']
+                container_dict[_field] = {  # TODO remove hardcoded values (or not?)
+                    '_start': point['_start'],
+                    '_stop': point['_stop'],
+                    '_time': point['_time'],
+                    '_value': point['_value']
+                }
+            else:
+                if _field not in _mes_dict.keys():
+                    _mes_dict[_field] = []
+                _field_list = _mes_dict[_field]
+
+            # remove redundant key-value pairs
+            del point['_measurement']
+            del point['_field']
+            del point['']
+            del point['result']
+            del point['table']
+
+            point = {k: v for k, v in point.items() if v}  # drop keys with null (None) values
+            _field_list.append(point)
+
+        if 'containers' in res.keys():
+            containers = res['containers']
+            res['containers'] = [val for val in containers.values()]  # transform 'containers' from dict of dicts to list of dicts
+
+        return res
 
     for bucket in buckets:
         bucket_name = bucket['name']
-        if ' ' in bucket_name:
-            name, ip = bucket_name.split(' ')
-        else:
-            name = bucket_name
-            ip = ''
-        host_names.append({
-            'name': name,
-            'ip': ip
-        })
+        stats = query_resolvers.fetch_stats_for_host(host=bucket_name)
+        data = _transform_stats(stats)
+        if ' ' in bucket_name:  # TODO: do not tolerate buckets that don't follow naming convention
+            data['name'], data['ip'] = bucket_name.split()
+        hosts[bucket_name] = data
 
-    response = {
-            'hosts': host_names
-        }
-
-    return create_response(response, 200)
+    return create_response(hosts, 200)
 
 
 # return error response in an unified format
