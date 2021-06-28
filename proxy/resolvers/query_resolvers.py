@@ -1,6 +1,5 @@
 from utils import INFLUXDB_TOKEN, ENCODING
 import requests
-import json
 import csv
 import io
 
@@ -8,7 +7,7 @@ import io
 # fetches all stats in bucket (host) form InfluxDB
 # https://docs.influxdata.com/influxdb/v2.0/api/#operation/PostQuery
 # https://docs.influxdata.com/influxdb/v2.0/query-data/execute-queries/influx-api/
-def fetch_stats_for_host(host, org='agh-utc', start="-1h", resolution="10s"):
+def fetch_stats_for_host(host, org='agh-utc', start="-7d", resolution="10s"):
     response = requests.post(
         url=f'http://influxdb:8086/api/v2/query?org={org}',
         headers={

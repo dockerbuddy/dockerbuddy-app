@@ -198,7 +198,7 @@ def get_hosts():
 
     for bucket in buckets:
         bucket_name = bucket['name']
-        stats = query_resolvers.fetch_stats_for_host(host=bucket_name, start=start, resolution=resolution)
+        stats = query_resolvers.fetch_stats_for_host(host=bucket_name)
         data = _transform_stats(stats)
         if ' ' in bucket_name:  # TODO: do not tolerate buckets that don't follow naming convention
             data['name'], data['ip'] = bucket_name.split()
