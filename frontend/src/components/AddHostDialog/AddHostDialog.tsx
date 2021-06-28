@@ -10,6 +10,7 @@ import TextField from "@material-ui/core/TextField";
 import { Box, Grid, Typography } from "@material-ui/core";
 import { proxy } from "../../common/api";
 import { capitalizeFirstLetter } from "../../util/util";
+import RangePicker from "./RangePicker";
 
 interface AddHostDialogProps {
   onClose: () => void;
@@ -30,6 +31,8 @@ const AddHostDialog: React.FC<AddHostDialogProps> = ({ onClose, isOpen }) => {
     bucket_name: "",
     ip_address: "",
   });
+
+  const [ranges, setRanges] = useState([50, 80]);
 
   const [formData, setFormData] = useState<FormData>({
     bucket_name: "",
@@ -184,6 +187,9 @@ const AddHostDialog: React.FC<AddHostDialogProps> = ({ onClose, isOpen }) => {
                       error={!!formErros.bucket_name}
                       helperText={formErros.bucket_name}
                     />
+                  </Grid>
+                  <Grid item>
+                    <RangePicker ranges={ranges} setRanges={setRanges} />
                   </Grid>
                 </>
               )}
