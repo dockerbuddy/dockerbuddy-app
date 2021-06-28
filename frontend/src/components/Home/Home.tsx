@@ -1,6 +1,8 @@
-import React, { useState } from "react";
+/* eslint-disable @typescript-eslint/no-unused-vars */
+import React, { useState, useEffect } from "react";
 import { Box, Container, Button } from "@material-ui/core";
 import AddHostDialog from "../AddHostDialog/AddHostDialog";
+import { Socket } from "net";
 
 const Home: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false);
