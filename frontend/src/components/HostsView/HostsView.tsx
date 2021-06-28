@@ -37,7 +37,7 @@ const HostsView: React.FC = () => {
           hostsData.hosts.map((obj: HostData) => {
             return (
               <Grid item xs={6} key={obj.ip}>
-                <HostCardComponent ip={obj.ip} name={obj.name} />
+                <HostCardComponent host={obj} />
               </Grid>
             );
           })}

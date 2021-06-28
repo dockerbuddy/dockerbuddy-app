@@ -44,7 +44,7 @@ export const useHostsData = (): ContextState => {
 };
 
 export const HostsDataProvider: React.FC = ({ children }) => {
-  const intervalSeconds = 10;
+  const intervalSeconds = 1;
   const [state, setState] = React.useState<ContextState>({ status: "LOADING" });
   // const [state, dispatch] = useReducer(reducer, defaultState);
 
@@ -61,7 +61,7 @@ export const HostsDataProvider: React.FC = ({ children }) => {
         const json = await response.json();
         setState({
           status: "LOADED",
-          ...json,
+          hosts: Object.values(json),
         });
       } else {
         setState({
