@@ -3,7 +3,7 @@ import requests
 import json
 
 
-def create_check_for_bucket(bucket, resource, org_id):
+def create_check_for_bucket(bucket, resource, org_id, min, max):
     response = requests.post(
         url='http://influxdb:8086/api/v2/checks',
         headers={
@@ -55,21 +55,21 @@ def create_check_for_bucket(bucket, resource, org_id):
                 {
                     "allValues": False,
                     "level": "OK",
-                    "value": 71,
+                    "value": min + 1,
                     "type": "lesser"
                 },
                 {
                     "allValues": False,
                     "level": "WARN",
-                    "min": 70,
-                    "max": 90,
+                    "min": min,
+                    "max": max,
                     "within": True,
                     "type": "range"
                 },
                 {
                     "allValues": False,
                     "level": "CRIT",
-                    "value":89,
+                    "value": max - 1,
                     "type": "greater"
                 }
             ],

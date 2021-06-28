@@ -80,12 +80,21 @@ const AddHostDialog: React.FC<AddHostDialogProps> = ({ onClose, isOpen }) => {
     if (isError) return;
 
     //TODO TYPE THE RESPONSE!
+    console.log({
+      ...formData,
+      min: ranges[0],
+      max: ranges[1],
+    });
     const response = await fetch(`${proxy}/hosts`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify(formData),
+      body: JSON.stringify({
+        ...formData,
+        min: ranges[0],
+        max: ranges[1],
+      }),
     });
 
     const result = await response.json();
