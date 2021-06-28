@@ -10,6 +10,7 @@ import TextField from "@material-ui/core/TextField";
 import { Box, Grid, Typography } from "@material-ui/core";
 import { proxy } from "../../common/api";
 import { capitalizeFirstLetter } from "../../util/util";
+import RangePicker from "./RangePicker";
 
 interface AddHostDialogProps {
   onClose: () => void;
@@ -30,6 +31,9 @@ const AddHostDialog: React.FC<AddHostDialogProps> = ({ onClose, isOpen }) => {
     bucket_name: "",
     ip_address: "",
   });
+
+  const [virtualRange, setVirtualRange] = useState([50, 80]);
+  const [diskRange, setDiskRange] = useState([50, 80]);
 
   const [formData, setFormData] = useState<FormData>({
     bucket_name: "",
@@ -77,12 +81,33 @@ const AddHostDialog: React.FC<AddHostDialogProps> = ({ onClose, isOpen }) => {
     if (isError) return;
 
     //TODO TYPE THE RESPONSE!
-    const response = await fetch(`${proxy}/buckets`, {
+    console.log({
+      ...formData,
+      disk_range: {
+        min: diskRange[0],
+        max: diskRange[1],
+      },
+      virtual_range: {
+        min: virtualRange[0],
+        max: virtualRange[1],
+      },
+    });
+    const response = await fetch(`${proxy}/hosts`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify(formData),
+      body: JSON.stringify({
+        ...formData,
+        disk_range: {
+          min: diskRange[0],
+          max: diskRange[1],
+        },
+        virtual_range: {
+          min: virtualRange[0],
+          max: virtualRange[1],
+        },
+      }),
     });
 
     const result = await response.json();
@@ -183,6 +208,14 @@ const AddHostDialog: React.FC<AddHostDialogProps> = ({ onClose, isOpen }) => {
                       onChange={handleChange}
                       error={!!formErros.bucket_name}
                       helperText={formErros.bucket_name}
+                    />
+                  </Grid>
+                  <Grid item>
+                    <RangePicker
+                      virtualRange={virtualRange}
+                      setVirtualRange={setVirtualRange}
+                      diskRange={diskRange}
+                      setDiskRange={setDiskRange}
                     />
                   </Grid>
                 </>

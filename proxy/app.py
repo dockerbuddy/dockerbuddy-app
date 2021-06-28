@@ -1,14 +1,34 @@
+from influx_settings import alerts_settings
 from flask import Flask, jsonify, request
-from resolvers import bucket_resolvers, organization_resolvers, query_resolvers
+from resolvers import bucket_resolvers, organization_resolvers, query_resolvers, notification_check_resolvers
 from utils import INFLUXDB_TOKEN
 import json
 from flask_cors import CORS
 from werkzeug.exceptions import BadRequestKeyError
+from notification_module import notifications_handler as notifications_handler_module
+from flask_socketio import SocketIO
+
 
 app = Flask(__name__)
 CORS(app)
 CONTENT_TYPE = 'application/json'
 API_VERSION = 'v1'
+socketio = SocketIO(app, cors_allowed_origins='*')
+notifications_handler = notifications_handler_module.NotificationHandler(app.logger, socketio)
+
+
+
+# set up of endpoints and rules for notifications
+# runs once at the start of application
+@app.before_first_request
+def init():
+    try:
+        settings_provider = alerts_settings.SettingsProvider()
+        settings_provider.get_organization_id()
+        settings_provider.setup_notification_endpoint()
+        settings_provider.setup_any_rule()
+    except Exception:
+        pass
 
 
 # return token for InfluxDB
@@ -100,7 +120,7 @@ def create_bucket_for_host():
         org_id = data['org_id']  # organization's id: bucket will be assigned to it
     except KeyError:
         org_id = organization_resolvers.fetch_all_organizations()['orgs'][0]['id']
-    
+
     try:
         retention = data['retention']  # retention of data in bucket (in seconds)
     except KeyError:
@@ -109,6 +129,11 @@ def create_bucket_for_host():
     name = name + " " + host_ip  # TODO return error response when name already contains spaces
 
     bucket = bucket_resolvers.create_bucket(name, org_id, retention)
+    app.logger.info(org_id)
+    app.logger.info(type(name))
+    notification_check_resolvers.create_check_for_bucket(name, "virtual_memory", org_id, data['virtual_range']['min'], data['virtual_range']['max'])
+    notification_check_resolvers.create_check_for_bucket(name, "disk", org_id, data['disk_range']['min'], data['disk_range']['max'])
+
 
     if "code" in bucket:
         return create_error_response(bucket['message'], bucket['code'])
@@ -127,6 +152,12 @@ def create_bucket_for_host():
         }),
         status=status,
     )
+
+
+@app.route(f'/hook/notifications', methods=['POST'])
+def push_notification():
+    notifications_handler.handle_influx_message(request.json)
+    return "ok"
 
 
 # returns stats for each host: containers (with stats), disk and virtual_memory
