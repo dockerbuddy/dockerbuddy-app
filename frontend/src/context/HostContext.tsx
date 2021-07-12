@@ -68,7 +68,7 @@ export const HostsDataProvider: React.FC = ({ children }) => {
           //TODO why error never appears?
           status: "ERROR",
         });
-        throw new Error(`Response code is ${response.status}`);
+        console.error(`Response code is ${response.status}`);
       }
     }
     asyncFetch();

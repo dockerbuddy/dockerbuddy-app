@@ -21,6 +21,12 @@ export function getLatestStats(stats: Stats): {
       percent: +stats.percent[0]._value,
     };
   } catch (e) {
-    throw new Error("Couldn't get first element. " + e);
+    //TODO return another type?
+    console.warn("Couldn't get first element. " + e);
+    return {
+      used: "",
+      total: "",
+      percent: 0,
+    };
   }
 }
