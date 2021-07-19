@@ -20,11 +20,12 @@ export const openRoutes: Route[] = [
   {
     path: "/",
     exact: true,
-    component: Home,
-  },
-  {
-    path: "/hosts",
-    exact: true,
+    // component: Home,
     component: HostsView,
   },
+  // {
+  //   path: "/hosts",
+  //   exact: true,
+  //   component: HostsView,
+  // },
 ];

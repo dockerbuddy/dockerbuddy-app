@@ -8,6 +8,7 @@ import {
   IconButton,
   Grid,
 } from "@material-ui/core";
+import { Alert } from "@material-ui/lab";
 import SettingsIcon from "@material-ui/icons/Settings";
 import { humanFileSize, getLatestStats } from "../../util/util";
 import ProgressBarComponent from "./ProgressBarComponent";
@@ -26,6 +27,7 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
+//TODO: Create custom alert
 const HostCardComponent: React.FC<{ host: HostData }> = (props) => {
   const classes = useStyles();
   const host = props.host;
@@ -61,31 +63,49 @@ const HostCardComponent: React.FC<{ host: HostData }> = (props) => {
         }
       />
       <CardContent>
-        <ProgressBarComponent
-          name="Disk"
-          used={diskUsed}
-          total={diskMax}
-          percent={diskPercent}
-        />
-        <ProgressBarComponent
-          name="Vmem"
-          used={humanFileSize(vmem.used)}
-          total={humanFileSize(vmem.total)}
-          percent={vmem.percent}
-        />
+        {host.disk !== undefined ? (
+          <ProgressBarComponent
+            name="Disk"
+            used={diskUsed}
+            total={diskMax}
+            percent={diskPercent}
+          />
+        ) : (
+          <Grid item>
+            <Alert severity="error"> NO DISC INFO </Alert>
+          </Grid>
+        )}
+        {host.virtual_memory !== undefined ? (
+          <ProgressBarComponent
+            name="Vmem"
+            used={humanFileSize(vmem.used)}
+            total={humanFileSize(vmem.total)}
+            percent={vmem.percent}
+          />
+        ) : (
+          <Grid item>
+            <Alert severity="error"> NO VMEM INFO </Alert>
+          </Grid>
+        )}
         <Grid container spacing={2}>
           <Grid item xs={12}>
             <Typography variant="h6" style={{ display: "inline-block" }}>
               Containers:
             </Typography>
           </Grid>
-          {host.containers.map((cont: Container) => {
-            return (
-              <Grid item xs={4} key={cont.id}>
-                <ContainerCardComponent container={cont} />
-              </Grid>
-            );
-          })}
+          {host.containers !== undefined ? (
+            host.containers.map((cont: Container) => {
+              return (
+                <Grid item xs={4} key={cont.id}>
+                  <ContainerCardComponent container={cont} />
+                </Grid>
+              );
+            })
+          ) : (
+            <Grid item>
+              <Alert severity="error"> NO CONTAINERS INFO </Alert>
+            </Grid>
+          )}
         </Grid>
       </CardContent>
     </Card>
