@@ -1,0 +1,41 @@
+version: '3'
+services: 
+    influxdb:
+        image: influxdb:latest
+        ports: 
+            - '8086:8086'
+        volumes: 
+            - influxdb-storage:/var/lib/influxdb
+        environment: 
+            - DOCKER_INFLUXDB_INIT_MODE=setup
+            - DOCKER_INFLUXDB_INIT_USERNAME=${INFLUXDB_USERNAME}
+            - DOCKER_INFLUXDB_INIT_PASSWORD=${INFLUXDB_PASSWORD}
+            - DOCKER_INFLUXDB_INIT_ORG=${INFLUXDB_ORGANIZATION}
+            - DOCKER_INFLUXDB_INIT_BUCKET=${INFLUXDB_BUCKET}
+            - DOCKER_INFLUXDB_INIT_ADMIN_TOKEN=${INFLUXDB_ADMIN_TOKEN}
+
+    proxy:
+        build: ./proxy
+        ports:
+            - '5000:5000'
+        volumes:
+            - ./proxy:/app
+        environment:
+            - INFLUXDB_TOKEN=${INFLUXDB_ADMIN_TOKEN}
+            - FLASK_ENV=development
+        depends_on: 
+            - influxdb
+
+    frontend:
+        build: ./frontend
+        user: "node"
+        depends_on: 
+            - proxy
+        ports: 
+            - '3000:3000'
+        environment:
+            - CHOKIDAR_USEPOLLING=true
+
+        
+volumes:
+    influxdb-storage:
