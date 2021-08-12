@@ -1,0 +1,51 @@
+swagger: '2.0'
+info:
+  description: Backend API docummentation for Dockiera App
+  version: 1.0.0
+  title: Dockiera App Backend API
+  license:
+    name: Apache 2.0
+    url: 'http://www.apache.org/licenses/LICENSE-2.0.html'
+host: localhost:8080
+basePath: /
+schemes:
+- https
+- http
+paths:
+  /:
+    get:
+      tags: 
+        - InfluxDB token
+      produces:
+        - application/json
+      responses:
+        '200':
+          description: OK
+          schema: 
+            $ref: '#/definitions/Token'
+        '500':
+          description: Unexpected error
+        '503':
+          description: Service Unavailable
+        '504':
+          description: Gateway Timeout
+  /api/v2/buckets:
+    get:
+      tags:
+        - Buckets
+      produces:
+        - application/json
+      responses:
+        '200': 
+          description: OK
+          # TODO schema for response
+        
+definitions:
+  Token:
+    type: object
+    title: Token
+    properties:
+      INFLUXDB_TOKEN:
+        type: string
+        description: Token necessary for interactions with InfluxDB.
+    
