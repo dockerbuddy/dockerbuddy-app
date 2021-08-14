@@ -114,7 +114,7 @@ const AddHostDialog: React.FC<AddHostDialogProps> = ({ onClose, isOpen }) => {
     if (!response.ok) {
       setError(result.bucket.message);
     } else {
-      setSuccess(result.access_token);
+      setSuccess(`Token: ${result.access_token};Bucket: ${result.bucket.name}`);
     }
   };
 
@@ -147,6 +147,8 @@ const AddHostDialog: React.FC<AddHostDialogProps> = ({ onClose, isOpen }) => {
     setSuccess("");
   };
 
+  const [token, bucket] = success.split(";");
+
   return (
     <Dialog open={isOpen} onClose={handleClose} maxWidth="md" fullWidth={true}>
       <form onSubmit={handleSubmit}>
@@ -171,8 +173,10 @@ const AddHostDialog: React.FC<AddHostDialogProps> = ({ onClose, isOpen }) => {
               {success && (
                 <Grid item>
                   <Alert severity="success">
-                    <AlertTitle>Agent token:</AlertTitle>
-                    {capitalizeFirstLetter(success)}
+                    <AlertTitle>Agent settings:</AlertTitle>
+                    {token}
+                    <br />
+                    {bucket}
                   </Alert>
                 </Grid>
               )}
