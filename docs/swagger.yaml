@@ -19,26 +19,119 @@ paths:
       produces:
         - application/json
       responses:
-        '200':
+        200:
           description: OK
           schema: 
             $ref: '#/definitions/Token'
-        '500':
+        500:
           description: Unexpected error
-        '503':
+        503:
           description: Service Unavailable
-        '504':
+        504:
           description: Gateway Timeout
-  /api/v2/buckets:
+  /api/{API_VERSION}/buckets:
     get:
       tags:
         - Buckets
       produces:
         - application/json
+      parameters:
+        - name: API_VERSION
+          in: path
+          description: version of API
+          required: true
+          type: string
+          format: v1, v2, etc.
       responses:
-        '200': 
+        200: 
           description: OK
-          # TODO schema for response
+          schema:
+            type: array
+            title: Buckets
+            items:
+              $ref: '#/definitions/Bucket'
+  /api/{API_VERSION}/orgs:
+    get:
+      tags:
+        - Organizations
+      produces:
+        - application/json
+      parameters:
+        - name: API_VERSION
+          in: path
+          description: version of API
+          required: true
+          type: string
+          format: v1, v2, etc.
+      responses:
+        200:
+          description: OK
+          schema:
+            type: array
+            title: Organizations
+            items:
+              $ref: '#/definitions/Organization'
+  /api/{API_VERSION}/hosts:
+    get:
+      tags:
+        - Hosts
+      produces:
+        - application/json
+      parameters:
+        - name: API_VERSION
+          in: path
+          description: version of API
+          required: true
+          type: string
+          format: v1, v2, etc.
+      responses:
+        200:
+          description: OK
+          schema:
+            type: object
+            properties:
+              hosts:
+                type: array
+                items:
+                  $ref: '#/definitions/HostInfo'
+    post:
+      tags:
+        - Hosts
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - name: API_VERSION
+          in: path
+          description: version of API
+          required: true
+          type: string
+          format: v1, v2, etc.
+        - in: body
+          name: body
+          description: Information about host to be added
+          required: true
+          schema:
+            $ref: '#/definitions/Host'
+      responses:
+        201:
+          description: Created
+          schema:
+            $ref: '#/definitions/HostResponse'
+        400:
+          description: Description of a cause of an error
+  /hook/notifications:
+    post:
+      tags:
+        - Notifications
+      consumes:
+        - application/json
+      produces:
+        - string
+      responses:
+        200:
+          description: OK
         
 definitions:
   Token:
@@ -48,4 +141,126 @@ definitions:
       INFLUXDB_TOKEN:
         type: string
         description: Token necessary for interactions with InfluxDB.
+  Bucket:
+    type: object
+    properties:
+      id:
+        type: string
+      name:
+        type: string
+        format: name ip_address
+      org_id:
+        type: string
+  Organization:
+    type: object
+    properties:
+      id:
+        type: string
+      name:
+        type: string
+  Host:
+    type: object
+    properties:
+      bucket_name:
+        type: string
+      ip_address:
+        type: string
+  HostResponse:
+    type: object
+    description: Response for posting new host
+    properties:
+      access_token:
+        type: string
+      bucket:
+        type: object
+        allOf:
+          - $ref: '#/definitions/Bucket'
+  HostInfo:
+    type: object
+    description: Current data from the host
+    properties:
+      name:
+        type: string
+      ip:
+        type: string
+      containers:
+        type: array
+        items:
+          $ref: '#/definitions/ContainerInfo'
+  Data:
+    type: object
+    properties:
+      _start:
+        type: string
+        format: ISO 8601
+      _stop:
+        type: string
+        format: ISO 8601
+      _time:
+        type: string
+        format: ISO 8601
+      _value:
+        type: string
+        format: number
+  ContainerInfo:
+    type: object
+    description: Currrent data from a container
+    properties:
+      id:
+        type: string
+      name:
+        type: string
+      image:
+        type: string
+      cpu_percentage:
+        type: object
+        allOf:
+          - $ref: '#/definitions/Data'
+      memory_usage:
+        type: object
+        allOf:
+          - $ref: '#/definitions/Data'
+      status:
+        type: object
+        allOf:
+          - $ref: '#/definitions/Data'
+      disk:
+        type: object
+        properties:
+          percent:
+            type: array
+            items:
+              $ref: '#/definitions/Data'
+          total:
+            type: array
+            items:
+              $ref: '#/definitions/Data'
+          used:
+            type: array
+            items:
+              $ref: '#/definitions/Data'
+      virtual_memory:
+        type: object
+        properties:
+          percent:
+            type: array
+            items:
+              $ref: '#/definitions/Data'
+          total:
+            type: array
+            items:
+              $ref: '#/definitions/Data'
+          used:
+            type: array
+            items:
+              $ref: '#/definitions/Data'
+        
+      
+        
+        
+  
+      
+      
+    
+    
     
