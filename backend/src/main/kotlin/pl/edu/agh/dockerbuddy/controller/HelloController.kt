@@ -1,4 +1,5 @@
 package pl.edu.agh.dockerbuddy.controller
+import org.springframework.beans.factory.annotation.Value
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
@@ -7,5 +8,9 @@ import org.springframework.web.bind.annotation.RestController
 @RequestMapping("/hello")
 class HelloController {
     @GetMapping
-    fun sayHello() = "hello"
+    fun sayHello() = "Test"
+
+    @RequestMapping("/cred")
+    @GetMapping
+    fun getSth() = "XD"
 }

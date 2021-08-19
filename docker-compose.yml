@@ -14,17 +14,19 @@ services:
             - DOCKER_INFLUXDB_INIT_BUCKET=${INFLUXDB_BUCKET}
             - DOCKER_INFLUXDB_INIT_ADMIN_TOKEN=${INFLUXDB_ADMIN_TOKEN}
 
-    proxy:
-        build: ./proxy
-        ports:
-            - '5000:5000'
-        volumes:
-            - ./proxy:/app
-        environment:
-            - INFLUXDB_TOKEN=${INFLUXDB_ADMIN_TOKEN}
-            - FLASK_ENV=development
-        depends_on: 
+    backend:
+        container_name: backend
+        depends_on:
             - influxdb
+        # environment:
+
+        image: maven:3.6.3-jdk-11
+        command: mvn spring-boot:run
+        ports:
+            - "8080:8080"
+        volumes:
+            - ./backend:/usr/src/mymaven:rw
+        working_dir: /usr/src/mymaven
 
     frontend:
         image: "node:16-alpine"
@@ -34,7 +36,7 @@ services:
             - ./frontend:/app/frontend
         command: "yarn start"
         depends_on: 
-            - proxy
+            - backend
         ports: 
             - '3000:3000'
         environment:
