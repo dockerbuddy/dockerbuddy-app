@@ -1,0 +1,356 @@
+swagger: '2.0'
+info:
+  description: Backend API docummentation for Dockiera App
+  version: 2.0.0
+  title: Dockiera App Backend API
+  license:
+    name: Apache 2.0
+    url: 'http://www.apache.org/licenses/LICENSE-2.0.html'
+host: localhost:8080
+basePath: /
+schemes:
+- https
+- http
+paths:
+  /:
+    get:
+      tags: 
+        - InfluxDB token
+      produces:
+        - application/json
+      responses:
+        200:
+          description: OK
+          schema: 
+            $ref: '#/definitions/Token'
+  /api/{API_VERSION}/buckets:
+    get:
+      tags:
+        - Buckets
+      produces:
+        - application/json
+      parameters:
+        - name: API_VERSION
+          in: path
+          description: Version of API
+          required: true
+          type: string
+          format: v1, v2, etc.
+      responses:
+        200: 
+          description: OK
+          schema:
+            type: object
+            title: Buckets
+            properties:
+              buckets:
+                type: array
+                items:
+                  $ref: '#/definitions/Bucket'
+  /api/{API_VERSION}/orgs:
+    get:
+      tags:
+        - Organizations
+      produces:
+        - application/json
+      parameters:
+        - name: API_VERSION
+          in: path
+          description: Version of API
+          required: true
+          type: string
+          format: v1, v2, etc.
+      responses:
+        200:
+          description: OK
+          schema:
+            type: object
+            title: Organizations
+            properties:
+              orgs:
+                type: array
+                items:
+                  $ref: '#/definitions/Organization'
+  /api/{API_VERSION}/hosts:
+    get:
+      tags:
+        - Hosts
+      produces:
+        - application/json
+      parameters:
+        - name: API_VERSION
+          in: path
+          description: Version of API
+          required: true
+          type: string
+          format: v1, v2, etc.
+      responses:
+        200:
+          description: OK
+          schema:
+            type: object
+            properties:
+              hosts:
+                type: array
+                items:
+                  $ref: '#/definitions/HostData'
+    post:
+      tags:
+        - Hosts
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - name: API_VERSION
+          in: path
+          description: Version of API
+          required: true
+          type: string
+          format: v1, v2, etc.
+        - in: body
+          name: body
+          description: Information about host to be added
+          required: true
+          schema:
+            $ref: '#/definitions/Host'
+      responses:
+        201:
+          description: Created
+          schema:
+            $ref: '#/definitions/HostResponse'
+        400:
+          description: Description of a cause of an error
+  /hook/notifications:
+    post:
+      tags:
+        - Notifications
+      consumes:
+        - application/json
+      produces:
+        - string
+      responses:
+        200:
+          description: OK
+  /api/{API_VERSION}/metrics/{host_id}:
+    post:
+      tags:
+      - Host metrics
+      parameters:
+        - name: API_VERSION
+          in: path
+          description: Version of API
+          required: true
+          type: string
+          format: v1, v2, etc.
+        - name: host_id
+          in: path
+          description: ID of a host that data is send to
+          required: true
+          type: string
+          format: v1, v2, etc.
+        - in: body
+          name: body
+          description: Information about host to be added
+          required: true
+          schema:
+            $ref: '#/definitions/ContainerMetrics'
+      responses:
+        200:
+          description: OK
+definitions:
+  Token:
+    type: object
+    title: Token
+    properties:
+      INFLUXDB_TOKEN:
+        type: string
+        description: Token necessary for interactions with InfluxDB.
+  Bucket:
+    type: object
+    properties:
+      id:
+        type: string
+      name:
+        type: string
+        format: name ip_address
+      org_id:
+        type: string
+  Organization:
+    type: object
+    properties:
+      id:
+        type: string
+      name:
+        type: string
+  Host:
+    type: object
+    properties:
+      name:
+        type: string
+      ip:
+        type: string
+  HostResponse:
+    type: object
+    description: Response for posting new host
+    properties:
+      access_token:
+        type: string
+      bucket:
+        type: object
+        allOf:
+          - $ref: '#/definitions/Bucket'
+  HostData:
+    type: object
+    description: Current data from the host
+    properties:
+      name:
+        type: string
+      ip:
+        type: string
+      containers:
+        type: array
+        items:
+          $ref: '#/definitions/ContainerInfo'
+  HostMetrics:
+    type: object
+    description: Metrics sent from an agent
+    properties:
+      host_id:
+        type: string
+      ip:
+        type: string
+      name:
+        type: string
+      metrics:
+        type: array
+        items:
+          $ref: '#/definitions/ContainerInfo'
+  Data:
+    type: object
+    properties:
+      _start:
+        type: string
+        format: ISO 8601
+      _stop:
+        type: string
+        format: ISO 8601
+      _time:
+        type: string
+        format: ISO 8601
+      _value:
+        type: string
+        format: number
+  Metric:
+    type: object
+    properties:
+      timestamp:
+        type: string
+        format: ISO 8601
+      value:
+        type: string
+        format: number
+  ContainerInfo:
+    type: object
+    description: Currrent data from a container
+    properties:
+      id:
+        type: string
+      name:
+        type: string
+      image:
+        type: string
+      cpu_percentage:
+        type: object
+        allOf:
+          - $ref: '#/definitions/Data'
+      memory_usage:
+        type: object
+        allOf:
+          - $ref: '#/definitions/Data'
+      status:
+        type: object
+        allOf:
+          - $ref: '#/definitions/Data'
+      disk:
+        type: object
+        properties:
+          percent:
+            type: array
+            items:
+              $ref: '#/definitions/Data'
+          total:
+            type: array
+            items:
+              $ref: '#/definitions/Data'
+          used:
+            type: array
+            items:
+              $ref: '#/definitions/Data'
+      virtual_memory:
+        type: object
+        properties:
+          percent:
+            type: array
+            items:
+              $ref: '#/definitions/Data'
+          total:
+            type: array
+            items:
+              $ref: '#/definitions/Data'
+          used:
+            type: array
+            items:
+              $ref: '#/definitions/Data'
+  ContainerMetrics:
+    type: object
+    description: Currrent data from a container
+    properties:
+      id:
+        type: string
+      name:
+        type: string
+      image:
+        type: string
+      cpu_percentage:
+        type: object
+        allOf:
+          - $ref: '#/definitions/Metric'
+      memory_usage:
+        type: object
+        allOf:
+          - $ref: '#/definitions/Metric'
+      status:
+        type: object
+        allOf:
+          - $ref: '#/definitions/Metric'
+      disk:
+        type: object
+        properties:
+          percent:
+            type: array
+            items:
+              $ref: '#/definitions/Metric'
+          total:
+            type: array
+            items:
+              $ref: '#/definitions/Metric'
+          used:
+            type: array
+            items:
+              $ref: '#/definitions/Metric'
+      virtual_memory:
+        type: object
+        properties:
+          percent:
+            type: array
+            items:
+              $ref: '#/definitions/Metric'
+          total:
+            type: array
+            items:
+              $ref: '#/definitions/Metric'
+          used:
+            type: array
+            items:
+              $ref: '#/definitions/Metric'
