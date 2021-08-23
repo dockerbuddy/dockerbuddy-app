@@ -7,10 +7,15 @@ import org.springframework.web.bind.annotation.RestController
 @RestController
 @RequestMapping("/hello")
 class HelloController {
-    @GetMapping
-    fun sayHello() = "Test"
+    @Value("\${influxdb.token}")
+    lateinit var token: String
 
-    @RequestMapping("/cred")
+    @Value("\${influxdb.organization}")
+    lateinit var organization: String
+
+    @Value("\${influxdb.bucket}")
+    lateinit var bucket: String
+
     @GetMapping
-    fun getSth() = "XD"
+    fun getCredentials() = "$token\n$organization\n$bucket"
 }
