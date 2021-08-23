@@ -22,6 +22,7 @@ services:
             - INFLUXDB_ADMIN_TOKEN=${INFLUXDB_ADMIN_TOKEN}
             - INFLUXDB_ORGANIZATION=${INFLUXDB_ORGANIZATION}
             - INFLUXDB_BUCKET=${INFLUXDB_BUCKET}
+            - INFLUXDB_URL=${INFLUXDB_URL}
 
         image: maven:3.6.3-jdk-11
         command: mvn spring-boot:run
