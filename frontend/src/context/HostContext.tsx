@@ -2,38 +2,6 @@ import React, { useEffect } from "react";
 import { proxy } from "../common/api";
 
 const HostContext = React.createContext<ContextState | null>(null);
-//TODO: Add reducer so we can refresh context from remote
-
-// const defaultState: ContextState = {
-//   status: "LOADING",
-// };
-
-// const reducer = (): ContextState => {
-//   const [state, setState] = React.useState<ContextState>({ status: "LOADING" });
-
-//   async function asyncFetch() {
-//     const response = await fetch(`${proxy}/hosts`, {
-//       headers: {
-//         "Content-Type": "application/json",
-//       },
-//     });
-//     if (response.ok) {
-//       const json = await response.json();
-//       setState({
-//         status: "LOADED",
-//         ...json,
-//       });
-//     } else {
-//       setState({
-//         //TODO why error never appears?
-//         status: "ERROR",
-//       });
-//       throw new Error(`Response code is ${response.status}`);
-//     }
-//   }
-//   asyncFetch();
-//   return state;
-// };
 
 export const useHostsData = (): ContextState => {
   const contextType = React.useContext(HostContext);
@@ -46,7 +14,6 @@ export const useHostsData = (): ContextState => {
 export const HostsDataProvider: React.FC = ({ children }) => {
   const intervalSeconds = 1;
   const [state, setState] = React.useState<ContextState>({ status: "LOADING" });
-  // const [state, dispatch] = useReducer(reducer, defaultState);
 
   useEffect(() => {
     setState({ status: "LOADING" });
@@ -81,7 +48,6 @@ export const HostsDataProvider: React.FC = ({ children }) => {
   }, []);
 
   return (
-    // <HostContext.Provider value={{ state, dispatch }}>
     <HostContext.Provider value={state}> {children} </HostContext.Provider>
   );
 };
