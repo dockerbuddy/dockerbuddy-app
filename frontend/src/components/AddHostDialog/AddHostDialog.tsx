@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 import React, { useState } from "react";
 import Button from "@material-ui/core/Button";
 import Dialog from "@material-ui/core/Dialog";
@@ -21,8 +20,6 @@ interface FormData {
   bucket_name: string;
   ip_address: string;
 }
-
-//
 
 const AddHostDialog: React.FC<AddHostDialogProps> = ({ onClose, isOpen }) => {
   const [error, setError] = useState("");

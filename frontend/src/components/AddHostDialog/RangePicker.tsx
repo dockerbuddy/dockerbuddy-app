@@ -1,20 +1,30 @@
-/* eslint-disable @typescript-eslint/explicit-module-boundary-types */
 import React from "react";
 import Slider from "@material-ui/core/Slider";
 import { Box, Typography } from "@material-ui/core";
 
-const RangePicker = ({
+interface RangePickerProps {
+  virtualRange: number[];
+  setVirtualRange: (newValue: number[]) => void;
+  diskRange: number[];
+  setDiskRange: (newValue: number[]) => void;
+}
+
+const RangePicker: React.FC<RangePickerProps> = ({
   virtualRange,
   setVirtualRange,
   diskRange,
   setDiskRange,
 }) => {
-  const handleChangeVirtual = (event, newValue) => {
-    setVirtualRange(newValue);
+  const handleChangeVirtual = (_event: any, newValue: number | number[]) => {
+    typeof newValue === "number"
+      ? setVirtualRange([newValue])
+      : setVirtualRange(newValue);
   };
 
-  const handleChangeDisk = (event, newValue) => {
-    setDiskRange(newValue);
+  const handleChangeDisk = (_event: any, newValue: number | number[]) => {
+    typeof newValue === "number"
+      ? setDiskRange([newValue])
+      : setDiskRange(newValue);
   };
 
   return (
