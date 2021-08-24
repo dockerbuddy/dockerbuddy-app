@@ -1,10 +1,7 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { Box, Container, Button } from "@material-ui/core";
 import AddHostDialog from "../AddHostDialog/AddHostDialog";
-import { Socket } from "net";
 
-//TODO: remove button, change Home into Dashboard
 const Home: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false);
 

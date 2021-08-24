@@ -1,9 +1,8 @@
-/* eslint-disable @typescript-eslint/explicit-module-boundary-types */
 import React, { useContext, useEffect } from "react";
 import { WebSocketContext } from "../../context/WebSocket";
 import { useSnackbar } from "notistack";
 
-const NotificationComponent = ({ children }) => {
+const NotificationComponent: React.FC = ({ children }) => {
   const { webSocket } = useContext(WebSocketContext);
 
   useEffect(() => {
@@ -23,6 +22,8 @@ const NotificationComponent = ({ children }) => {
       enqueueSnackbar(
         `${messageArray[0]} ${messageArray[1]} is ${messageArray[3]}%`,
         {
+          // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+          // @ts-ignore: Unreachable code error
           variant: map[data._level],
         }
       );
