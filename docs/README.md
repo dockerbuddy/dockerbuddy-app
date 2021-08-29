@@ -1,1 +1,1 @@
-![alt text](https://github.com/agh-docker-monitoring/dockiera-app/blob/backend-main/docs/RDBMS v1.png)
+![alt text](./RDBMS%20v1.png)
