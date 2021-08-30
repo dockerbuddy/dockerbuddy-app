@@ -23,7 +23,7 @@ class AbstractRule (
     @Column(name = "critical_level", nullable = false)
     var criticalLevel: Int,
 
-        @ManyToOne(cascade = [CascadeType.ALL], fetch = FetchType.LAZY, optional = false)
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "host_id", nullable = false)
     var host: Host
 ): BaseLongIdEntity()  {
