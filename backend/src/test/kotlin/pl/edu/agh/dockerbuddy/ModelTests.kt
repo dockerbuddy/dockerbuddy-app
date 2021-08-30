@@ -6,9 +6,9 @@ import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest
-import pl.edu.agh.dockerbuddy.model.AbstractRule
-import pl.edu.agh.dockerbuddy.model.BaseLongIdEntity
-import pl.edu.agh.dockerbuddy.model.Host
+import pl.edu.agh.dockerbuddy.model.entity.AbstractRule
+import pl.edu.agh.dockerbuddy.model.entity.BaseLongIdEntity
+import pl.edu.agh.dockerbuddy.model.entity.Host
 import pl.edu.agh.dockerbuddy.model.RuleType
 import pl.edu.agh.dockerbuddy.repository.AbstractRuleRepository
 import pl.edu.agh.dockerbuddy.repository.HostRepository

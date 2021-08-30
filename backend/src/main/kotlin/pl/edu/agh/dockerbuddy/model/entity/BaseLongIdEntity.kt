@@ -1,4 +1,4 @@
-package pl.edu.agh.dockerbuddy.model
+package pl.edu.agh.dockerbuddy.model.entity
 
 import javax.persistence.*
 
