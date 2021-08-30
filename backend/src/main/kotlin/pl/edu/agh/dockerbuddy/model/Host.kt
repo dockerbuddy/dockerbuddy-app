@@ -12,6 +12,6 @@ class Host(
     var hostName: String? = null
 ): BaseLongIdEntity() {
 
-    @OneToMany(mappedBy = "host", cascade = [CascadeType.ALL], orphanRemoval = true)
+    @OneToMany(mappedBy = "host", orphanRemoval = true)
     var rules: MutableList<AbstractRule> = mutableListOf()
 }

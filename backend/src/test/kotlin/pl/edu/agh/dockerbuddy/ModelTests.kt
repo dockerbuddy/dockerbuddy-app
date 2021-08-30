@@ -3,10 +3,7 @@ package pl.edu.agh.dockerbuddy
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
-import org.junit.jupiter.params.ParameterizedTest
-import org.junit.jupiter.params.provider.ValueSource
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.beans.factory.annotation.Value
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest
 import pl.edu.agh.dockerbuddy.model.AbstractRule
@@ -77,9 +74,24 @@ class ModelTests (
         var violations = validator.validate(abstractRule1)
         assertFalse(violations.isEmpty())
 
-        val abstractRule2 = AbstractRule(RuleType.DiskMem, 100, 105, host)
+        val abstractRule2 = AbstractRule(RuleType.DiskMem, 105, 150, host)
         violations = validator.validate(abstractRule2)
         assertFalse(violations.isEmpty())
+    }
+
+    @Test
+    fun saveHostToDBTest() {
+        val host = Host("host")
+        hostRepository.save(host)
+        assertEquals(host, hostRepository.findAll().first())
+    }
+
+    @Test
+    fun saveAlertTypeToDBTest() {
+        val host = Host("host")
+        val abstractRule1 = AbstractRule(RuleType.DiskMem, 50, 90, host)
+        abstractRuleRepository.save(abstractRule1) // host is saved implicitly thanks to CascadeType.ALL
+        assertEquals(abstractRule1, abstractRuleRepository.findAll().first())
     }
 
 }
