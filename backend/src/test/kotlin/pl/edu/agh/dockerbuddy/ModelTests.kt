@@ -21,7 +21,7 @@ import kotlin.IllegalArgumentException
 class ModelTests (
     @Autowired val hostRepository: HostRepository,
     @Autowired val abstractRuleRepository: AbstractRuleRepository
-    ) {
+) {
 
     lateinit var validator: Validator
 
@@ -93,6 +93,4 @@ class ModelTests (
         abstractRuleRepository.save(abstractRule1) // host is saved implicitly thanks to CascadeType.ALL
         assertEquals(abstractRule1, abstractRuleRepository.findAll().first())
     }
-
 }
-
