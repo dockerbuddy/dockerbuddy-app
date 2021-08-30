@@ -87,10 +87,12 @@ class ModelTests (
     }
 
     @Test
-    fun saveAlertTypeToDBTest() {
+    fun saveAbstractRuleToDBTest() {
         val host = Host("host")
-        val abstractRule1 = AbstractRule(RuleType.DiskMem, 50, 90, host)
-        abstractRuleRepository.save(abstractRule1) // host is saved implicitly thanks to CascadeType.ALL
-        assertEquals(abstractRule1, abstractRuleRepository.findAll().first())
+        val abstractRule = AbstractRule(RuleType.DiskMem, 50, 90, host)
+        host.rules.add(abstractRule) // crucial to have bidirectional relation!
+        hostRepository.save(host) // AbstractRule is persisted when updated host is saved to DB
+        assertEquals(abstractRule, abstractRuleRepository.findAll().first())
+        assertEquals(abstractRule, hostRepository.findAll().first().rules.first())
     }
 }
