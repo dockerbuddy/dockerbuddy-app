@@ -6,7 +6,7 @@ data class BasicMetric(
         val value: Double,
         val total: Double,
         val percent: Double,
-        val alertType: AlertType?,
-        val alert: Boolean?
+        var alertType: AlertType?,
+        var alert: Boolean?
 
 )

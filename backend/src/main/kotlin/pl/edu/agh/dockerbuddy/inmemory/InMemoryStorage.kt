@@ -1,11 +1,9 @@
 package pl.edu.agh.dockerbuddy.inmemory
 
-import org.springframework.beans.factory.annotation.Qualifier
-import org.springframework.stereotype.Service
+import org.springframework.stereotype.Repository
 import pl.edu.agh.dockerbuddy.model.metric.HostSummary
 
-@Service
-@Qualifier("InMemoryStorage")
+@Repository("InMemoryStorage")
 class InMemoryStorage : InMemory {
     private val storage: MutableMap<Long, HostSummary> = HashMap()
 
