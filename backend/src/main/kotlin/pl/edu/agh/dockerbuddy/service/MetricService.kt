@@ -8,7 +8,7 @@ import pl.edu.agh.dockerbuddy.model.entity.AbstractRule
 import pl.edu.agh.dockerbuddy.model.entity.Host
 import pl.edu.agh.dockerbuddy.model.metric.HostSummary
 import pl.edu.agh.dockerbuddy.repository.HostRepository
-import pl.edu.agh.dockerbuddy.util.addAlertsToSummary
+import pl.edu.agh.dockerbuddy.tools.addAlertsToSummary
 import javax.annotation.PostConstruct
 import javax.persistence.EntityNotFoundException
 
