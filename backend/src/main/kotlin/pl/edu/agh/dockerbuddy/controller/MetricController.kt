@@ -14,10 +14,9 @@ import pl.edu.agh.dockerbuddy.service.MetricService
 class MetricController(val metricService: MetricService) {
 
     @PostMapping
-    @RequestMapping("/{hostId}")
-    fun addMetric(@RequestBody hostSummary: HostSummary, @PathVariable hostId: String): ResponseEntity<DefaultResponse> {
+    fun addMetric(@RequestBody hostSummary: HostSummary): ResponseEntity<DefaultResponse> {
         return try {
-            metricService.postMetric(hostSummary, hostId.toLong())
+            metricService.postMetric(hostSummary, hostSummary.id)
             ResponseEntity.status(HttpStatus.OK)
                     .body(DefaultResponse(ResponseType.SUCCESS, "Metric uploaded", null))
         } catch (e: Exception){

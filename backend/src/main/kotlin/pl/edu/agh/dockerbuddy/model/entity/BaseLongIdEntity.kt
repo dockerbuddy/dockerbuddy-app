@@ -6,7 +6,7 @@ import javax.persistence.*
 @MappedSuperclass
 class BaseLongIdEntity {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false)
     var id: Long? = null
 
