@@ -21,3 +21,13 @@ fun addAlertType(basicMetric: BasicMetric, rule: AbstractRule) = when {
     basicMetric.percent * 100 > rule.criticalLevel.toDouble() -> basicMetric.alertType = AlertType.CRITICAL
     else -> basicMetric.alertType = AlertType.WARN
 }
+
+fun checkForAlertSummary(hostSummary: HostSummary, prevHostSummary: HostSummary){
+    checkForAlert(hostSummary.diskUsage, prevHostSummary.diskUsage)
+    checkForAlert(hostSummary.cpuUsage, prevHostSummary.cpuUsage)
+    checkForAlert(hostSummary.memoryUsage, prevHostSummary.memoryUsage)
+}
+
+fun checkForAlert(basicMetric: BasicMetric, prevBasicMetric: BasicMetric){
+    basicMetric.alert = basicMetric.alertType != prevBasicMetric.alertType
+}
