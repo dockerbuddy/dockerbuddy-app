@@ -16,7 +16,7 @@ class MetricController {
     @RequestMapping("/{hostId}")
     fun addMetric(@RequestBody hostSummary: HostSummary, @PathVariable hostId: String): ResponseEntity<DefaultResponse> {
         return try {
-            //DO SOME STUFF HERE
+            println(hostSummary)
             ResponseEntity.status(HttpStatus.OK)
                     .body(DefaultResponse(ResponseType.SUCCESS, "Metric uploaded", null))
         } catch (e: Exception){

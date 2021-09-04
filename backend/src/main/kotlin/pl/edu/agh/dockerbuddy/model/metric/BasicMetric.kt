@@ -1,7 +1,11 @@
 package pl.edu.agh.dockerbuddy.model.metric
 
-open class BasicMetric(
+import pl.edu.agh.dockerbuddy.model.AlertType
+
+data class BasicMetric(
         val value: Double,
         val total: Double,
-        val percent: Double
+        val percent: Double,
+        val alertType: AlertType?,
+        val alert: Boolean?
 )
