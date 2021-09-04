@@ -9,8 +9,9 @@ import pl.edu.agh.dockerbuddy.model.entity.AbstractRule
 import pl.edu.agh.dockerbuddy.model.entity.Host
 import pl.edu.agh.dockerbuddy.model.metric.BasicMetric
 import pl.edu.agh.dockerbuddy.tools.addAlertType
+import pl.edu.agh.dockerbuddy.tools.checkForAlert
 
-class SummaryAlertParsingTests {
+class AlertToolsTests {
     @Test
     fun applyAlertTypeTest1(){
         //given
@@ -74,5 +75,44 @@ class SummaryAlertParsingTests {
 
         //then
         Assertions.assertEquals(AlertType.WARN, basicMetric.alertType)
+    }
+
+    @Test
+    fun checkForAlertTest1(){
+        //given
+        val prevBasicMetric: BasicMetric = BasicMetric(10.0, 100.0, 0.55, AlertType.WARN, null)
+        val basicMetric: BasicMetric = BasicMetric(10.0, 100.0, 0.6, AlertType.WARN, null)
+
+        //when
+        checkForAlert(basicMetric, prevBasicMetric)
+
+        //then
+        Assertions.assertEquals(false, basicMetric.alert)
+    }
+
+    @Test
+    fun checkForAlertTest2(){
+        //given
+        val prevBasicMetric: BasicMetric = BasicMetric(10.0, 100.0, 0.1, AlertType.OK, null)
+        val basicMetric: BasicMetric = BasicMetric(10.0, 100.0, 0.6, AlertType.WARN, null)
+
+        //when
+        checkForAlert(basicMetric, prevBasicMetric)
+
+        //then
+        Assertions.assertEquals(true, basicMetric.alert)
+    }
+
+    @Test
+    fun checkForAlertTest3(){
+        //given
+        val prevBasicMetric: BasicMetric = BasicMetric(10.0, 100.0, 0.55, AlertType.WARN, null)
+        val basicMetric: BasicMetric = BasicMetric(10.0, 100.0, 0.99, AlertType.CRITICAL, null)
+
+        //when
+        checkForAlert(basicMetric, prevBasicMetric)
+
+        //then
+        Assertions.assertEquals(true, basicMetric.alert)
     }
 }
