@@ -11,7 +11,7 @@ import pl.edu.agh.dockerbuddy.service.MetricService
 
 @RestController
 @RequestMapping("/api/v2/metrics")
-class MetricController(@Autowired val metricService: MetricService) {
+class MetricController(val metricService: MetricService) {
 
     @PostMapping
     @RequestMapping("/{hostId}")
