@@ -23,7 +23,7 @@ class AbstractRule (
     @field:Min(0)
     @field:Max(100)
     @Column(name = "critical_level", nullable = false)
-    var criticalLevel: Int,
+    var criticalLevel: Int
 ): BaseLongIdEntity()  {
 
     init {
