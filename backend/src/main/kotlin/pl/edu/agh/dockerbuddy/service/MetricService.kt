@@ -22,27 +22,4 @@ class MetricService(
         appendAlertTypeToMetrics(hostSummary, host.rules)
         println(hostSummary)
     }
-
-    @PostConstruct
-    fun mockData(){
-        val host = Host(hostName = "name")
-        val abstractRuleCpu = AbstractRule(type = RuleType.CpuUsage,
-                warnLevel = 40,
-                criticalLevel = 70,
-                host = host)
-
-        val abstractRuleMem = AbstractRule(type = RuleType.MemoryUsage,
-                warnLevel = 40,
-                criticalLevel = 70,
-                host = host)
-
-        val abstractRuleDisk = AbstractRule(type = RuleType.DiskUsage,
-                warnLevel = 40,
-                criticalLevel = 70,
-                host = host)
-
-        val rules: MutableList<AbstractRule> = mutableListOf(abstractRuleCpu, abstractRuleDisk, abstractRuleMem)
-        host.rules = rules
-        hostRepository.save(host)
-    }
 }
