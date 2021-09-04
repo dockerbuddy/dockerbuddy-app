@@ -8,7 +8,7 @@ import pl.edu.agh.dockerbuddy.model.entity.AbstractRule
 import pl.edu.agh.dockerbuddy.model.entity.Host
 import pl.edu.agh.dockerbuddy.model.metric.HostSummary
 import pl.edu.agh.dockerbuddy.repository.HostRepository
-import pl.edu.agh.dockerbuddy.tools.addAlertsToSummary
+import pl.edu.agh.dockerbuddy.tools.appendAlertTypeToMetrics
 import javax.annotation.PostConstruct
 import javax.persistence.EntityNotFoundException
 
@@ -19,7 +19,7 @@ class MetricService(
 
     fun postMetric(hostSummary: HostSummary, hostId: Long){
         val host: Host = hostRepository.findByIdOrNull(hostId) ?: throw EntityNotFoundException()
-        addAlertsToSummary(hostSummary, host.rules)
+        appendAlertTypeToMetrics(hostSummary, host.rules)
         println(hostSummary)
     }
 
