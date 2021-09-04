@@ -24,12 +24,10 @@ class MetricService(val hostRepository: HostRepository,
         appendAlertTypeToMetrics(hostSummary, host.rules)
 
         val prevHostSummary: HostSummary? = inMemory.getHostSummary(hostId)
-        println(prevHostSummary)
         if (prevHostSummary != null){
             checkForAlertSummary(hostSummary, prevHostSummary)
         }
 
         inMemory.saveHostSummary(hostId, hostSummary)
-        println(hostSummary)
     }
 }
