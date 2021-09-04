@@ -3,6 +3,8 @@ package pl.edu.agh.dockerbuddy
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.ValueSource
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest
@@ -45,51 +47,79 @@ class ModelTests (
         assertFalse(violations.isEmpty())
     }
 
+    @ParameterizedTest
+    @ValueSource(strings = ["192.168.1.1", "1.1.1.1", "255.255.255.255"])
+    fun hostCorrectIPTest(ip: String) {
+        val host = Host("host", ip)
+        val violations = validator.validate(host)
+        assertTrue(violations.isEmpty())
+    }
+
+
+    @ParameterizedTest
+    @ValueSource(strings = ["", "999.999.999.999", "256.1.0.0"])
+    fun hostIncorrectIPTest(ip: String) {
+        val host = Host("host", ip)
+        val violations = validator.validate(host)
+        assertFalse(violations.isEmpty())
+    }
+
+    @Test
+    fun hostRulesInitTest() {
+        val host = Host("name", "192.168.1.1")
+        assertTrue(host.rules.isEmpty())
+    }
+
+    @Test
+    fun createHostWithRule() {
+        val host = Host(
+            "name",
+            "192.168.1.1",
+            mutableListOf(AbstractRule(RuleType.DiskMem, 10, 20)
+            ))
+        assertFalse(host.rules.isEmpty())
+    }
+
     @Test
     fun abstractRuleAlertLevelTest() {
-        val host = Host("host")
         assertThrows(IllegalArgumentException().javaClass, fun() {
-            AbstractRule(RuleType.DiskMem, 50, 10, host)
+            AbstractRule(RuleType.DiskMem, 50, 10)
         })
     }
 
     @Test
     fun abstractRuleMinAlertLevelConstraintTest() {
-        val host = Host("host")
-
-        val abstractRule1 = AbstractRule(RuleType.DiskMem, -1, 20, host)
+        val abstractRule1 = AbstractRule(RuleType.DiskMem, -1, 20)
         var violations = validator.validate(abstractRule1)
         assertFalse(violations.isEmpty())
 
-        val abstractRule2 = AbstractRule(RuleType.DiskMem, -2, -1, host)
+        val abstractRule2 = AbstractRule(RuleType.DiskMem, -2, -1)
         violations = validator.validate(abstractRule2)
         assertFalse(violations.isEmpty())
     }
 
     @Test
     fun abstractRuleMaxAlertLevelConstraintTest() {
-        val host = Host("host")
-
-        val abstractRule1 = AbstractRule(RuleType.DiskMem, 50, 105, host)
+        val abstractRule1 = AbstractRule(RuleType.DiskMem, 50, 105)
         var violations = validator.validate(abstractRule1)
         assertFalse(violations.isEmpty())
 
-        val abstractRule2 = AbstractRule(RuleType.DiskMem, 105, 150, host)
+        val abstractRule2 = AbstractRule(RuleType.DiskMem, 105, 150)
         violations = validator.validate(abstractRule2)
         assertFalse(violations.isEmpty())
     }
 
     @Test
     fun saveHostToDBTest() {
-        val host = Host("host")
+        val host = Host("host", "192.168.1.55")
         hostRepository.save(host)
         assertEquals(host, hostRepository.findAll().first())
     }
 
     @Test
     fun saveAbstractRuleToDBTest() {
-        val host = Host("host")
-        val abstractRule = AbstractRule(RuleType.DiskMem, 50, 90, host)
+        val host = Host("host", "192.168.1.55")
+        val abstractRule = AbstractRule(RuleType.DiskMem, 50, 90)
         host.rules.add(abstractRule) // crucial to have bidirectional relation!
         hostRepository.save(host) // AbstractRule is persisted when updated host is saved to DB
         assertEquals(abstractRule, abstractRuleRepository.findAll().first())
