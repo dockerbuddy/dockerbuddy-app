@@ -5,6 +5,7 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.ValueSource
+import org.mockito.Mockito
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest
@@ -75,14 +76,13 @@ class ModelTests (
         val host = Host(
             "name",
             "192.168.1.1",
-            mutableListOf(AbstractRule(RuleType.DiskMem, 10, 20)
-            ))
+            mutableListOf(Mockito.mock(AbstractRule::class.java)))
         assertFalse(host.rules.isEmpty())
     }
 
     @Test
     fun abstractRuleAlertLevelTest() {
-        assertThrows(IllegalArgumentException().javaClass, fun() {
+        assertThrows(IllegalArgumentException::class.java, fun() {
             AbstractRule(RuleType.DiskMem, 50, 10)
         })
     }
@@ -120,7 +120,7 @@ class ModelTests (
     fun saveAbstractRuleToDBTest() {
         val host = Host("host", "192.168.1.55")
         val abstractRule = AbstractRule(RuleType.DiskMem, 50, 90)
-        host.rules.add(abstractRule) // crucial to have bidirectional relation!
+        host.rules.add(abstractRule)
         hostRepository.save(host) // AbstractRule is persisted when updated host is saved to DB
         assertEquals(abstractRule, abstractRuleRepository.findAll().first())
         assertEquals(abstractRule, hostRepository.findAll().first().rules.first())
