@@ -16,7 +16,7 @@ class AlertToolsTests {
     fun applyAlertTypeTest1(){
         //given
         val basicMetric: BasicMetric = BasicMetric(10.0, 100.0, 0.1, null, null)
-        val rule: AbstractRule = AbstractRule(RuleType.DiskUsage, 40, 60, Mockito.mock(Host::class.java))
+        val rule: AbstractRule = AbstractRule(RuleType.DiskUsage, 40, 60)
 
         //when
         addAlertType(basicMetric, rule)
@@ -29,7 +29,7 @@ class AlertToolsTests {
     fun applyAlertTypeTest2(){
         //given
         val basicMetric: BasicMetric = BasicMetric(10.0, 100.0, 0.5, null, null)
-        val rule: AbstractRule = AbstractRule(RuleType.DiskUsage, 40, 60, Mockito.mock(Host::class.java))
+        val rule: AbstractRule = AbstractRule(RuleType.DiskUsage, 40, 60)
 
         //when
         addAlertType(basicMetric, rule)
@@ -42,7 +42,7 @@ class AlertToolsTests {
     fun applyAlertTypeTest3(){
         //given
         val basicMetric: BasicMetric = BasicMetric(10.0, 100.0, 0.8, null, null)
-        val rule: AbstractRule = AbstractRule(RuleType.DiskUsage, 40, 60, Mockito.mock(Host::class.java))
+        val rule: AbstractRule = AbstractRule(RuleType.DiskUsage, 40, 60)
 
         //when
         addAlertType(basicMetric, rule)
@@ -55,7 +55,7 @@ class AlertToolsTests {
     fun applyAlertTypeTest4(){
         //given
         val basicMetric: BasicMetric = BasicMetric(10.0, 100.0, 0.4, null, null)
-        val rule: AbstractRule = AbstractRule(RuleType.DiskUsage, 40, 60, Mockito.mock(Host::class.java))
+        val rule: AbstractRule = AbstractRule(RuleType.DiskUsage, 40, 60)
 
         //when
         addAlertType(basicMetric, rule)
@@ -68,7 +68,7 @@ class AlertToolsTests {
     fun applyAlertTypeTest5(){
         //given
         val basicMetric: BasicMetric = BasicMetric(10.0, 100.0, 0.6, null, null)
-        val rule: AbstractRule = AbstractRule(RuleType.DiskUsage, 40, 60, Mockito.mock(Host::class.java))
+        val rule: AbstractRule = AbstractRule(RuleType.DiskUsage, 40, 60)
 
         //when
         addAlertType(basicMetric, rule)

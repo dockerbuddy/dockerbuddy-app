@@ -1,5 +1,6 @@
 package pl.edu.agh.dockerbuddy.model.entity
 
+import com.fasterxml.jackson.annotation.JsonAlias
 import pl.edu.agh.dockerbuddy.model.RuleType
 import java.lang.IllegalArgumentException
 import javax.persistence.*
@@ -11,6 +12,7 @@ import javax.validation.constraints.Min
 class AbstractRule (
     @Enumerated(EnumType.STRING)
     @Column(name = "type", nullable = false)
+    @JsonAlias("ruleType")
     var type: RuleType,
 
     @field:Min(0)
@@ -21,11 +23,7 @@ class AbstractRule (
     @field:Min(0)
     @field:Max(100)
     @Column(name = "critical_level", nullable = false)
-    var criticalLevel: Int,
-
-    @ManyToOne(fetch = FetchType.EAGER, optional = false)
-    @JoinColumn(name = "host_id", nullable = false)
-    var host: Host
+    var criticalLevel: Int
 ): BaseLongIdEntity()  {
 
     init {
