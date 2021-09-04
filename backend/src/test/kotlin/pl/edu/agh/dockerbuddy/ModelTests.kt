@@ -49,7 +49,7 @@ class ModelTests (
     fun abstractRuleAlertLevelTest() {
         val host = Host("host")
         assertThrows(IllegalArgumentException().javaClass, fun() {
-            AbstractRule(RuleType.DiskMem, 50, 10, host)
+            AbstractRule(RuleType.DiskUsage, 50, 10, host)
         })
     }
 
@@ -57,11 +57,11 @@ class ModelTests (
     fun abstractRuleMinAlertLevelConstraintTest() {
         val host = Host("host")
 
-        val abstractRule1 = AbstractRule(RuleType.DiskMem, -1, 20, host)
+        val abstractRule1 = AbstractRule(RuleType.DiskUsage, -1, 20, host)
         var violations = validator.validate(abstractRule1)
         assertFalse(violations.isEmpty())
 
-        val abstractRule2 = AbstractRule(RuleType.DiskMem, -2, -1, host)
+        val abstractRule2 = AbstractRule(RuleType.DiskUsage, -2, -1, host)
         violations = validator.validate(abstractRule2)
         assertFalse(violations.isEmpty())
     }
@@ -70,11 +70,11 @@ class ModelTests (
     fun abstractRuleMaxAlertLevelConstraintTest() {
         val host = Host("host")
 
-        val abstractRule1 = AbstractRule(RuleType.DiskMem, 50, 105, host)
+        val abstractRule1 = AbstractRule(RuleType.DiskUsage, 50, 105, host)
         var violations = validator.validate(abstractRule1)
         assertFalse(violations.isEmpty())
 
-        val abstractRule2 = AbstractRule(RuleType.DiskMem, 105, 150, host)
+        val abstractRule2 = AbstractRule(RuleType.DiskUsage, 105, 150, host)
         violations = validator.validate(abstractRule2)
         assertFalse(violations.isEmpty())
     }
@@ -89,7 +89,7 @@ class ModelTests (
     @Test
     fun saveAbstractRuleToDBTest() {
         val host = Host("host")
-        val abstractRule = AbstractRule(RuleType.DiskMem, 50, 90, host)
+        val abstractRule = AbstractRule(RuleType.DiskUsage, 50, 90, host)
         host.rules.add(abstractRule) // crucial to have bidirectional relation!
         hostRepository.save(host) // AbstractRule is persisted when updated host is saved to DB
         assertEquals(abstractRule, abstractRuleRepository.findAll().first())
