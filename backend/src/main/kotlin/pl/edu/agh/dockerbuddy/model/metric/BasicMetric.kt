@@ -8,4 +8,5 @@ data class BasicMetric(
         val percent: Double,
         val alertType: AlertType?,
         val alert: Boolean?
+
 )
