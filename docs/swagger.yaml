@@ -121,17 +121,6 @@ paths:
             $ref: '#/definitions/HostResponse'
         400:
           description: Description of a cause of an error
-  /hook/notifications:
-    post:
-      tags:
-        - Notifications
-      consumes:
-        - application/json
-      produces:
-        - string
-      responses:
-        200:
-          description: OK
   /api/{API_VERSION}/metrics/{host_id}:
     post:
       tags:
@@ -154,7 +143,7 @@ paths:
           description: Information about host to be added
           required: true
           schema:
-            $ref: '#/definitions/ContainerMetrics'
+            $ref: '#/definitions/HostMetrics'
       responses:
         200:
           description: OK
@@ -225,7 +214,7 @@ definitions:
       metrics:
         type: array
         items:
-          $ref: '#/definitions/ContainerInfo'
+          $ref: '#/definitions/ContainerMetrics'
   Data:
     type: object
     properties:
