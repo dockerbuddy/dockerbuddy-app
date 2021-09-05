@@ -1,16 +1,21 @@
 package pl.edu.agh.dockerbuddy.service
 
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import org.springframework.stereotype.Service
 import pl.edu.agh.dockerbuddy.inmemory.InMemory
 import pl.edu.agh.dockerbuddy.model.HostWithSummary
 import pl.edu.agh.dockerbuddy.model.entity.Host
 import pl.edu.agh.dockerbuddy.repository.HostRepository
 import javax.persistence.EntityNotFoundException
+import pl.edu.agh.dockerbuddy.influxdb.InfluxDbProxy
 
 @Service
 class HostService (
     private val hostRepository: HostRepository,
-    private val inMemory: InMemory
+    private val inMemory: InMemory,
+    private val influxDbProxy: InfluxDbProxy
 ){
     fun addHost(host: Host): Host {
         return hostRepository.save(host)
@@ -32,6 +37,12 @@ class HostService (
                     )
                 }!!
             )
+        }
+
+        runBlocking {
+            launch {
+                influxDbProxy.saveMetric(hostsWithSummary)
+            }
         }
 
         return hostsWithSummary.toList()
