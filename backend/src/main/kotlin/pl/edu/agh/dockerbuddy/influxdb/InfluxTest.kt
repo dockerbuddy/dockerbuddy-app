@@ -5,7 +5,6 @@ import org.springframework.stereotype.Service
 import javax.annotation.PostConstruct
 import com.influxdb.client.InfluxDBClientFactory
 
-import com.influxdb.client.InfluxDBClient
 import com.influxdb.client.domain.WritePrecision
 import com.influxdb.client.write.Point
 import java.time.Instant
