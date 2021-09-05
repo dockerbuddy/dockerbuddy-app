@@ -26,7 +26,7 @@ class HostController (
         }
     }
 
-    @GetMapping("s")
+    @GetMapping
     fun getHostsWithSummary(): ResponseEntity<DefaultResponse> {
         return try {
             val hostWithSummary = hostService.getHostsWithSummary()
