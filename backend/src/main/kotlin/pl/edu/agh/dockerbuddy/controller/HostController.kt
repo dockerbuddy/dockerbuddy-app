@@ -19,13 +19,8 @@ class HostController (
 
     @PostMapping
     fun addHost(@RequestBody host: Host): ResponseEntity<DefaultResponse> {
-        return try {
             val savedHost = hostService.addHost(host)
-            ResponseEntity.status(HttpStatus.CREATED)
+            return ResponseEntity.status(HttpStatus.CREATED)
                 .body(DefaultResponse(ResponseType.SUCCESS, "Host added", savedHost))
-        } catch (e: Exception){
-            ResponseEntity.status(HttpStatus.NOT_IMPLEMENTED)
-                .body(DefaultResponse(ResponseType.ERROR, e.message.toString(), null))
-        }
     }
 }
