@@ -29,10 +29,10 @@ interface HostData {
 }
 
 type ContextState =
-  {
-    status: "LOADING" | "ERROR";
-  }
-| {
-    status: "LOADED";
-    hosts: HostData[];
-  };
+  | {
+      status: "LOADING" | "ERROR";
+    }
+  | {
+      status: "LOADED";
+      hosts: HostData[];
+    };

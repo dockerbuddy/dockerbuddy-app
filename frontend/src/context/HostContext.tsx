@@ -12,7 +12,7 @@ export const useHostsData = (): ContextState => {
 };
 
 export const HostsDataProvider: React.FC = ({ children }) => {
-  const intervalSeconds = 1;
+  // const intervalSeconds = 1;
   const [state, setState] = React.useState<ContextState>({ status: "LOADING" });
 
   useEffect(() => {
@@ -40,11 +40,11 @@ export const HostsDataProvider: React.FC = ({ children }) => {
     }
     asyncFetch();
 
-    const interval = setInterval(() => {
-      asyncFetch();
-    }, intervalSeconds * 1000);
+    // const interval = setInterval(() => {
+    //   asyncFetch();
+    // }, intervalSeconds * 1000);
 
-    return () => clearInterval(interval);
+    // return () => clearInterval(interval);
   }, []);
 
   return (

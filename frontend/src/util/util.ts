@@ -1,3 +1,5 @@
+import { BasicMetric } from "../hosts/types";
+
 /* eslint-disable @typescript-eslint/no-explicit-any */
 export function capitalizeFirstLetter(string: string): string {
   return string.charAt(0).toUpperCase() + string.slice(1);
@@ -10,16 +12,16 @@ export function humanFileSize(size: string): string {
   return y.toFixed(2) * 1 + " " + ["B", "kB", "MB", "GB", "TB"][i];
 }
 
-export function getLatestStats(stats: Stats): {
+export function getLatestStats(stats: BasicMetric): {
   used: string;
   total: string;
   percent: number;
 } {
   try {
     return {
-      used: stats.used[0]._value,
-      total: stats.total[0]._value,
-      percent: +stats.percent[0]._value,
+      used: stats.value,
+      total: stats.total,
+      percent: +stats.percent,
     };
   } catch (e) {
     //TODO return another type?
