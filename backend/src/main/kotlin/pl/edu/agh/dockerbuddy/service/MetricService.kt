@@ -4,19 +4,16 @@ import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 import pl.edu.agh.dockerbuddy.inmemory.InMemory
-import pl.edu.agh.dockerbuddy.model.RuleType
-import pl.edu.agh.dockerbuddy.model.entity.AbstractRule
 import pl.edu.agh.dockerbuddy.model.entity.Host
-import pl.edu.agh.dockerbuddy.model.metric.BasicMetric
 import pl.edu.agh.dockerbuddy.model.metric.HostSummary
 import pl.edu.agh.dockerbuddy.repository.HostRepository
 import pl.edu.agh.dockerbuddy.tools.appendAlertTypeToMetrics
 import pl.edu.agh.dockerbuddy.tools.checkForAlertSummary
-import javax.annotation.PostConstruct
 import javax.persistence.EntityNotFoundException
 
 @Service
 class MetricService(val hostRepository: HostRepository,
+                    val alertService: AlertService,
                     @Qualifier("InMemoryStorage") val inMemory: InMemory) {
 
     fun postMetric(hostSummary: HostSummary, hostId: Long){
@@ -29,5 +26,6 @@ class MetricService(val hostRepository: HostRepository,
         }
 
         inMemory.saveHostSummary(hostId, hostSummary)
+        alertService.sendMessage(hostSummary)
     }
 }
