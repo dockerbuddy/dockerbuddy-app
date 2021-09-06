@@ -8,8 +8,21 @@ import { HostsDataProvider } from "./context/HostContext";
 import { WebSocketProvider } from "./context/WebSocket";
 import NotificationComponent from "./components/Notifications/NotificationComponent";
 import { SnackbarProvider } from "notistack";
+import SockJS from "sockjs-client";
+import { Stomp } from "@stomp/stompjs";
 
 const App: React.FC = () => {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const socket = new SockJS("http://localhost:8080/gs-guide-websocket");
+  const stompClient = Stomp.over(socket);
+  stompClient.connect({}, function (frame: any) {
+    console.log("Connected: " + frame);
+    stompClient.subscribe("/alerts", function (greeting) {
+      console.log("AAAAAAAAA");
+      console.log(JSON.parse(greeting.body));
+    });
+  });
+
   return (
     <BrowserRouter>
       <ThemeProvider theme={theme}>
