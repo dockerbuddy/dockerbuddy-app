@@ -12,8 +12,7 @@ import SockJS from "sockjs-client";
 import { Stomp } from "@stomp/stompjs";
 
 const App: React.FC = () => {
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const socket = new SockJS("http://localhost:8080/gs-guide-websocket");
+  const socket = new SockJS("http://localhost:8080/api/v2/ws");
   const stompClient = Stomp.over(socket);
   stompClient.connect({}, function (frame: any) {
     console.log("Connected: " + frame);
