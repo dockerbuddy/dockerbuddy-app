@@ -1,6 +1,5 @@
 import React, { useState } from "react";
 import Button from "@material-ui/core/Button";
-import Dialog from "@material-ui/core/Dialog";
 import DialogActions from "@material-ui/core/DialogActions";
 import DialogContent from "@material-ui/core/DialogContent";
 import DialogTitle from "@material-ui/core/DialogTitle";
@@ -11,17 +10,12 @@ import { proxy } from "../../common/api";
 import { capitalizeFirstLetter } from "../../util/util";
 import RangePicker from "./RangePicker";
 
-interface AddHostDialogProps {
-  onClose: () => void;
-  isOpen: boolean;
-}
-
 interface FormData {
   bucket_name: string;
   ip_address: string;
 }
 
-const AddHostDialog: React.FC<AddHostDialogProps> = ({ onClose, isOpen }) => {
+const AddHost: React.FC = () => {
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
   const [formErros, setFormErros] = useState<FormData>({
@@ -129,7 +123,6 @@ const AddHostDialog: React.FC<AddHostDialogProps> = ({ onClose, isOpen }) => {
 
   const handleClose = async () => {
     console.log("asdasd");
-    onClose();
     setFormData({
       bucket_name: "",
       ip_address: "",
@@ -147,7 +140,7 @@ const AddHostDialog: React.FC<AddHostDialogProps> = ({ onClose, isOpen }) => {
   const [token, bucket] = success.split(";");
 
   return (
-    <Dialog open={isOpen} onClose={handleClose} maxWidth="md" fullWidth={true}>
+    <Box>
       <form onSubmit={handleSubmit}>
         <Box p={4}>
           <DialogTitle>
@@ -247,8 +240,8 @@ const AddHostDialog: React.FC<AddHostDialogProps> = ({ onClose, isOpen }) => {
           </DialogActions>
         </Box>
       </form>
-    </Dialog>
+    </Box>
   );
 };
 
-export default AddHostDialog;
+export default AddHost;
