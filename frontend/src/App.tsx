@@ -10,8 +10,20 @@ import NotificationComponent from "./components/Notifications/NotificationCompon
 import { SnackbarProvider } from "notistack";
 import { Provider } from "react-redux";
 import { store } from "./app/store";
+import SockJS from "sockjs-client";
+import { Stomp } from "@stomp/stompjs";
 
 const App: React.FC = () => {
+  const socket = new SockJS("http://localhost:8080/api/v2/ws");
+  const stompClient = Stomp.over(socket);
+  stompClient.connect({}, function (frame: any) {
+    console.log("Connected: " + frame);
+    stompClient.subscribe("/alerts", function (greeting) {
+      console.log("AAAAAAAAA");
+      console.log(JSON.parse(greeting.body));
+    });
+  });
+
   return (
     <BrowserRouter>
       <ThemeProvider theme={theme}>

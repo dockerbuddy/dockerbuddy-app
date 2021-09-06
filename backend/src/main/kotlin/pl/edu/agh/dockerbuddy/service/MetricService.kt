@@ -17,7 +17,7 @@ class MetricService(val hostRepository: HostRepository,
                     @Qualifier("InMemoryStorage") val inMemory: InMemory) {
 
     fun postMetric(hostSummary: HostSummary, hostId: Long){
-        val host: Host = hostRepository.findByIdOrNull(hostId) ?: throw EntityNotFoundException()
+        val host: Host = hostRepository.findByIdOrNull(hostId) ?: throw EntityNotFoundException("Host not found")
         appendAlertTypeToMetrics(hostSummary, host.rules)
 
         val prevHostSummary: HostSummary? = inMemory.getHostSummary(hostId)
