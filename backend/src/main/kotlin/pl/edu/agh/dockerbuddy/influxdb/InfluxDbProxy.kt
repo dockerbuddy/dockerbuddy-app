@@ -1,6 +1,6 @@
 package pl.edu.agh.dockerbuddy.influxdb
 
-import com.influxdb.client.InfluxDBClientFactory
+import com.influxdb.client.kotlin.InfluxDBClientKotlinFactory
 import com.influxdb.client.domain.WritePrecision
 import com.influxdb.client.write.Point
 import kotlinx.coroutines.coroutineScope
@@ -23,14 +23,14 @@ class InfluxDbProxy {
     @Value("\${influxdb.url}")
     private lateinit var url: String
 
-    private val influxDBClient = InfluxDBClientFactory.create(url, token.toCharArray(), organization, bucket)
+    private val influxDBClient = InfluxDBClientKotlinFactory.create(url, token.toCharArray(), organization, bucket)
 
-
+    // TODO redesign after discovering kotlin client library
     suspend fun saveMetrics(hostsWithSummary: MutableList<HostWithSummary>) =
         coroutineScope {
             for (hostWithSummary in hostsWithSummary) {
                 launch {
-                    val writeApi = influxDBClient.writeApiBlocking
+                    val writeApi = influxDBClient.getWriteKotlinApi()
                     val point = Point.measurement("host_stats")
                         .addTag("id", hostWithSummary.id.toString())
                         .addTag("name", hostWithSummary.hostName)
@@ -49,28 +49,28 @@ class InfluxDbProxy {
                     writeApi.writePoint(point)
                 }
 
-                for (container in hostWithSummary.hostSummary.containers)
-                launch {
-                    val writeApi = influxDBClient.writeApiBlocking
-                    val point = Point.measurement("container")
-                        .addTag("host_id", hostWithSummary.id.toString())
-                        .addTag("host_name", hostWithSummary.hostName)
-                        .addTag("ip", hostWithSummary.ip)
-                        .addTag("container_id", hostWithSummary.ip)
-                        .addTag("container_name", hostWithSummary.ip)
-                        .addTag("image", hostWithSummary.ip)
-                        .addField("status", container.status)
-                        .addField("memory_usage_total", container.memoryUsage.total)
-                        .addField("memory_usage_value", container.memoryUsage.value)
-                        .addField("memory_usage_percent", container.memoryUsage.percent)
-                        .addField("cpu_usage_total", container.cpuUsage.total)
-                        .addField("cpu_usage_value", container.cpuUsage.value)
-                        .addField("cpu_usage_percent", container.cpuUsage.percent)
-                        .time(hostWithSummary.hostSummary.timestamp.toLong(), WritePrecision.NS)
+                for (container in hostWithSummary.hostSummary.containers) {
+                    launch {
+                        val writeApi = influxDBClient.getWriteKotlinApi()
+                        val point = Point.measurement("container")
+                            .addTag("host_id", hostWithSummary.id.toString())
+                            .addTag("host_name", hostWithSummary.hostName)
+                            .addTag("ip", hostWithSummary.ip)
+                            .addTag("container_id", hostWithSummary.ip)
+                            .addTag("container_name", hostWithSummary.ip)
+                            .addTag("image", hostWithSummary.ip)
+                            .addField("status", container.status)
+                            .addField("memory_usage_total", container.memoryUsage.total)
+                            .addField("memory_usage_value", container.memoryUsage.value)
+                            .addField("memory_usage_percent", container.memoryUsage.percent)
+                            .addField("cpu_usage_total", container.cpuUsage.total)
+                            .addField("cpu_usage_value", container.cpuUsage.value)
+                            .addField("cpu_usage_percent", container.cpuUsage.percent)
+                            .time(hostWithSummary.hostSummary.timestamp.toLong(), WritePrecision.NS)
 
-                    writeApi.writePoint(point)
+                        writeApi.writePoint(point)
+                    }
                 }
-
             }
         }
 }
