@@ -1,6 +1,5 @@
 package pl.edu.agh.dockerbuddy.service
 
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import org.springframework.stereotype.Service
@@ -41,7 +40,7 @@ class HostService (
 
         runBlocking {
             launch {
-                influxDbProxy.saveMetric(hostsWithSummary)
+                influxDbProxy.saveMetrics(hostsWithSummary)
             }
         }
 
