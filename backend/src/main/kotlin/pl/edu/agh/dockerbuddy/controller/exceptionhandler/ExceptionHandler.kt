@@ -12,6 +12,7 @@ import pl.edu.agh.dockerbuddy.controller.response.ResponseType
 import javax.persistence.EntityNotFoundException
 import javax.validation.ConstraintViolationException
 
+// TODO hide logger WARNS on some exceptions
 @ControllerAdvice
 class ExceptionHandler {
     private val logger = LoggerFactory.getLogger(ExceptionHelper::class.java)
@@ -19,7 +20,7 @@ class ExceptionHandler {
     @Order(1)
     @ExceptionHandler(value = [ EntityNotFoundException::class ])
     fun handleEntityNotFound(ex: EntityNotFoundException): ResponseEntity<DefaultResponse> {
-        logger.error("EntityNotFoundException: " + ex.message)
+        logger.info(ex.message)
         return ResponseEntity.status(HttpStatus.NOT_FOUND)
             .body(DefaultResponse(ResponseType.ERROR, ex.message ?: "No message provided", null))
     }

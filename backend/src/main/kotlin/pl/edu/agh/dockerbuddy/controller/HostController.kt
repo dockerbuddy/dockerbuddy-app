@@ -1,5 +1,7 @@
 package pl.edu.agh.dockerbuddy.controller
 
+import io.reactivex.internal.util.ExceptionHelper
+import org.slf4j.LoggerFactory
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
@@ -13,6 +15,7 @@ import pl.edu.agh.dockerbuddy.service.HostService
 class HostController (
     val hostService: HostService
 ) {
+    private val logger = LoggerFactory.getLogger(ExceptionHelper::class.java)
 
     @PostMapping
     fun addHost(@RequestBody host: Host): ResponseEntity<DefaultResponse> {

@@ -3,11 +3,10 @@ package pl.edu.agh.dockerbuddy.influxdb
 import com.influxdb.client.kotlin.InfluxDBClientKotlinFactory
 import com.influxdb.client.domain.WritePrecision
 import com.influxdb.client.write.Point
-import kotlinx.coroutines.coroutineScope
-import kotlinx.coroutines.launch
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Service
 import pl.edu.agh.dockerbuddy.model.HostWithSummary
+import java.time.Instant
 
 @Service
 class InfluxDbProxy {
@@ -23,12 +22,13 @@ class InfluxDbProxy {
     @Value("\${influxdb.url}")
     private lateinit var url: String
 
-    private val influxDBClient = InfluxDBClientKotlinFactory.create(url, token.toCharArray(), organization, bucket)
+//    private
 
     // TODO research on writing data classes directly:
     //  https://github.com/influxdata/influxdb-client-java/tree/master/client-kotlin#writes
     //  https://github.com/influxdata/influxdb-client-java/blob/3d771d497dc45322be8b94f70e8b49f6dab95dac/examples/src/main/java/example/KotlinWriteApi.kt#L69
     suspend fun saveMetrics(hostsWithSummary: MutableList<HostWithSummary>) {
+        val influxDBClient = InfluxDBClientKotlinFactory.create(url, token.toCharArray(), organization, bucket)
         for (hostWithSummary in hostsWithSummary) {
             val writeApi = influxDBClient.getWriteKotlinApi()
             val hostPoint = Point.measurement("host_stats")
@@ -44,7 +44,8 @@ class InfluxDbProxy {
                 .addField("cpu_usage_total", hostWithSummary.hostSummary.cpuUsage.total)
                 .addField("cpu_usage_value", hostWithSummary.hostSummary.cpuUsage.value)
                 .addField("cpu_usage_percent", hostWithSummary.hostSummary.cpuUsage.percent)
-                .time(hostWithSummary.hostSummary.timestamp.toLong(), WritePrecision.NS)
+//                .time(hostWithSummary.hostSummary.timestamp.toLong(), WritePrecision.NS)
+                .time(Instant.now().nano, WritePrecision.NS)
 
             writeApi.writePoint(hostPoint)
 
@@ -63,7 +64,7 @@ class InfluxDbProxy {
                     .addField("cpu_usage_total", container.cpuUsage.total)
                     .addField("cpu_usage_value", container.cpuUsage.value)
                     .addField("cpu_usage_percent", container.cpuUsage.percent)
-                    .time(hostWithSummary.hostSummary.timestamp.toLong(), WritePrecision.NS)
+                    .time(Instant.now().nano, WritePrecision.NS)
 
                 writeApi.writePoint(containerPoint)
             }
