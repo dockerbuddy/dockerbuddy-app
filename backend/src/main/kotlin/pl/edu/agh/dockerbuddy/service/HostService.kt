@@ -25,6 +25,7 @@ class HostService (
         val hosts = hostRepository.findAll()
 
         if (hosts.isEmpty()) throw EntityNotFoundException("No hosts were found in database")
+
         hosts.forEach {
             host -> hostsWithSummary.add(
                 inMemory.getHostSummary(host.id!!)?.let {

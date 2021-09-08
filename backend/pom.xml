@@ -59,11 +59,6 @@
             <artifactId>spring-boot-starter-test</artifactId>
             <scope>test</scope>
         </dependency>
-<!--        <dependency>-->
-<!--            <groupId>com.influxdb</groupId>-->
-<!--            <artifactId>influxdb-client-java</artifactId>-->
-<!--            <version>3.1.0</version>-->
-<!--        </dependency>-->
         <dependency>
             <groupId>com.influxdb</groupId>
             <artifactId>influxdb-client-kotlin</artifactId>
