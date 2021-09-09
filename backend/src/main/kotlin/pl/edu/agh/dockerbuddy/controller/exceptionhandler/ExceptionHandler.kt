@@ -20,7 +20,7 @@ class ExceptionHandler {
     @Order(1)
     @ExceptionHandler(value = [ EntityNotFoundException::class ])
     fun handleEntityNotFound(ex: EntityNotFoundException): ResponseEntity<DefaultResponse> {
-        logger.info(ex.message)
+        logger.warn(ex.message)
         return ResponseEntity.status(HttpStatus.NOT_FOUND)
             .body(DefaultResponse(ResponseType.ERROR, ex.message ?: "No message provided", null))
     }

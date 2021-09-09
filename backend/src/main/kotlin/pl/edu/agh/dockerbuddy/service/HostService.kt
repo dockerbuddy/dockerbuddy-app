@@ -1,8 +1,6 @@
 package pl.edu.agh.dockerbuddy.service
 
 import io.reactivex.internal.util.ExceptionHelper
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import pl.edu.agh.dockerbuddy.inmemory.InMemory
@@ -10,17 +8,16 @@ import pl.edu.agh.dockerbuddy.model.HostWithSummary
 import pl.edu.agh.dockerbuddy.model.entity.Host
 import pl.edu.agh.dockerbuddy.repository.HostRepository
 import javax.persistence.EntityNotFoundException
-import pl.edu.agh.dockerbuddy.influxdb.InfluxDbProxy
 
 @Service
 class HostService (
     private val hostRepository: HostRepository,
     private val inMemory: InMemory,
-    private val influxDbProxy: InfluxDbProxy
 ){
     private val logger = LoggerFactory.getLogger(ExceptionHelper::class.java)
 
     fun addHost(host: Host): Host {
+        logger.info("New host received. Attempting to add: $host")
         return hostRepository.save(host)
     }
 
@@ -28,32 +25,28 @@ class HostService (
         logger.info("Fetching all hosts with summary")
         val hostsWithSummary = mutableListOf<HostWithSummary>()
         val hosts = hostRepository.findAll()
-        logger.info("Hosts: $hosts")
         if (hosts.isEmpty()) throw EntityNotFoundException("No hosts were found in database")
 
-//        hosts.forEach { logger.info(it.toString()) }
-
+        logger.info("Processing found hosts:")
         // TODO handle case when there is no summary for host -> sole endpoint for hosts?
         for (host in hosts) {
-            val hostWithSummary = inMemory.getHostSummary(host.id!!)
-            if (hostWithSummary != null) {
+            logger.info("> $host")
+            val hostSummary = inMemory.getHostSummary(host.id!!)
+            if (hostSummary != null) {
+                logger.info("Found newest host summary: $hostSummary")
                 hostsWithSummary.add(
                     HostWithSummary(
                         host.id!!,
                         host.hostName!!,
                         host.ip!!,
-                        hostWithSummary
+                        hostSummary // FIXME make HostSummary nullable in HostWithSummary -> return even without summary
                     )
                 )
-
+            }
+            else {
+                logger.warn("Host $host appear not to have any metrics")
             }
         }
-
-//        runBlocking {
-//            launch {
-//                influxDbProxy.saveMetrics(hostsWithSummary)
-//            }
-//        }
 
         if (hostsWithSummary.isEmpty()) throw EntityNotFoundException("None of hosts does contain any metrics")
 

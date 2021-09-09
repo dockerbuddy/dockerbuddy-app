@@ -15,6 +15,7 @@ import pl.edu.agh.dockerbuddy.repository.HostRepository
 import pl.edu.agh.dockerbuddy.tools.appendAlertTypeToMetrics
 import pl.edu.agh.dockerbuddy.tools.checkForAlertSummary
 import javax.persistence.EntityNotFoundException
+import kotlin.math.log
 
 @Service
 class MetricService(
@@ -28,12 +29,18 @@ class MetricService(
     private val logger = LoggerFactory.getLogger(ExceptionHelper::class.java)
 
     fun postMetric(hostSummary: HostSummary, hostId: Long){
-        val host: Host = hostRepository.findByIdOrNull(hostId) ?: throw EntityNotFoundException()
+        logger.info("Processing new metrics for host with id $hostId: $hostSummary")
+        val host: Host = hostRepository.findByIdOrNull(hostId) ?:
+            throw EntityNotFoundException("Host with id $hostId not found. Cannot add metric")
         appendAlertTypeToMetrics(hostSummary, host.rules)
 
         val prevHostSummary: HostSummary? = inMemory.getHostSummary(hostId)
         if (prevHostSummary != null){
+            logger.info("Host found in cache. Checking for alerts...")
             checkForAlertSummary(hostSummary, prevHostSummary)
+            logger.info("Metrics updated: $hostSummary")
+        } else {
+            logger.info("No data for this host in cache. Adding an entry...")
         }
 
         inMemory.saveHostSummary(hostId, hostSummary)

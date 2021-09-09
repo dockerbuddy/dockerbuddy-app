@@ -34,6 +34,7 @@ class InfluxDbProxy {
         logger.info("Saving metric $hostSummary for host with id $hostId")
         val influxDBClient = InfluxDBClientKotlinFactory.create(url, token.toCharArray(), organization, bucket)
         val writeApi = influxDBClient.getWriteKotlinApi()
+
         val hostPoint = Point.measurement("host_stats")
             .addTag("host_id", hostId.toString())
             .addTag("metric_id", hostSummary.id.toString())
@@ -48,10 +49,11 @@ class InfluxDbProxy {
             .addField("cpu_usage_percent", hostSummary.cpuUsage.percent)
 //            .time(hostSummary.timestamp, WritePrecision.MS)
             .time(Instant.now().toEpochMilli(), WritePrecision.MS)
-
         writeApi.writePoint(hostPoint)
 
+        logger.info("Processing container metrics for host with id $hostId")
         for (container in hostSummary.containers) {
+            logger.info("> $container")
             val containerPoint = Point.measurement("container")
                 .addTag("host_id", hostId.toString())
                 .addTag("metric_id", hostSummary.id.toString())
@@ -67,7 +69,6 @@ class InfluxDbProxy {
                 .addField("cpu_usage_percent", container.cpuUsage.percent)
 //                .time(hostSummary.timestamp, WritePrecision.MS)
                 .time(Instant.now().toEpochMilli(), WritePrecision.MS)
-
             writeApi.writePoint(containerPoint)
         }
     }

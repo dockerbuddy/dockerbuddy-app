@@ -29,7 +29,6 @@ class InfluxTest {
 
     @PostConstruct
     fun connectAndSave(){
-//        val influxDBClient = InfluxDBClientFactory.create(url, token.toCharArray(), organization, bucket)
         val influxDBClient = InfluxDBClientKotlinFactory.create(url, token.toCharArray(), organization, bucket)
         val writeApi = influxDBClient.getWriteKotlinApi()
         val point = Point.measurement("test_measurement")

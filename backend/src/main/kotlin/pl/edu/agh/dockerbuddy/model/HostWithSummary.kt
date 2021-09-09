@@ -8,5 +8,5 @@ data class HostWithSummary(
     val id: Long,
     val hostName: String,
     val ip: String,
-    val hostSummary: HostSummary
+    val hostSummary: HostSummary // TODO consider making nullable in order to always return all hosts, even without metrics
 )
