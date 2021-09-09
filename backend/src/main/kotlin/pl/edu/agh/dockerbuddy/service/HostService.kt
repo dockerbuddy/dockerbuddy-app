@@ -31,22 +31,9 @@ class HostService (
         logger.info("Hosts: $hosts")
         if (hosts.isEmpty()) throw EntityNotFoundException("No hosts were found in database")
 
-        hosts.forEach { logger.info(it.toString()) }
+//        hosts.forEach { logger.info(it.toString()) }
 
         // TODO handle case when there is no summary for host -> sole endpoint for hosts?
-//        hosts.forEach {
-//            host -> hostsWithSummary.add(
-//                inMemory.getHostSummary(host.id!!)?.let {
-//                    HostWithSummary(
-//                        host.id!!,
-//                        host.hostName!!,
-//                        host.ip!!,
-//                        it
-//                    )
-//                }!!
-//            )
-//        }
-
         for (host in hosts) {
             val hostWithSummary = inMemory.getHostSummary(host.id!!)
             if (hostWithSummary != null) {
@@ -62,13 +49,13 @@ class HostService (
             }
         }
 
-        runBlocking {
-            launch {
-                influxDbProxy.saveMetrics(hostsWithSummary)
-            }
-        }
+//        runBlocking {
+//            launch {
+//                influxDbProxy.saveMetrics(hostsWithSummary)
+//            }
+//        }
 
-        if (hostsWithSummary.isEmpty()) throw EntityNotFoundException("None of the hosts does contain any mecovtrics")
+        if (hostsWithSummary.isEmpty()) throw EntityNotFoundException("None of hosts does contain any metrics")
 
         return hostsWithSummary.toList()
     }

@@ -1,5 +1,8 @@
 package pl.edu.agh.dockerbuddy.model.metric
 
+import lombok.ToString
+
+@ToString
 data class ContainerSummary(
     val id: String,
     val name: String,
