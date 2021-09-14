@@ -28,24 +28,18 @@ class HostService (
         if (hosts.isEmpty()) throw EntityNotFoundException("No hosts were found in database")
 
         logger.info("Processing found hosts:")
-        // TODO handle case when there is no summary for host -> sole endpoint for hosts?
         for (host in hosts) {
             logger.info("> $host")
             val hostSummary = inMemory.getHostSummary(host.id!!)
-            if (hostSummary != null) {
-                logger.info("Found newest host summary: $hostSummary")
-                hostsWithSummary.add(
-                    HostWithSummary(
-                        host.id!!,
-                        host.hostName!!,
-                        host.ip!!,
-                        hostSummary // FIXME make HostSummary nullable in HostWithSummary -> return even without summary
-                    )
+            logger.info("Found newest host summary: $hostSummary") // TODO change message
+            hostsWithSummary.add(
+                HostWithSummary(
+                    host.id!!,
+                    host.hostName!!,
+                    host.ip!!,
+                    hostSummary
                 )
-            }
-            else {
-                logger.warn("Host $host appear not to have any metrics")
-            }
+            )
         }
 
         if (hostsWithSummary.isEmpty()) throw EntityNotFoundException("None of hosts does contain any metrics")

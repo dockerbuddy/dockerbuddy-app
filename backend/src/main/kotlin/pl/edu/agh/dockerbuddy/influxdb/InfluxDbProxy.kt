@@ -47,7 +47,7 @@ class InfluxDbProxy {
             .addField("cpu_usage_total", hostSummary.cpuUsage.total)
             .addField("cpu_usage_value", hostSummary.cpuUsage.value)
             .addField("cpu_usage_percent", hostSummary.cpuUsage.percent)
-//            .time(hostSummary.timestamp, WritePrecision.MS)
+//            .time(hostSummary.timestamp, WritePrecision.MS) // TODO use provided timestamp
             .time(Instant.now().toEpochMilli(), WritePrecision.MS)
         writeApi.writePoint(hostPoint)
 
@@ -67,7 +67,7 @@ class InfluxDbProxy {
                 .addField("cpu_usage_total", container.cpuUsage.total)
                 .addField("cpu_usage_value", container.cpuUsage.value)
                 .addField("cpu_usage_percent", container.cpuUsage.percent)
-//                .time(hostSummary.timestamp, WritePrecision.MS)
+//                .time(hostSummary.timestamp, WritePrecision.MS) // TODO use provided timestamp
                 .time(Instant.now().toEpochMilli(), WritePrecision.MS)
             writeApi.writePoint(containerPoint)
         }
