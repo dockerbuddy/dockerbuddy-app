@@ -1,13 +1,12 @@
 import { makeStyles, createStyles, Box, Toolbar } from "@material-ui/core";
 import React from "react";
-import Footer from "./Footer";
 import Header from "./Header";
 import PageWrapper from "./PageWrapper";
 
 const useStyles = makeStyles((_theme) =>
   createStyles({
     root: {
-      flexGrow: 1, //TODO remove after footer placement fix
+      flexGrow: 1,
       display: "flex",
     },
     content: {
@@ -29,7 +28,6 @@ const Layout: React.FC = ({ children }) => {
           {children}
         </Box>
       </Box>
-      <Footer />
     </PageWrapper>
   );
 };

@@ -1,6 +1,6 @@
 import React from "react";
-import Home from "../components/Home/Home";
-import HostsView from "../components/HostsView/HostsView";
+import AddHost from "../components/AddHost/AddHost";
+import Dashboard from "../components/Dashboard/Dashboard";
 
 interface Route {
   path: string;
@@ -12,7 +12,7 @@ export const protectedRoutes: Route[] = [
   {
     path: "/protected",
     exact: true,
-    component: Home,
+    component: Dashboard,
   },
 ];
 
@@ -20,12 +20,11 @@ export const openRoutes: Route[] = [
   {
     path: "/",
     exact: true,
-    // component: Home,
-    component: HostsView,
+    component: Dashboard,
   },
-  // {
-  //   path: "/hosts",
-  //   exact: true,
-  //   component: HostsView,
-  // },
+  {
+    path: "/addHost",
+    exact: true,
+    component: AddHost,
+  },
 ];
