@@ -1,16 +1,18 @@
 import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { RootState } from "../app/store";
-import { fetchHosts } from "./hostAPI";
+import { RootState } from "../redux/store";
+import { fetchHosts } from "../common/api";
 import { FullHostSummary, HostSummary } from "./types";
 
 export interface HostState {
   status: "LOADING" | "ERROR" | "LOADED";
-  hosts: FullHostSummary[];
+  hosts: {
+    [id: number]: FullHostSummary;
+  };
 }
 
 const initialState: HostState = {
   status: "LOADING",
-  hosts: [],
+  hosts: {},
 };
 
 export const updateHostsAsync = createAsyncThunk("hosts/update", async () => {
@@ -26,7 +28,9 @@ export const hostsSlice = createSlice({
   initialState,
   reducers: {
     updateSingleHost: (state, action: PayloadAction<HostSummary>) => {
-      state.hosts[action.payload.id].hostSummary = action.payload;
+      if (state.hosts[action.payload.id]) {
+        state.hosts[action.payload.id].hostSummary = { ...action.payload };
+      }
     },
   },
   extraReducers: (builder) => {
@@ -36,11 +40,16 @@ export const hostsSlice = createSlice({
       })
       .addCase(updateHostsAsync.fulfilled, (state, action) => {
         const hosts = action.payload.body;
-        if (hosts.length > 0) {
-          state.status = "LOADED";
-          state.hosts = action.payload.body;
-        } else {
+        if (hosts == null) {
           state.status = "ERROR";
+          state.hosts = [];
+        } else if (hosts.length > 0) {
+          state.status = "LOADED";
+          hosts.forEach((e: FullHostSummary) => {
+            state.hosts[e.id] = e;
+          });
+        } else {
+          state.status = "LOADED";
           state.hosts = [];
         }
       });

@@ -31,7 +31,7 @@ export interface BasicMetric {
   alert: boolean;
 }
 
-enum AlertType {
+export enum AlertType {
   OK,
   WARN,
   CRITICAL,
