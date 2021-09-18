@@ -76,7 +76,7 @@ class InfluxDbProxy {
         }
     }
 
-    suspend fun queryInfluxDb(metricType: String, hostId: Long, start: String, end: String?): List<FluxRecord> {
+    suspend fun queryInfluxDb(metricType: String, hostId: Long, start: String, end: String?): List<CustomFluxRecord> {
 
         if (metricType !in listOf("memory_usage", "disk_usage", "cpu_usage"))
             throw IllegalArgumentException("Unknown metric type: $metricType")
@@ -91,9 +91,16 @@ class InfluxDbProxy {
                     "r._field == \"${metricType}_percent\")))"
                 )
 
-        val result = influxDBClient.getQueryKotlinApi().query(fluxQuery).toList()
+        val result = influxDBClient.getQueryKotlinApi().query(fluxQuery).toList().map { CustomFluxRecord(
+            it.measurement!!,
+            (it.values["host_id"] as String).toLong(),
+            (it.values["metric_id"] as String).toLong(),
+            it.time.toString(),
+            it.field!!,
+            it.value as Double
+        ) }
+
         logger.info("Records fetched form InfluxDB: $result")
-//        influxDBClient.close()
         return result
     }
 }
