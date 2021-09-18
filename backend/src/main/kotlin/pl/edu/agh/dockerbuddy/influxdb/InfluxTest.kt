@@ -3,10 +3,12 @@ package pl.edu.agh.dockerbuddy.influxdb
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Service
 import javax.annotation.PostConstruct
-import com.influxdb.client.InfluxDBClientFactory
 
 import com.influxdb.client.domain.WritePrecision
+import com.influxdb.client.kotlin.InfluxDBClientKotlinFactory
 import com.influxdb.client.write.Point
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import java.time.Instant
 
 
@@ -27,13 +29,17 @@ class InfluxTest {
 
     @PostConstruct
     fun connectAndSave(){
-        val influxDBClient = InfluxDBClientFactory.create(url, token.toCharArray(), organization, bucket)
-        val writeApi = influxDBClient.writeApiBlocking
+        val influxDBClient = InfluxDBClientKotlinFactory.create(url, token.toCharArray(), organization, bucket)
+        val writeApi = influxDBClient.getWriteKotlinApi()
         val point = Point.measurement("test_measurement")
                 .addTag("location", "west")
                 .addField("value", 55)
                 .time(Instant.now().toEpochMilli(), WritePrecision.MS)
 
-        writeApi.writePoint(point)
+        runBlocking {
+            launch {
+                writeApi.writePoint(point)
+            }
+        }
     }
 }
