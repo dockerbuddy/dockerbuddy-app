@@ -25,7 +25,6 @@ class HostService (
         logger.info("Fetching all hosts with summary")
         val hostsWithSummary = mutableListOf<HostWithSummary>()
         val hosts = hostRepository.findAll()
-        if (hosts.isEmpty()) throw EntityNotFoundException("No hosts were found in database")
 
         logger.info("Processing found hosts:")
         for (host in hosts) {
@@ -41,8 +40,6 @@ class HostService (
                 )
             )
         }
-
-        if (hostsWithSummary.isEmpty()) throw EntityNotFoundException("None of hosts does contain any metrics")
 
         return hostsWithSummary.toList()
     }
