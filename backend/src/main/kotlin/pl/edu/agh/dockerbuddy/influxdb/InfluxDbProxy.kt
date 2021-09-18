@@ -4,11 +4,14 @@ import com.influxdb.client.kotlin.InfluxDBClientKotlinFactory
 import com.influxdb.client.domain.WritePrecision
 import com.influxdb.client.write.Point
 import io.reactivex.internal.util.ExceptionHelper
+import kotlinx.coroutines.channels.toList
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Service
 import pl.edu.agh.dockerbuddy.model.metric.HostSummary
+import java.lang.IllegalArgumentException
 import java.time.Instant
+import javax.persistence.EntityNotFoundException
 
 @Service
 class InfluxDbProxy {
@@ -26,9 +29,18 @@ class InfluxDbProxy {
 
     private val logger = LoggerFactory.getLogger(ExceptionHelper::class.java)
 
-    // TODO research on writing data classes directly:
-    //  https://github.com/influxdata/influxdb-client-java/tree/master/client-kotlin#writes
-    //  https://github.com/influxdata/influxdb-client-java/blob/3d771d497dc45322be8b94f70e8b49f6dab95dac/examples/src/main/java/example/KotlinWriteApi.kt#L69
+    val checklist = mutableListOf<String>()
+
+    init {
+        val metricTypes = listOf("memory_usage", "disk_usage", "cpu_usage")
+        val metricVariations = listOf("total", "value", "percent")
+
+        for (metric in metricTypes) {
+            for (variation in metricVariations) {
+                checklist.add(metric + "_" + variation)
+            }
+        }
+    }
 
     suspend fun saveMetric(hostId: Long, hostSummary: HostSummary) {
         logger.info("Saving metric $hostSummary for host with id $hostId")
@@ -71,5 +83,30 @@ class InfluxDbProxy {
                 .time(Instant.now().toEpochMilli(), WritePrecision.MS)
             writeApi.writePoint(containerPoint)
         }
+    }
+
+    suspend fun queryInfluxDb(metricType: String, hostId: Long, start: String, end: String?): List<CustomFluxRecord> {
+
+        if (metricType !in checklist)
+            throw IllegalArgumentException("Unknown metric type: $metricType")
+
+        val influxDBClient = InfluxDBClientKotlinFactory.create(url, token.toCharArray(), organization, bucket)
+        val fluxQuery = ("from(bucket: \"$bucket\")\n"
+                + " |> range(start: $start, stop: ${end ?: "now()"})"
+                + " |> filter(fn: (r) => (" +
+                    "r._measurement == \"host_stats\" and " +
+                    "r.host_id == \"$hostId\" and " +
+                    "r._field == \"$metricType\"))"
+                )
+
+        val result = influxDBClient.getQueryKotlinApi().query(fluxQuery).toList().map { CustomFluxRecord(
+            it.time.toString(),
+            it.value as Double
+        ) }
+
+        if (result.isEmpty()) throw EntityNotFoundException("No records found")
+
+        logger.info("Records fetched form InfluxDB: $result")
+        return result
     }
 }

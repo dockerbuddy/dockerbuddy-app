@@ -8,6 +8,7 @@ import pl.edu.agh.dockerbuddy.controller.response.ResponseType
 import pl.edu.agh.dockerbuddy.model.metric.HostSummary
 import pl.edu.agh.dockerbuddy.service.MetricService
 
+@CrossOrigin
 @RestController
 @RequestMapping("/api/v2/metrics")
 class MetricController(val metricService: MetricService) {
