@@ -6,9 +6,9 @@ import {
   Typography,
   Button,
 } from "@material-ui/core";
-import AddHostDialog from "../AddHostDialog/AddHostDialog";
 
-import React, { useState } from "react";
+import React from "react";
+import { Link } from "react-router-dom";
 
 const useStyles = makeStyles((theme) => ({
   appBar: {
@@ -22,30 +22,26 @@ const useStyles = makeStyles((theme) => ({
 
 const Header: React.FC = () => {
   const classes = useStyles();
-
-  const [isOpen, setIsOpen] = useState(false);
-
-  const handleClose = () => {
-    setIsOpen(false);
-  };
-
   return (
     <Box>
       <AppBar position="fixed" className={classes.appBar}>
         <Toolbar>
-          <Typography variant="h5" color="primary" className={classes.title}>
-            DockerBuddy
-          </Typography>
-          <Button
-            variant="outlined"
-            color="primary"
-            onClick={() => setIsOpen(true)}
+          <Link
+            to="/"
+            style={{ textDecoration: "none" }}
+            className={classes.title}
           >
-            Add host
-          </Button>
+            <Typography variant="h5" color="primary">
+              DockerBuddy
+            </Typography>
+          </Link>
+          <Link to="/addHost" style={{ textDecoration: "none" }}>
+            <Button variant="outlined" color="primary">
+              Add host
+            </Button>
+          </Link>
         </Toolbar>
       </AppBar>
-      <AddHostDialog isOpen={isOpen} onClose={handleClose} />
     </Box>
   );
 };
