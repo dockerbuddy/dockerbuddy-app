@@ -14,7 +14,6 @@ const WebSocketProvider: React.FC = ({ children }) => {
     dispatch(updateHostsAsync()).then(() => {
       stompClient.connect({}, function () {
         stompClient.subscribe("/alerts", function (greeting) {
-          console.log("XD");
           dispatch(updateSingleHost(JSON.parse(greeting.body)));
         });
       });
