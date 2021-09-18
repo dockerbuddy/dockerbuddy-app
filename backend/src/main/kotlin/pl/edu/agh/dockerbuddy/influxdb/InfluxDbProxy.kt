@@ -3,7 +3,6 @@ package pl.edu.agh.dockerbuddy.influxdb
 import com.influxdb.client.kotlin.InfluxDBClientKotlinFactory
 import com.influxdb.client.domain.WritePrecision
 import com.influxdb.client.write.Point
-import com.influxdb.query.FluxRecord
 import io.reactivex.internal.util.ExceptionHelper
 import kotlinx.coroutines.channels.toList
 import org.slf4j.LoggerFactory
@@ -12,6 +11,7 @@ import org.springframework.stereotype.Service
 import pl.edu.agh.dockerbuddy.model.metric.HostSummary
 import java.lang.IllegalArgumentException
 import java.time.Instant
+import javax.persistence.EntityNotFoundException
 
 @Service
 class InfluxDbProxy {
@@ -99,6 +99,8 @@ class InfluxDbProxy {
             it.field!!,
             it.value as Double
         ) }
+
+        if (result.isEmpty()) throw EntityNotFoundException("No records found")
 
         logger.info("Records fetched form InfluxDB: $result")
         return result
