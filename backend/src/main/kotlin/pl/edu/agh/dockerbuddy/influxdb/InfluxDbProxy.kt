@@ -29,9 +29,18 @@ class InfluxDbProxy {
 
     private val logger = LoggerFactory.getLogger(ExceptionHelper::class.java)
 
-    // TODO research on writing data classes directly:
-    //  https://github.com/influxdata/influxdb-client-java/tree/master/client-kotlin#writes
-    //  https://github.com/influxdata/influxdb-client-java/blob/3d771d497dc45322be8b94f70e8b49f6dab95dac/examples/src/main/java/example/KotlinWriteApi.kt#L69
+    val checklist = mutableListOf<String>()
+
+    init {
+        val metricTypes = listOf("memory_usage", "disk_usage", "cpu_usage")
+        val metricVariations = listOf("total", "value", "percent")
+
+        for (metric in metricTypes) {
+            for (variation in metricVariations) {
+                checklist.add(metric + "_" + variation)
+            }
+        }
+    }
 
     suspend fun saveMetric(hostId: Long, hostSummary: HostSummary) {
         logger.info("Saving metric $hostSummary for host with id $hostId")
@@ -78,7 +87,7 @@ class InfluxDbProxy {
 
     suspend fun queryInfluxDb(metricType: String, hostId: Long, start: String, end: String?): List<CustomFluxRecord> {
 
-        if (metricType !in listOf("memory_usage", "disk_usage", "cpu_usage"))
+        if (metricType !in checklist)
             throw IllegalArgumentException("Unknown metric type: $metricType")
 
         val influxDBClient = InfluxDBClientKotlinFactory.create(url, token.toCharArray(), organization, bucket)
@@ -86,17 +95,12 @@ class InfluxDbProxy {
                 + " |> range(start: $start, stop: ${end ?: "now()"})"
                 + " |> filter(fn: (r) => (" +
                     "r._measurement == \"host_stats\" and " +
-                    "(r._field == \"${metricType}_total\" or " +
-                    "r._field == \"${metricType}_value\" or " +
-                    "r._field == \"${metricType}_percent\")))"
+                    "r.host_id == \"$hostId\" and " +
+                    "r._field == \"$metricType\"))"
                 )
 
         val result = influxDBClient.getQueryKotlinApi().query(fluxQuery).toList().map { CustomFluxRecord(
-            it.measurement!!,
-            (it.values["host_id"] as String).toLong(),
-            (it.values["metric_id"] as String).toLong(),
             it.time.toString(),
-            it.field!!,
             it.value as Double
         ) }
 

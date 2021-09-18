@@ -1,8 +1,7 @@
 package pl.edu.agh.dockerbuddy.service
 
 import io.reactivex.internal.util.ExceptionHelper
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.*
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.data.repository.findByIdOrNull
@@ -46,10 +45,8 @@ class MetricService(
         inMemory.saveHostSummary(hostId, hostSummary)
         alertService.sendMessage(hostSummary)
 
-        runBlocking {
-            launch {
-                influxDbProxy.saveMetric(hostId, hostSummary)
-            }
+        CoroutineScope(Dispatchers.IO).launch {
+            influxDbProxy.saveMetric(hostId, hostSummary)
         }
     }
 }
