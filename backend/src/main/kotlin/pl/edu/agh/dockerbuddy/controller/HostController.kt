@@ -10,6 +10,7 @@ import pl.edu.agh.dockerbuddy.controller.response.ResponseType
 import pl.edu.agh.dockerbuddy.model.entity.Host
 import pl.edu.agh.dockerbuddy.service.HostService
 
+@CrossOrigin
 @RestController
 @RequestMapping("/api/v2/hosts")
 class HostController (

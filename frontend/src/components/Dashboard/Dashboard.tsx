@@ -1,8 +1,10 @@
 import React from "react";
 import { makeStyles, Grid } from "@material-ui/core";
 import { Alert } from "@material-ui/lab";
-import { useHostsData } from "../../context/HostContext";
 import HostCardComponent from "./HostCardComponent";
+import { selectHost } from "../../hosts/hostsSlice";
+import { useAppSelector } from "../../redux/hooks";
+import { FullHostSummary } from "../../hosts/types";
 
 const useStyles = makeStyles(() => ({
   root: {
@@ -22,7 +24,7 @@ const useStyles = makeStyles(() => ({
 
 const Dashboard: React.FC = () => {
   const classes = useStyles();
-  const hostsData = useHostsData();
+  const hostsData = useAppSelector(selectHost);
 
   return (
     <div className={classes.root}>
@@ -34,7 +36,7 @@ const Dashboard: React.FC = () => {
         )}
         {hostsData.status === "LOADING" && <p>LOADING</p>}
         {hostsData.status === "LOADED" &&
-          hostsData.hosts.map((obj: HostData) => {
+          Object.values(hostsData.hosts).map((obj: FullHostSummary) => {
             return (
               <Grid item xs={6} key={obj.ip}>
                 <HostCardComponent host={obj} />

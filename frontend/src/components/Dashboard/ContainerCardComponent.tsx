@@ -7,6 +7,7 @@ import {
   Typography,
 } from "@material-ui/core";
 import { humanFileSize } from "../../util/util";
+import { ContainerSummary } from "../../hosts/types";
 
 const useStyles = makeStyles((theme) => ({
   card: {
@@ -18,11 +19,13 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-const ContainerCardComponent: React.FC<{ container: Container }> = (props) => {
+const ContainerCardComponent: React.FC<{ container: ContainerSummary }> = (
+  props
+) => {
   const classes = useStyles();
 
-  const mem = props.container.memory_usage._value;
-  const cpu = props.container.cpu_percentage._value;
+  const mem = props.container.memoryUsage.value;
+  const cpu = props.container.cpuUsage.value;
   const name = props.container.name;
 
   return (

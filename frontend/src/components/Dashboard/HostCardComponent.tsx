@@ -13,6 +13,7 @@ import SettingsIcon from "@material-ui/icons/Settings";
 import { humanFileSize, getLatestStats } from "../../util/util";
 import ProgressBarComponent from "./ProgressBarComponent";
 import ContainerCardComponent from "./ContainerCardComponent";
+import { ContainerSummary, FullHostSummary } from "../../hosts/types";
 
 const useStyles = makeStyles((theme) => ({
   card: {
@@ -28,16 +29,16 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 //TODO: Create custom alert
-const HostCardComponent: React.FC<{ host: HostData }> = (props) => {
+const HostCardComponent: React.FC<{ host: FullHostSummary }> = (props) => {
   const classes = useStyles();
   const host = props.host;
 
-  const diskData = getLatestStats(host.disk);
+  const diskData = getLatestStats(host.hostSummary.diskUsage);
   const diskMax = humanFileSize(diskData.total);
   const diskUsed = humanFileSize(diskData.used);
   const diskPercent: number = diskData.percent;
 
-  const vmem = getLatestStats(host.virtual_memory);
+  const vmem = getLatestStats(host.hostSummary.memoryUsage);
 
   return (
     <Card className={classes.card} variant="outlined">
@@ -49,7 +50,7 @@ const HostCardComponent: React.FC<{ host: HostData }> = (props) => {
               style={{ display: "inline-block" }}
               className={classes.nameColor}
             >
-              {host.name}
+              {host.hostName}
             </Typography>
             <Typography variant="h6" style={{ display: "inline-block" }}>
               {": " + host.ip}
@@ -63,7 +64,7 @@ const HostCardComponent: React.FC<{ host: HostData }> = (props) => {
         }
       />
       <CardContent>
-        {host.disk !== undefined ? (
+        {host.hostSummary.diskUsage !== undefined ? (
           <ProgressBarComponent
             name="Disk"
             used={diskUsed}
@@ -75,7 +76,7 @@ const HostCardComponent: React.FC<{ host: HostData }> = (props) => {
             <Alert severity="error"> NO DISC INFO </Alert>
           </Grid>
         )}
-        {host.virtual_memory !== undefined ? (
+        {host.hostSummary.memoryUsage !== undefined ? (
           <ProgressBarComponent
             name="Vmem"
             used={humanFileSize(vmem.used)}
@@ -93,8 +94,8 @@ const HostCardComponent: React.FC<{ host: HostData }> = (props) => {
               Containers:
             </Typography>
           </Grid>
-          {host.containers !== undefined ? (
-            host.containers.map((cont: Container) => {
+          {host.hostSummary.containers !== undefined ? (
+            host.hostSummary.containers.map((cont: ContainerSummary) => {
               return (
                 <Grid item xs={4} key={cont.id}>
                   <ContainerCardComponent container={cont} />
