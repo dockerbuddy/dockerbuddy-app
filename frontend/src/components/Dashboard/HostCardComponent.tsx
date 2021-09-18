@@ -10,7 +10,7 @@ import {
 } from "@material-ui/core";
 import { Alert } from "@material-ui/lab";
 import SettingsIcon from "@material-ui/icons/Settings";
-import { humanFileSize, getLatestStats } from "../../util/util";
+import { humanFileSize } from "../../util/util";
 import ProgressBarComponent from "./ProgressBarComponent";
 import ContainerCardComponent from "./ContainerCardComponent";
 import { ContainerSummary, FullHostSummary } from "../../hosts/types";
@@ -28,17 +28,10 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-//TODO: Create custom alert
 const HostCardComponent: React.FC<{ host: FullHostSummary }> = (props) => {
   const classes = useStyles();
   const host = props.host;
-
-  const diskData = getLatestStats(host.hostSummary.diskUsage);
-  const diskMax = humanFileSize(diskData.total);
-  const diskUsed = humanFileSize(diskData.used);
-  const diskPercent: number = diskData.percent;
-
-  const vmem = getLatestStats(host.hostSummary.memoryUsage);
+  const hostSummary = props.host.hostSummary;
 
   return (
     <Card className={classes.card} variant="outlined">
@@ -64,24 +57,24 @@ const HostCardComponent: React.FC<{ host: FullHostSummary }> = (props) => {
         }
       />
       <CardContent>
-        {host.hostSummary.diskUsage !== undefined ? (
+        {hostSummary?.diskUsage !== undefined ? (
           <ProgressBarComponent
             name="Disk"
-            used={diskUsed}
-            total={diskMax}
-            percent={diskPercent}
+            used={humanFileSize(hostSummary.diskUsage.value)}
+            total={humanFileSize(hostSummary.diskUsage.total)}
+            percent={hostSummary.diskUsage.percent}
           />
         ) : (
           <Grid item>
             <Alert severity="error"> NO DISC INFO </Alert>
           </Grid>
         )}
-        {host.hostSummary.memoryUsage !== undefined ? (
+        {hostSummary?.memoryUsage !== undefined ? (
           <ProgressBarComponent
             name="Vmem"
-            used={humanFileSize(vmem.used)}
-            total={humanFileSize(vmem.total)}
-            percent={vmem.percent}
+            used={humanFileSize(hostSummary.memoryUsage.value)}
+            total={humanFileSize(hostSummary.memoryUsage.total)}
+            percent={hostSummary.memoryUsage.percent}
           />
         ) : (
           <Grid item>
@@ -94,7 +87,7 @@ const HostCardComponent: React.FC<{ host: FullHostSummary }> = (props) => {
               Containers:
             </Typography>
           </Grid>
-          {host.hostSummary.containers !== undefined ? (
+          {host.hostSummary?.containers !== undefined ? (
             host.hostSummary.containers.map((cont: ContainerSummary) => {
               return (
                 <Grid item xs={4} key={cont.id}>

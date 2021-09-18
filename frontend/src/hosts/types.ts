@@ -24,9 +24,9 @@ export interface ContainerSummary {
 }
 
 export interface BasicMetric {
-  value: string;
-  total: string;
-  percent: string;
+  value: number;
+  total: number;
+  percent: number;
   alertType: AlertType;
   alert: boolean;
 }
