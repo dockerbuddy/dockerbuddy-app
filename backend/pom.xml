@@ -14,7 +14,7 @@
     <name>docker-buddy</name>
     <properties>
         <java.version>11</java.version>
-        <kotlin.version>1.5.21</kotlin.version>
+        <kotlin.version>1.5.30</kotlin.version>
         <spring.boot.mainclass>pl.edu.agh.dockerbuddy.Application</spring.boot.mainclass>
 
     </properties>
@@ -61,8 +61,8 @@
         </dependency>
         <dependency>
             <groupId>com.influxdb</groupId>
-            <artifactId>influxdb-client-java</artifactId>
-            <version>3.1.0</version>
+            <artifactId>influxdb-client-kotlin</artifactId>
+            <version>3.2.0</version>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -78,6 +78,11 @@
             <artifactId>mockito-core</artifactId>
             <version>3.12.4</version>
             <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.jetbrains.kotlinx</groupId>
+            <artifactId>kotlinx-coroutines-core</artifactId>
+            <version>1.5.2</version>
         </dependency>
     </dependencies>
 
