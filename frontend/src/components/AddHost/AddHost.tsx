@@ -10,8 +10,9 @@ import {
 } from "@material-ui/core";
 import { useForm } from "react-hook-form";
 import { proxy } from "../../common/api";
-import { StandardApiResponse } from "../../common/types";
-import { Alert } from "@material-ui/lab";
+import { PostHostResponse, StandardApiResponse } from "../../common/types";
+import { Alert, AlertTitle } from "@material-ui/lab";
+import { Link } from "react-router-dom";
 
 interface Rule {
   ruleType: string;
@@ -33,6 +34,7 @@ interface AddHostFormData {
 const AddHost: React.FC = () => {
   const { register, errors, handleSubmit } = useForm<AddHostFormData>();
   const [error, setError] = useState<string>("");
+  const [hostId, setHostId] = useState<string>("");
 
   const handleAdd = async (data: AddHostFormData) => {
     setError("");
@@ -101,9 +103,11 @@ const AddHost: React.FC = () => {
     });
 
     const result: StandardApiResponse = await response.json();
-    console.log(result);
 
-    if (!response.ok) {
+    if (response.ok) {
+      const hostResponse: PostHostResponse = result.body;
+      setHostId(hostResponse.id.toString());
+    } else {
       setError(result.message);
     }
   };
@@ -115,173 +119,193 @@ const AddHost: React.FC = () => {
       </Box>
       <Box>
         <form onSubmit={handleSubmit(handleAdd)}>
-          <Grid container item direction="column" spacing={4}>
-            <Grid item>{error && <Alert severity="error">{error}</Alert>}</Grid>
-            <Grid item>
-              <TextField
-                name="ip"
-                label="IP Address"
-                variant="outlined"
-                fullWidth={true}
-                size="small"
-                inputRef={register({
-                  required: "IP Address is required",
-                  pattern: {
-                    value:
-                      /^(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/,
-                    message: "Invalid IP Address",
-                  },
-                })}
-                error={!!errors.ip}
-                helperText={errors.ip?.message}
-              />
+          {hostId ? (
+            <>
+              <Alert severity="success">
+                <AlertTitle>Host added</AlertTitle>
+                This is your unique host identifier: <strong>{hostId}</strong>
+                <br />
+                You will have to pass it in agent{"'"}s config
+              </Alert>
+              <Box textAlign="center" mt={3}>
+                <Link to="/" style={{ textDecoration: "none" }}>
+                  <Button variant="outlined" color="primary">
+                    confirm
+                  </Button>
+                </Link>
+              </Box>
+            </>
+          ) : (
+            <Grid container item direction="column" spacing={4}>
+              <Grid item>
+                {error && <Alert severity="error">{error}</Alert>}
+              </Grid>
+              <Grid item>
+                <TextField
+                  name="ip"
+                  label="IP Address"
+                  variant="outlined"
+                  fullWidth={true}
+                  size="small"
+                  inputRef={register({
+                    required: "IP Address is required",
+                    pattern: {
+                      value:
+                        /^(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/,
+                      message: "Invalid IP Address",
+                    },
+                  })}
+                  error={!!errors.ip}
+                  helperText={errors.ip?.message}
+                />
+              </Grid>
+              <Grid item>
+                <TextField
+                  name="hostName"
+                  label="Host Name"
+                  variant="outlined"
+                  fullWidth={true}
+                  size="small"
+                  inputRef={register({
+                    required: "Host Name is required",
+                  })}
+                  error={!!errors.hostName}
+                  helperText={errors.hostName?.message}
+                />
+              </Grid>
+              <Grid item>
+                <Typography variant="h6">CPU usage alerting</Typography>
+                <TextField
+                  name="cpuWarn"
+                  label="Warn threshold"
+                  size="small"
+                  inputRef={register({
+                    pattern: {
+                      value: /^[1-9][0-9]?$|^100$/,
+                      message: "Value should be in range from 0 to 100",
+                    },
+                  })}
+                  error={!!errors.cpuWarn}
+                  helperText={errors.cpuWarn?.message}
+                  InputProps={{
+                    endAdornment: (
+                      <InputAdornment position="end">%</InputAdornment>
+                    ),
+                  }}
+                  style={{ marginRight: "40px" }}
+                />
+                <TextField
+                  name="cpuCrit"
+                  label="Critical threshold"
+                  size="small"
+                  inputRef={register({
+                    pattern: {
+                      value: /^[1-9][0-9]?$|^100$/,
+                      message: "Value should be in range from 0 to 100",
+                    },
+                  })}
+                  error={!!errors.cpuCrit}
+                  helperText={errors.cpuCrit?.message}
+                  InputProps={{
+                    endAdornment: (
+                      <InputAdornment position="end">%</InputAdornment>
+                    ),
+                  }}
+                />
+              </Grid>
+              <Grid item>
+                <Typography variant="h6">Memory usage alerting</Typography>
+                <TextField
+                  name="memWarn"
+                  label="Warn threshold"
+                  size="small"
+                  inputRef={register({
+                    pattern: {
+                      value: /^[1-9][0-9]?$|^100$/,
+                      message: "Value should be in range from 0 to 100",
+                    },
+                  })}
+                  error={!!errors.memWarn}
+                  helperText={errors.memWarn?.message}
+                  InputProps={{
+                    endAdornment: (
+                      <InputAdornment position="end">%</InputAdornment>
+                    ),
+                  }}
+                  style={{ marginRight: "40px" }}
+                />
+                <TextField
+                  name="memCrit"
+                  label="Critical threshold"
+                  size="small"
+                  inputRef={register({
+                    pattern: {
+                      value: /^[1-9][0-9]?$|^100$/,
+                      message: "Value should be in range from 0 to 100",
+                    },
+                  })}
+                  error={!!errors.memCrit}
+                  helperText={errors.memCrit?.message}
+                  InputProps={{
+                    endAdornment: (
+                      <InputAdornment position="end">%</InputAdornment>
+                    ),
+                  }}
+                />
+              </Grid>
+              <Grid item>
+                <Typography variant="h6">Disk usage alerting</Typography>
+                <TextField
+                  name="diskWarn"
+                  label="Warn threshold"
+                  size="small"
+                  inputRef={register({
+                    pattern: {
+                      value: /^[1-9][0-9]?$|^100$/,
+                      message: "Value should be in range from 0 to 100",
+                    },
+                  })}
+                  error={!!errors.diskWarn}
+                  helperText={errors.diskWarn?.message}
+                  InputProps={{
+                    endAdornment: (
+                      <InputAdornment position="end">%</InputAdornment>
+                    ),
+                  }}
+                  style={{ marginRight: "40px" }}
+                />
+                <TextField
+                  name="diskCrit"
+                  label="Critical threshold"
+                  size="small"
+                  inputRef={register({
+                    pattern: {
+                      value: /^[1-9][0-9]?$|^100$/,
+                      message: "Value should be in range from 0 to 100",
+                    },
+                  })}
+                  error={!!errors.diskCrit}
+                  helperText={errors.diskCrit?.message}
+                  InputProps={{
+                    endAdornment: (
+                      <InputAdornment position="end">%</InputAdornment>
+                    ),
+                  }}
+                />
+              </Grid>
+              <Grid item>
+                <Button
+                  type="submit"
+                  variant="contained"
+                  color="primary"
+                  disableElevation
+                  fullWidth
+                >
+                  Submit
+                </Button>
+              </Grid>
             </Grid>
-            <Grid item>
-              <TextField
-                name="hostName"
-                label="Host Name"
-                variant="outlined"
-                fullWidth={true}
-                size="small"
-                inputRef={register({
-                  required: "Host Name is required",
-                })}
-                error={!!errors.hostName}
-                helperText={errors.hostName?.message}
-              />
-            </Grid>
-            <Grid item>
-              <Typography variant="h6">CPU usage alerting</Typography>
-              <TextField
-                name="cpuWarn"
-                label="Warn threshold"
-                size="small"
-                inputRef={register({
-                  pattern: {
-                    value: /^[1-9][0-9]?$|^100$/,
-                    message: "Value should be in range from 0 to 100",
-                  },
-                })}
-                error={!!errors.cpuWarn}
-                helperText={errors.cpuWarn?.message}
-                InputProps={{
-                  endAdornment: (
-                    <InputAdornment position="end">%</InputAdornment>
-                  ),
-                }}
-                style={{ marginRight: "40px" }}
-              />
-              <TextField
-                name="cpuCrit"
-                label="Critical threshold"
-                size="small"
-                inputRef={register({
-                  pattern: {
-                    value: /^[1-9][0-9]?$|^100$/,
-                    message: "Value should be in range from 0 to 100",
-                  },
-                })}
-                error={!!errors.cpuCrit}
-                helperText={errors.cpuCrit?.message}
-                InputProps={{
-                  endAdornment: (
-                    <InputAdornment position="end">%</InputAdornment>
-                  ),
-                }}
-              />
-            </Grid>
-            <Grid item>
-              <Typography variant="h6">Memory usage alerting</Typography>
-              <TextField
-                name="memWarn"
-                label="Warn threshold"
-                size="small"
-                inputRef={register({
-                  pattern: {
-                    value: /^[1-9][0-9]?$|^100$/,
-                    message: "Value should be in range from 0 to 100",
-                  },
-                })}
-                error={!!errors.memWarn}
-                helperText={errors.memWarn?.message}
-                InputProps={{
-                  endAdornment: (
-                    <InputAdornment position="end">%</InputAdornment>
-                  ),
-                }}
-                style={{ marginRight: "40px" }}
-              />
-              <TextField
-                name="memCrit"
-                label="Critical threshold"
-                size="small"
-                inputRef={register({
-                  pattern: {
-                    value: /^[1-9][0-9]?$|^100$/,
-                    message: "Value should be in range from 0 to 100",
-                  },
-                })}
-                error={!!errors.memCrit}
-                helperText={errors.memCrit?.message}
-                InputProps={{
-                  endAdornment: (
-                    <InputAdornment position="end">%</InputAdornment>
-                  ),
-                }}
-              />
-            </Grid>
-            <Grid item>
-              <Typography variant="h6">Disk usage alerting</Typography>
-              <TextField
-                name="diskWarn"
-                label="Warn threshold"
-                size="small"
-                inputRef={register({
-                  pattern: {
-                    value: /^[1-9][0-9]?$|^100$/,
-                    message: "Value should be in range from 0 to 100",
-                  },
-                })}
-                error={!!errors.diskWarn}
-                helperText={errors.diskWarn?.message}
-                InputProps={{
-                  endAdornment: (
-                    <InputAdornment position="end">%</InputAdornment>
-                  ),
-                }}
-                style={{ marginRight: "40px" }}
-              />
-              <TextField
-                name="diskCrit"
-                label="Critical threshold"
-                size="small"
-                inputRef={register({
-                  pattern: {
-                    value: /^[1-9][0-9]?$|^100$/,
-                    message: "Value should be in range from 0 to 100",
-                  },
-                })}
-                error={!!errors.diskCrit}
-                helperText={errors.diskCrit?.message}
-                InputProps={{
-                  endAdornment: (
-                    <InputAdornment position="end">%</InputAdornment>
-                  ),
-                }}
-              />
-            </Grid>
-            <Grid item>
-              <Button
-                type="submit"
-                variant="contained"
-                color="primary"
-                disableElevation
-                fullWidth
-              >
-                Submit
-              </Button>
-            </Grid>
-          </Grid>
+          )}
         </form>
       </Box>
     </Container>
