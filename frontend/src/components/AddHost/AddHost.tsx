@@ -1,246 +1,130 @@
-import React, { useState } from "react";
-import Button from "@material-ui/core/Button";
-import DialogActions from "@material-ui/core/DialogActions";
-import DialogContent from "@material-ui/core/DialogContent";
-import DialogTitle from "@material-ui/core/DialogTitle";
-import { Alert, AlertTitle } from "@material-ui/lab";
-import TextField from "@material-ui/core/TextField";
-import { Box, Grid, Typography } from "@material-ui/core";
-import { proxy } from "../../common/api";
-import { capitalizeFirstLetter } from "../../util/util";
-import RangePicker from "./RangePicker";
+import React from "react";
+import {
+  Accordion,
+  AccordionDetails,
+  AccordionSummary,
+  Box,
+  Button,
+  Container,
+  Grid,
+  TextField,
+  Typography,
+} from "@material-ui/core";
+import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
+import { useForm } from "react-hook-form";
 
-interface FormData {
-  bucket_name: string;
-  ip_address: string;
+interface Rule {
+  ruleType: string;
+  warnLevel: number;
+  criticalLevel: number;
+}
+
+interface AddHostFormData {
+  hostName: string;
+  ip: string;
+  rules: [Rule];
 }
 
 const AddHost: React.FC = () => {
-  const [error, setError] = useState("");
-  const [success, setSuccess] = useState("");
-  const [formErros, setFormErros] = useState<FormData>({
-    bucket_name: "",
-    ip_address: "",
-  });
+  const { register, errors, handleSubmit } = useForm<AddHostFormData>();
 
-  const [virtualRange, setVirtualRange] = useState([50, 80]);
-  const [diskRange, setDiskRange] = useState([50, 80]);
-
-  const [formData, setFormData] = useState<FormData>({
-    bucket_name: "",
-    ip_address: "",
-  });
-
-  const handleSubmit = async (e: React.SyntheticEvent) => {
-    e.preventDefault();
-    setError("");
-    setSuccess("");
-
-    let isError = false;
-    if (formData.bucket_name === "") {
-      setFormErros((prev) => ({
-        ...prev,
-        bucket_name: "Host name is required",
-      }));
-      isError = true;
-    }
-
-    if (/\s/g.test(formData.bucket_name)) {
-      setFormErros((prev) => ({
-        ...prev,
-        bucket_name: "White space is not allowed in the name",
-      }));
-      isError = true;
-    }
-
-    if (formData.ip_address === "") {
-      setFormErros((prev) => ({
-        ...prev,
-        ip_address: "IP address is required",
-      }));
-      isError = true;
-    }
-
-    if (!/^(?:[0-9]{1,3}\.){3}[0-9]{1,3}$/.test(formData.ip_address)) {
-      setFormErros((prev) => ({
-        ...prev,
-        ip_address: "IP address is incorrect",
-      }));
-      isError = true;
-    }
-
-    if (isError) return;
-
-    //TODO TYPE THE RESPONSE!
-    console.log({
-      ...formData,
-      disk_range: {
-        min: diskRange[0],
-        max: diskRange[1],
-      },
-      virtual_range: {
-        min: virtualRange[0],
-        max: virtualRange[1],
-      },
-    });
-    const response = await fetch(`${proxy}/hosts`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        ...formData,
-        disk_range: {
-          min: diskRange[0],
-          max: diskRange[1],
-        },
-        virtual_range: {
-          min: virtualRange[0],
-          max: virtualRange[1],
-        },
-      }),
-    });
-
-    const result = await response.json();
-    if (!response.ok) {
-      setError(result.bucket.message);
-    } else {
-      setSuccess(`Token: ${result.access_token};Bucket: ${result.bucket.name}`);
-    }
+  const handleAdd = async (data: AddHostFormData) => {
+    console.log(data);
   };
-
-  const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setFormData((prev) => ({
-      ...prev,
-      [event.target.id]: event.target.value,
-    }));
-
-    setFormErros((prev) => ({
-      ...prev,
-      [event.target.id]: "",
-    }));
-  };
-
-  const handleClose = async () => {
-    console.log("asdasd");
-    setFormData({
-      bucket_name: "",
-      ip_address: "",
-    });
-
-    setFormErros({
-      bucket_name: "",
-      ip_address: "",
-    });
-
-    setError("");
-    setSuccess("");
-  };
-
-  const [token, bucket] = success.split(";");
 
   return (
-    <Box>
-      <form onSubmit={handleSubmit}>
-        <Box p={4}>
-          <DialogTitle>
-            <Box textAlign="center">
-              <Typography variant="h4">Add new host</Typography>
-            </Box>
-          </DialogTitle>
-          <DialogContent>
-            <Grid
-              container
-              direction="column"
-              spacing={4}
-              style={{ overflow: "hidden" }}
-            >
-              {error && (
-                <Grid item>
-                  <Alert severity="error">{capitalizeFirstLetter(error)}</Alert>
-                </Grid>
-              )}
-              {success && (
-                <Grid item>
-                  <Alert severity="success">
-                    <AlertTitle>Agent settings:</AlertTitle>
-                    {token}
-                    <br />
-                    {bucket}
-                  </Alert>
-                </Grid>
-              )}
-              {!success && (
-                <>
-                  <Grid item>
-                    <TextField
-                      id="ip_address"
-                      name="ip_address"
-                      autoFocus
-                      label="IP Address"
-                      type="text"
-                      variant="outlined"
-                      fullWidth={true}
-                      autoComplete="off"
-                      value={formData.ip_address}
-                      onChange={handleChange}
-                      error={!!formErros.ip_address}
-                      helperText={formErros.ip_address}
-                    />
-                  </Grid>
-                  <Grid item>
-                    <TextField
-                      id="bucket_name"
-                      name="bucket_name"
-                      autoFocus
-                      label="Host name"
-                      type="text"
-                      variant="outlined"
-                      autoComplete="off"
-                      fullWidth={true}
-                      value={formData.bucket_name}
-                      onChange={handleChange}
-                      error={!!formErros.bucket_name}
-                      helperText={formErros.bucket_name}
-                    />
-                  </Grid>
-                  <Grid item>
-                    <RangePicker
-                      virtualRange={virtualRange}
-                      setVirtualRange={setVirtualRange}
-                      diskRange={diskRange}
-                      setDiskRange={setDiskRange}
-                    />
-                  </Grid>
-                </>
-              )}
+    <Container maxWidth="lg">
+      <Box textAlign="center" m={2}>
+        <Typography variant="h4">Add new host</Typography>
+      </Box>
+      <Box>
+        <form onSubmit={handleSubmit(handleAdd)}>
+          <Grid container item direction="column" spacing={4}>
+            <Grid item>
+              <TextField
+                name="ip"
+                label="IP Address"
+                variant="outlined"
+                fullWidth={true}
+                size="small"
+                inputRef={register({
+                  required: "IP Address is required",
+                  pattern: {
+                    value:
+                      /^(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/,
+                    message: "Invalid IP Address",
+                  },
+                })}
+                error={!!errors.ip}
+                helperText={errors.ip?.message}
+              />
             </Grid>
-          </DialogContent>
-          <DialogActions>
-            <Box mt={3}>
-              <Grid container spacing={2}>
-                <Grid item>
-                  <Button
-                    onClick={handleClose}
-                    color="primary"
-                    variant="outlined"
-                  >
-                    Exit
-                  </Button>
-                </Grid>
-                {!success && (
-                  <Grid item>
-                    <Button type="submit" color="primary" variant="contained">
-                      Create
-                    </Button>
-                  </Grid>
-                )}
-              </Grid>
-            </Box>
-          </DialogActions>
-        </Box>
-      </form>
-    </Box>
+            <Grid item>
+              <TextField
+                name="hostName"
+                label="Host Name"
+                variant="outlined"
+                fullWidth={true}
+                size="small"
+                inputRef={register({
+                  required: "Host Name is required",
+                })}
+                error={!!errors.hostName}
+                helperText={errors.hostName?.message}
+              />
+            </Grid>
+            <Grid item>
+              {/* <Box mt={2}>
+                <Typography>Alerting rules</Typography>
+              </Box> */}
+              <Accordion>
+                <AccordionSummary
+                  expandIcon={<ExpandMoreIcon />}
+                  aria-controls="panel1a-content"
+                  id="panel1a-header"
+                >
+                  <Typography>Accordion 1</Typography>
+                </AccordionSummary>
+                <AccordionDetails>
+                  <Typography>
+                    Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+                    Suspendisse malesuada lacus ex, sit amet blandit leo
+                    lobortis eget.
+                  </Typography>
+                </AccordionDetails>
+              </Accordion>
+              <Accordion>
+                <AccordionSummary
+                  expandIcon={<ExpandMoreIcon />}
+                  aria-controls="panel2a-content"
+                  id="panel2a-header"
+                >
+                  <Typography>Accordion 2</Typography>
+                </AccordionSummary>
+                <AccordionDetails>
+                  <Typography>
+                    Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+                    Suspendisse malesuada lacus ex, sit amet blandit leo
+                    lobortis eget.
+                  </Typography>
+                </AccordionDetails>
+              </Accordion>
+            </Grid>
+            <Grid item>
+              <Button
+                type="submit"
+                variant="contained"
+                color="primary"
+                disableElevation
+                fullWidth
+              >
+                Submit
+              </Button>
+            </Grid>
+          </Grid>
+        </form>
+      </Box>
+    </Container>
   );
 };
 
