@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import {
   Box,
   Button,
@@ -11,6 +11,7 @@ import {
 import { useForm } from "react-hook-form";
 import { proxy } from "../../common/api";
 import { StandardApiResponse } from "../../common/types";
+import { Alert } from "@material-ui/lab";
 
 interface Rule {
   ruleType: string;
@@ -31,9 +32,10 @@ interface AddHostFormData {
 
 const AddHost: React.FC = () => {
   const { register, errors, handleSubmit } = useForm<AddHostFormData>();
+  const [error, setError] = useState<string>("");
 
   const handleAdd = async (data: AddHostFormData) => {
-    console.log(data);
+    setError("");
     const cpuWarn = parseInt(data.cpuWarn);
     const cpuCrit = parseInt(data.cpuCrit);
     const memWarn = parseInt(data.memWarn);
@@ -43,6 +45,26 @@ const AddHost: React.FC = () => {
 
     const rules: Rule[] = [];
 
+    if (cpuWarn >= cpuCrit) {
+      setError(
+        "CPU usage warn threshold should be smaller than CPU usage critical threshold"
+      );
+      return;
+    }
+
+    if (memWarn >= memCrit) {
+      setError(
+        "Memory usage warn threshold should be smaller than memory usage critical threshold"
+      );
+      return;
+    }
+
+    if (diskWarn >= diskCrit) {
+      setError(
+        "Disk usage warn threshold should be smaller than disk usage critical threshold"
+      );
+      return;
+    }
     if (!isNaN(cpuWarn) && !isNaN(cpuCrit))
       rules.push({
         ruleType: "CpuUsage",
@@ -70,8 +92,6 @@ const AddHost: React.FC = () => {
       rules: rules,
     };
 
-    console.log(json);
-
     const response = await fetch(`${proxy}/hosts`, {
       method: "POST",
       headers: {
@@ -82,16 +102,21 @@ const AddHost: React.FC = () => {
 
     const result: StandardApiResponse = await response.json();
     console.log(result);
+
+    if (!response.ok) {
+      setError(result.message);
+    }
   };
 
   return (
-    <Container maxWidth="lg">
+    <Container maxWidth="md">
       <Box textAlign="center" m={2}>
         <Typography variant="h4">Add new host</Typography>
       </Box>
       <Box>
         <form onSubmit={handleSubmit(handleAdd)}>
           <Grid container item direction="column" spacing={4}>
+            <Grid item>{error && <Alert severity="error">{error}</Alert>}</Grid>
             <Grid item>
               <TextField
                 name="ip"
@@ -131,7 +156,14 @@ const AddHost: React.FC = () => {
                 name="cpuWarn"
                 label="Warn threshold"
                 size="small"
-                inputRef={register()}
+                inputRef={register({
+                  pattern: {
+                    value: /^[1-9][0-9]?$|^100$/,
+                    message: "Value should be in range from 0 to 100",
+                  },
+                })}
+                error={!!errors.cpuWarn}
+                helperText={errors.cpuWarn?.message}
                 InputProps={{
                   endAdornment: (
                     <InputAdornment position="end">%</InputAdornment>
@@ -143,7 +175,14 @@ const AddHost: React.FC = () => {
                 name="cpuCrit"
                 label="Critical threshold"
                 size="small"
-                inputRef={register()}
+                inputRef={register({
+                  pattern: {
+                    value: /^[1-9][0-9]?$|^100$/,
+                    message: "Value should be in range from 0 to 100",
+                  },
+                })}
+                error={!!errors.cpuCrit}
+                helperText={errors.cpuCrit?.message}
                 InputProps={{
                   endAdornment: (
                     <InputAdornment position="end">%</InputAdornment>
@@ -157,7 +196,14 @@ const AddHost: React.FC = () => {
                 name="memWarn"
                 label="Warn threshold"
                 size="small"
-                inputRef={register()}
+                inputRef={register({
+                  pattern: {
+                    value: /^[1-9][0-9]?$|^100$/,
+                    message: "Value should be in range from 0 to 100",
+                  },
+                })}
+                error={!!errors.memWarn}
+                helperText={errors.memWarn?.message}
                 InputProps={{
                   endAdornment: (
                     <InputAdornment position="end">%</InputAdornment>
@@ -169,7 +215,14 @@ const AddHost: React.FC = () => {
                 name="memCrit"
                 label="Critical threshold"
                 size="small"
-                inputRef={register()}
+                inputRef={register({
+                  pattern: {
+                    value: /^[1-9][0-9]?$|^100$/,
+                    message: "Value should be in range from 0 to 100",
+                  },
+                })}
+                error={!!errors.memCrit}
+                helperText={errors.memCrit?.message}
                 InputProps={{
                   endAdornment: (
                     <InputAdornment position="end">%</InputAdornment>
@@ -183,7 +236,14 @@ const AddHost: React.FC = () => {
                 name="diskWarn"
                 label="Warn threshold"
                 size="small"
-                inputRef={register()}
+                inputRef={register({
+                  pattern: {
+                    value: /^[1-9][0-9]?$|^100$/,
+                    message: "Value should be in range from 0 to 100",
+                  },
+                })}
+                error={!!errors.diskWarn}
+                helperText={errors.diskWarn?.message}
                 InputProps={{
                   endAdornment: (
                     <InputAdornment position="end">%</InputAdornment>
@@ -195,7 +255,14 @@ const AddHost: React.FC = () => {
                 name="diskCrit"
                 label="Critical threshold"
                 size="small"
-                inputRef={register()}
+                inputRef={register({
+                  pattern: {
+                    value: /^[1-9][0-9]?$|^100$/,
+                    message: "Value should be in range from 0 to 100",
+                  },
+                })}
+                error={!!errors.diskCrit}
+                helperText={errors.diskCrit?.message}
                 InputProps={{
                   endAdornment: (
                     <InputAdornment position="end">%</InputAdornment>
