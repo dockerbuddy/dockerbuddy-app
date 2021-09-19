@@ -1,17 +1,16 @@
 import React from "react";
 import {
-  Accordion,
-  AccordionDetails,
-  AccordionSummary,
   Box,
   Button,
   Container,
   Grid,
+  InputAdornment,
   TextField,
   Typography,
 } from "@material-ui/core";
-import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
 import { useForm } from "react-hook-form";
+import { proxy } from "../../common/api";
+import { StandardApiResponse } from "../../common/types";
 
 interface Rule {
   ruleType: string;
@@ -22,7 +21,12 @@ interface Rule {
 interface AddHostFormData {
   hostName: string;
   ip: string;
-  rules: [Rule];
+  cpuWarn: string;
+  cpuCrit: string;
+  memWarn: string;
+  memCrit: string;
+  diskWarn: string;
+  diskCrit: string;
 }
 
 const AddHost: React.FC = () => {
@@ -30,6 +34,54 @@ const AddHost: React.FC = () => {
 
   const handleAdd = async (data: AddHostFormData) => {
     console.log(data);
+    const cpuWarn = parseInt(data.cpuWarn);
+    const cpuCrit = parseInt(data.cpuCrit);
+    const memWarn = parseInt(data.memWarn);
+    const memCrit = parseInt(data.memCrit);
+    const diskWarn = parseInt(data.diskWarn);
+    const diskCrit = parseInt(data.diskCrit);
+
+    const rules: Rule[] = [];
+
+    if (!isNaN(cpuWarn) && !isNaN(cpuCrit))
+      rules.push({
+        ruleType: "CpuUsage",
+        warnLevel: cpuWarn,
+        criticalLevel: cpuCrit,
+      });
+
+    if (!isNaN(memWarn) && !isNaN(memCrit))
+      rules.push({
+        ruleType: "MemoryUsage",
+        warnLevel: memWarn,
+        criticalLevel: memCrit,
+      });
+
+    if (!isNaN(diskWarn) && !isNaN(diskCrit))
+      rules.push({
+        ruleType: "DiskUsage",
+        warnLevel: diskWarn,
+        criticalLevel: diskCrit,
+      });
+
+    const json = {
+      hostName: data.hostName,
+      ip: data.ip,
+      rules: rules,
+    };
+
+    console.log(json);
+
+    const response = await fetch(`${proxy}/hosts`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(json),
+    });
+
+    const result: StandardApiResponse = await response.json();
+    console.log(result);
   };
 
   return (
@@ -74,41 +126,82 @@ const AddHost: React.FC = () => {
               />
             </Grid>
             <Grid item>
-              {/* <Box mt={2}>
-                <Typography>Alerting rules</Typography>
-              </Box> */}
-              <Accordion>
-                <AccordionSummary
-                  expandIcon={<ExpandMoreIcon />}
-                  aria-controls="panel1a-content"
-                  id="panel1a-header"
-                >
-                  <Typography>Accordion 1</Typography>
-                </AccordionSummary>
-                <AccordionDetails>
-                  <Typography>
-                    Lorem ipsum dolor sit amet, consectetur adipiscing elit.
-                    Suspendisse malesuada lacus ex, sit amet blandit leo
-                    lobortis eget.
-                  </Typography>
-                </AccordionDetails>
-              </Accordion>
-              <Accordion>
-                <AccordionSummary
-                  expandIcon={<ExpandMoreIcon />}
-                  aria-controls="panel2a-content"
-                  id="panel2a-header"
-                >
-                  <Typography>Accordion 2</Typography>
-                </AccordionSummary>
-                <AccordionDetails>
-                  <Typography>
-                    Lorem ipsum dolor sit amet, consectetur adipiscing elit.
-                    Suspendisse malesuada lacus ex, sit amet blandit leo
-                    lobortis eget.
-                  </Typography>
-                </AccordionDetails>
-              </Accordion>
+              <Typography variant="h6">CPU usage alerting</Typography>
+              <TextField
+                name="cpuWarn"
+                label="Warn threshold"
+                size="small"
+                inputRef={register()}
+                InputProps={{
+                  endAdornment: (
+                    <InputAdornment position="end">%</InputAdornment>
+                  ),
+                }}
+                style={{ marginRight: "40px" }}
+              />
+              <TextField
+                name="cpuCrit"
+                label="Critical threshold"
+                size="small"
+                inputRef={register()}
+                InputProps={{
+                  endAdornment: (
+                    <InputAdornment position="end">%</InputAdornment>
+                  ),
+                }}
+              />
+            </Grid>
+            <Grid item>
+              <Typography variant="h6">Memory usage alerting</Typography>
+              <TextField
+                name="memWarn"
+                label="Warn threshold"
+                size="small"
+                inputRef={register()}
+                InputProps={{
+                  endAdornment: (
+                    <InputAdornment position="end">%</InputAdornment>
+                  ),
+                }}
+                style={{ marginRight: "40px" }}
+              />
+              <TextField
+                name="memCrit"
+                label="Critical threshold"
+                size="small"
+                inputRef={register()}
+                InputProps={{
+                  endAdornment: (
+                    <InputAdornment position="end">%</InputAdornment>
+                  ),
+                }}
+              />
+            </Grid>
+            <Grid item>
+              <Typography variant="h6">Disk usage alerting</Typography>
+              <TextField
+                name="diskWarn"
+                label="Warn threshold"
+                size="small"
+                inputRef={register()}
+                InputProps={{
+                  endAdornment: (
+                    <InputAdornment position="end">%</InputAdornment>
+                  ),
+                }}
+                style={{ marginRight: "40px" }}
+              />
+              <TextField
+                name="diskCrit"
+                label="Critical threshold"
+                size="small"
+                inputRef={register()}
+                InputProps={{
+                  endAdornment: (
+                    <InputAdornment position="end">%</InputAdornment>
+                  ),
+                }}
+              />
             </Grid>
             <Grid item>
               <Button
