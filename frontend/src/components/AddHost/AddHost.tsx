@@ -1,246 +1,314 @@
 import React, { useState } from "react";
-import Button from "@material-ui/core/Button";
-import DialogActions from "@material-ui/core/DialogActions";
-import DialogContent from "@material-ui/core/DialogContent";
-import DialogTitle from "@material-ui/core/DialogTitle";
-import { Alert, AlertTitle } from "@material-ui/lab";
-import TextField from "@material-ui/core/TextField";
-import { Box, Grid, Typography } from "@material-ui/core";
+import {
+  Box,
+  Button,
+  Container,
+  Grid,
+  InputAdornment,
+  TextField,
+  Typography,
+} from "@material-ui/core";
+import { useForm } from "react-hook-form";
 import { proxy } from "../../common/api";
-import { capitalizeFirstLetter } from "../../util/util";
-import RangePicker from "./RangePicker";
+import { PostHostResponse, StandardApiResponse } from "../../common/types";
+import { Alert, AlertTitle } from "@material-ui/lab";
+import { Link } from "react-router-dom";
 
-interface FormData {
-  bucket_name: string;
-  ip_address: string;
+interface Rule {
+  ruleType: string;
+  warnLevel: number;
+  criticalLevel: number;
+}
+
+interface AddHostFormData {
+  hostName: string;
+  ip: string;
+  cpuWarn: string;
+  cpuCrit: string;
+  memWarn: string;
+  memCrit: string;
+  diskWarn: string;
+  diskCrit: string;
 }
 
 const AddHost: React.FC = () => {
-  const [error, setError] = useState("");
-  const [success, setSuccess] = useState("");
-  const [formErros, setFormErros] = useState<FormData>({
-    bucket_name: "",
-    ip_address: "",
-  });
+  const { register, errors, handleSubmit } = useForm<AddHostFormData>();
+  const [error, setError] = useState<string>("");
+  const [hostId, setHostId] = useState<string>("");
 
-  const [virtualRange, setVirtualRange] = useState([50, 80]);
-  const [diskRange, setDiskRange] = useState([50, 80]);
-
-  const [formData, setFormData] = useState<FormData>({
-    bucket_name: "",
-    ip_address: "",
-  });
-
-  const handleSubmit = async (e: React.SyntheticEvent) => {
-    e.preventDefault();
+  const handleAdd = async (data: AddHostFormData) => {
     setError("");
-    setSuccess("");
+    const cpuWarn = parseInt(data.cpuWarn);
+    const cpuCrit = parseInt(data.cpuCrit);
+    const memWarn = parseInt(data.memWarn);
+    const memCrit = parseInt(data.memCrit);
+    const diskWarn = parseInt(data.diskWarn);
+    const diskCrit = parseInt(data.diskCrit);
 
-    let isError = false;
-    if (formData.bucket_name === "") {
-      setFormErros((prev) => ({
-        ...prev,
-        bucket_name: "Host name is required",
-      }));
-      isError = true;
+    const rules: Rule[] = [];
+
+    if (cpuWarn >= cpuCrit) {
+      setError(
+        "CPU usage warn threshold should be smaller than CPU usage critical threshold"
+      );
+      return;
     }
 
-    if (/\s/g.test(formData.bucket_name)) {
-      setFormErros((prev) => ({
-        ...prev,
-        bucket_name: "White space is not allowed in the name",
-      }));
-      isError = true;
+    if (memWarn >= memCrit) {
+      setError(
+        "Memory usage warn threshold should be smaller than memory usage critical threshold"
+      );
+      return;
     }
 
-    if (formData.ip_address === "") {
-      setFormErros((prev) => ({
-        ...prev,
-        ip_address: "IP address is required",
-      }));
-      isError = true;
+    if (diskWarn >= diskCrit) {
+      setError(
+        "Disk usage warn threshold should be smaller than disk usage critical threshold"
+      );
+      return;
     }
+    if (!isNaN(cpuWarn) && !isNaN(cpuCrit))
+      rules.push({
+        ruleType: "CpuUsage",
+        warnLevel: cpuWarn,
+        criticalLevel: cpuCrit,
+      });
 
-    if (!/^(?:[0-9]{1,3}\.){3}[0-9]{1,3}$/.test(formData.ip_address)) {
-      setFormErros((prev) => ({
-        ...prev,
-        ip_address: "IP address is incorrect",
-      }));
-      isError = true;
-    }
+    if (!isNaN(memWarn) && !isNaN(memCrit))
+      rules.push({
+        ruleType: "MemoryUsage",
+        warnLevel: memWarn,
+        criticalLevel: memCrit,
+      });
 
-    if (isError) return;
+    if (!isNaN(diskWarn) && !isNaN(diskCrit))
+      rules.push({
+        ruleType: "DiskUsage",
+        warnLevel: diskWarn,
+        criticalLevel: diskCrit,
+      });
 
-    //TODO TYPE THE RESPONSE!
-    console.log({
-      ...formData,
-      disk_range: {
-        min: diskRange[0],
-        max: diskRange[1],
-      },
-      virtual_range: {
-        min: virtualRange[0],
-        max: virtualRange[1],
-      },
-    });
+    const json = {
+      hostName: data.hostName,
+      ip: data.ip,
+      rules: rules,
+    };
+
     const response = await fetch(`${proxy}/hosts`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({
-        ...formData,
-        disk_range: {
-          min: diskRange[0],
-          max: diskRange[1],
-        },
-        virtual_range: {
-          min: virtualRange[0],
-          max: virtualRange[1],
-        },
-      }),
+      body: JSON.stringify(json),
     });
 
-    const result = await response.json();
-    if (!response.ok) {
-      setError(result.bucket.message);
+    const result: StandardApiResponse = await response.json();
+
+    if (response.ok) {
+      const hostResponse: PostHostResponse = result.body;
+      setHostId(hostResponse.id.toString());
     } else {
-      setSuccess(`Token: ${result.access_token};Bucket: ${result.bucket.name}`);
+      setError(result.message);
     }
   };
 
-  const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setFormData((prev) => ({
-      ...prev,
-      [event.target.id]: event.target.value,
-    }));
-
-    setFormErros((prev) => ({
-      ...prev,
-      [event.target.id]: "",
-    }));
-  };
-
-  const handleClose = async () => {
-    console.log("asdasd");
-    setFormData({
-      bucket_name: "",
-      ip_address: "",
-    });
-
-    setFormErros({
-      bucket_name: "",
-      ip_address: "",
-    });
-
-    setError("");
-    setSuccess("");
-  };
-
-  const [token, bucket] = success.split(";");
-
   return (
-    <Box>
-      <form onSubmit={handleSubmit}>
-        <Box p={4}>
-          <DialogTitle>
-            <Box textAlign="center">
-              <Typography variant="h4">Add new host</Typography>
-            </Box>
-          </DialogTitle>
-          <DialogContent>
-            <Grid
-              container
-              direction="column"
-              spacing={4}
-              style={{ overflow: "hidden" }}
-            >
-              {error && (
-                <Grid item>
-                  <Alert severity="error">{capitalizeFirstLetter(error)}</Alert>
-                </Grid>
-              )}
-              {success && (
-                <Grid item>
-                  <Alert severity="success">
-                    <AlertTitle>Agent settings:</AlertTitle>
-                    {token}
-                    <br />
-                    {bucket}
-                  </Alert>
-                </Grid>
-              )}
-              {!success && (
-                <>
-                  <Grid item>
-                    <TextField
-                      id="ip_address"
-                      name="ip_address"
-                      autoFocus
-                      label="IP Address"
-                      type="text"
-                      variant="outlined"
-                      fullWidth={true}
-                      autoComplete="off"
-                      value={formData.ip_address}
-                      onChange={handleChange}
-                      error={!!formErros.ip_address}
-                      helperText={formErros.ip_address}
-                    />
-                  </Grid>
-                  <Grid item>
-                    <TextField
-                      id="bucket_name"
-                      name="bucket_name"
-                      autoFocus
-                      label="Host name"
-                      type="text"
-                      variant="outlined"
-                      autoComplete="off"
-                      fullWidth={true}
-                      value={formData.bucket_name}
-                      onChange={handleChange}
-                      error={!!formErros.bucket_name}
-                      helperText={formErros.bucket_name}
-                    />
-                  </Grid>
-                  <Grid item>
-                    <RangePicker
-                      virtualRange={virtualRange}
-                      setVirtualRange={setVirtualRange}
-                      diskRange={diskRange}
-                      setDiskRange={setDiskRange}
-                    />
-                  </Grid>
-                </>
-              )}
-            </Grid>
-          </DialogContent>
-          <DialogActions>
-            <Box mt={3}>
-              <Grid container spacing={2}>
-                <Grid item>
-                  <Button
-                    onClick={handleClose}
-                    color="primary"
-                    variant="outlined"
-                  >
-                    Exit
+    <Container maxWidth="md">
+      <Box textAlign="center" m={2}>
+        <Typography variant="h4">Add new host</Typography>
+      </Box>
+      <Box>
+        <form onSubmit={handleSubmit(handleAdd)}>
+          {hostId ? (
+            <>
+              <Alert severity="success">
+                <AlertTitle>Host added</AlertTitle>
+                This is your unique host identifier: <strong>{hostId}</strong>
+                <br />
+                You will have to pass it in agent{"'"}s config
+              </Alert>
+              <Box textAlign="center" mt={3}>
+                <Link to="/" style={{ textDecoration: "none" }}>
+                  <Button variant="outlined" color="primary">
+                    confirm
                   </Button>
-                </Grid>
-                {!success && (
-                  <Grid item>
-                    <Button type="submit" color="primary" variant="contained">
-                      Create
-                    </Button>
-                  </Grid>
-                )}
+                </Link>
+              </Box>
+            </>
+          ) : (
+            <Grid container item direction="column" spacing={4}>
+              <Grid item>
+                {error && <Alert severity="error">{error}</Alert>}
               </Grid>
-            </Box>
-          </DialogActions>
-        </Box>
-      </form>
-    </Box>
+              <Grid item>
+                <TextField
+                  name="ip"
+                  label="IP Address"
+                  variant="outlined"
+                  fullWidth={true}
+                  size="small"
+                  inputRef={register({
+                    required: "IP Address is required",
+                    pattern: {
+                      value:
+                        /^(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/,
+                      message: "Invalid IP Address",
+                    },
+                  })}
+                  error={!!errors.ip}
+                  helperText={errors.ip?.message}
+                />
+              </Grid>
+              <Grid item>
+                <TextField
+                  name="hostName"
+                  label="Host Name"
+                  variant="outlined"
+                  fullWidth={true}
+                  size="small"
+                  inputRef={register({
+                    required: "Host Name is required",
+                  })}
+                  error={!!errors.hostName}
+                  helperText={errors.hostName?.message}
+                />
+              </Grid>
+              <Grid item>
+                <Typography variant="h6">CPU usage alerting</Typography>
+                <TextField
+                  name="cpuWarn"
+                  label="Warn threshold"
+                  size="small"
+                  inputRef={register({
+                    pattern: {
+                      value: /^[1-9][0-9]?$|^100$/,
+                      message: "Value should be in range from 0 to 100",
+                    },
+                  })}
+                  error={!!errors.cpuWarn}
+                  helperText={errors.cpuWarn?.message}
+                  InputProps={{
+                    endAdornment: (
+                      <InputAdornment position="end">%</InputAdornment>
+                    ),
+                  }}
+                  style={{ marginRight: "40px" }}
+                />
+                <TextField
+                  name="cpuCrit"
+                  label="Critical threshold"
+                  size="small"
+                  inputRef={register({
+                    pattern: {
+                      value: /^[1-9][0-9]?$|^100$/,
+                      message: "Value should be in range from 0 to 100",
+                    },
+                  })}
+                  error={!!errors.cpuCrit}
+                  helperText={errors.cpuCrit?.message}
+                  InputProps={{
+                    endAdornment: (
+                      <InputAdornment position="end">%</InputAdornment>
+                    ),
+                  }}
+                />
+              </Grid>
+              <Grid item>
+                <Typography variant="h6">Memory usage alerting</Typography>
+                <TextField
+                  name="memWarn"
+                  label="Warn threshold"
+                  size="small"
+                  inputRef={register({
+                    pattern: {
+                      value: /^[1-9][0-9]?$|^100$/,
+                      message: "Value should be in range from 0 to 100",
+                    },
+                  })}
+                  error={!!errors.memWarn}
+                  helperText={errors.memWarn?.message}
+                  InputProps={{
+                    endAdornment: (
+                      <InputAdornment position="end">%</InputAdornment>
+                    ),
+                  }}
+                  style={{ marginRight: "40px" }}
+                />
+                <TextField
+                  name="memCrit"
+                  label="Critical threshold"
+                  size="small"
+                  inputRef={register({
+                    pattern: {
+                      value: /^[1-9][0-9]?$|^100$/,
+                      message: "Value should be in range from 0 to 100",
+                    },
+                  })}
+                  error={!!errors.memCrit}
+                  helperText={errors.memCrit?.message}
+                  InputProps={{
+                    endAdornment: (
+                      <InputAdornment position="end">%</InputAdornment>
+                    ),
+                  }}
+                />
+              </Grid>
+              <Grid item>
+                <Typography variant="h6">Disk usage alerting</Typography>
+                <TextField
+                  name="diskWarn"
+                  label="Warn threshold"
+                  size="small"
+                  inputRef={register({
+                    pattern: {
+                      value: /^[1-9][0-9]?$|^100$/,
+                      message: "Value should be in range from 0 to 100",
+                    },
+                  })}
+                  error={!!errors.diskWarn}
+                  helperText={errors.diskWarn?.message}
+                  InputProps={{
+                    endAdornment: (
+                      <InputAdornment position="end">%</InputAdornment>
+                    ),
+                  }}
+                  style={{ marginRight: "40px" }}
+                />
+                <TextField
+                  name="diskCrit"
+                  label="Critical threshold"
+                  size="small"
+                  inputRef={register({
+                    pattern: {
+                      value: /^[1-9][0-9]?$|^100$/,
+                      message: "Value should be in range from 0 to 100",
+                    },
+                  })}
+                  error={!!errors.diskCrit}
+                  helperText={errors.diskCrit?.message}
+                  InputProps={{
+                    endAdornment: (
+                      <InputAdornment position="end">%</InputAdornment>
+                    ),
+                  }}
+                />
+              </Grid>
+              <Grid item>
+                <Button
+                  type="submit"
+                  variant="contained"
+                  color="primary"
+                  disableElevation
+                  fullWidth
+                >
+                  Submit
+                </Button>
+              </Grid>
+            </Grid>
+          )}
+        </form>
+      </Box>
+    </Container>
   );
 };
 
