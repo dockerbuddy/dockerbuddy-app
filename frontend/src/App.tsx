@@ -14,20 +14,20 @@ const App: React.FC = () => {
     <BrowserRouter>
       <ThemeProvider theme={theme}>
         <Provider store={store}>
-          <WebSocketProvider>
-            <SnackbarProvider
-              maxSnack={4}
-              anchorOrigin={{
-                vertical: "bottom",
-                horizontal: "right",
-              }}
-            >
+          <SnackbarProvider
+            maxSnack={4}
+            anchorOrigin={{
+              vertical: "bottom",
+              horizontal: "right",
+            }}
+          >
+            <WebSocketProvider>
               <CssBaseline />
               <Layout>
                 <Navigation />
               </Layout>
-            </SnackbarProvider>
-          </WebSocketProvider>
+            </WebSocketProvider>
+          </SnackbarProvider>
         </Provider>
       </ThemeProvider>
     </BrowserRouter>

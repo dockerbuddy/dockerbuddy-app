@@ -4,7 +4,7 @@ import { Alert } from "@material-ui/lab";
 import HostCardComponent from "./HostCardComponent";
 import { selectHost } from "../../hosts/hostsSlice";
 import { useAppSelector } from "../../redux/hooks";
-import { FullHostSummary } from "../../hosts/types";
+import { FullHostSummary } from "../../common/types";
 
 const useStyles = makeStyles(() => ({
   root: {

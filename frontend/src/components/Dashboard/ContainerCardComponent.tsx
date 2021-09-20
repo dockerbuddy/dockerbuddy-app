@@ -7,7 +7,7 @@ import {
   Typography,
 } from "@material-ui/core";
 import { humanFileSize } from "../../util/util";
-import { ContainerSummary } from "../../hosts/types";
+import { ContainerSummary } from "../../common/types";
 
 const useStyles = makeStyles((theme) => ({
   card: {

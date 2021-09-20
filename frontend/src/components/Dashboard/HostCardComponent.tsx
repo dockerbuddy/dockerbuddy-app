@@ -13,7 +13,7 @@ import SettingsIcon from "@material-ui/icons/Settings";
 import { humanFileSize } from "../../util/util";
 import ProgressBarComponent from "./ProgressBarComponent";
 import ContainerCardComponent from "./ContainerCardComponent";
-import { ContainerSummary, FullHostSummary } from "../../hosts/types";
+import { ContainerSummary, FullHostSummary } from "../../common/types";
 
 const useStyles = makeStyles((theme) => ({
   card: {

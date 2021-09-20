@@ -1,7 +1,7 @@
 import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { RootState } from "../redux/store";
 import { fetchHosts } from "../common/api";
-import { FullHostSummary, HostSummary } from "./types";
+import { FullHostSummary, HostSummary } from "../common/types";
 
 export interface HostState {
   status: "LOADING" | "ERROR" | "LOADED";
