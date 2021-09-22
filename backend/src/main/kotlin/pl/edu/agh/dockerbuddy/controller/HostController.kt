@@ -16,7 +16,6 @@ import pl.edu.agh.dockerbuddy.service.HostService
 class HostController (
     val hostService: HostService
 ) {
-    private val logger = LoggerFactory.getLogger(ExceptionHelper::class.java)
 
     @PostMapping
     fun addHost(@RequestBody host: Host): ResponseEntity<DefaultResponse> {

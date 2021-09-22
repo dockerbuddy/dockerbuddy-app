@@ -37,11 +37,11 @@ class HostService (
         val hostsWithSummary = mutableListOf<HostWithSummary>()
         val hosts = hostRepository.findAll()
 
-        logger.info("Processing found hosts:")
+        logger.info("Processing ${hosts.size} found hosts")
         for (host in hosts) {
-            logger.info("> $host")
+            logger.debug("> $host")
             val hostSummary = inMemory.getHostSummary(host.id!!)
-            logger.info("Found newest host summary: $hostSummary") // TODO change message
+            logger.debug("Found newest host summary: $hostSummary")
             hostsWithSummary.add(
                 HostWithSummary(
                     host.id!!,
