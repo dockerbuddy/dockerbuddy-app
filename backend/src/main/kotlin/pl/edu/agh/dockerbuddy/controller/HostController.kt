@@ -31,4 +31,18 @@ class HostController (
             return ResponseEntity.status(HttpStatus.OK)
                 .body(DefaultResponse(ResponseType.SUCCESS, "Hosts fetched", hostWithSummary))
     }
+
+    @DeleteMapping("/{id}")
+    fun deleteHost(@PathVariable id: Long): ResponseEntity<DefaultResponse> {
+        hostService.deleteHost(id)
+        return ResponseEntity.status(HttpStatus.OK)
+            .body(DefaultResponse(ResponseType.SUCCESS, "Host deleted", null))
+    }
+
+    @PutMapping("/{id}")
+    fun updateHost(@PathVariable id: Long, @RequestBody host: Host): ResponseEntity<DefaultResponse> {
+        val updatedHost = hostService.updateHost(id, host)
+        return ResponseEntity.status(HttpStatus.OK)
+            .body(DefaultResponse(ResponseType.SUCCESS, "Host updated", updatedHost))
+    }
 }

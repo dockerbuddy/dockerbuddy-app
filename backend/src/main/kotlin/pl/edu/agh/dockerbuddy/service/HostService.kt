@@ -21,6 +21,17 @@ class HostService (
         return hostRepository.save(host)
     }
 
+    fun deleteHost(id: Long) {
+        logger.info("Deleting host $id")
+        if (!hostRepository.existsById(id)) throw EntityNotFoundException("Host $id does not exist")
+        return hostRepository.deleteById(id)
+    }
+
+    fun updateHost(id: Long, host: Host): Host {
+        logger.info("Host $id update: $host")
+        return hostRepository.save(host)
+    }
+
     fun getHostsWithSummary(): List<HostWithSummary> {
         logger.info("Fetching all hosts with summary")
         val hostsWithSummary = mutableListOf<HostWithSummary>()
