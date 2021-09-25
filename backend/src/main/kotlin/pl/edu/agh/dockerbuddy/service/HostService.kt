@@ -24,11 +24,14 @@ class HostService (
     fun deleteHost(id: Long) {
         logger.info("Deleting host $id")
         if (!hostRepository.existsById(id)) throw EntityNotFoundException("Host $id does not exist")
+        inMemory.deleteHost(id)
         return hostRepository.deleteById(id)
     }
 
     fun updateHost(id: Long, host: Host): Host {
+        if (!hostRepository.existsById(id)) throw EntityNotFoundException("Host $id does not exist")
         logger.info("Host $id update: $host")
+        host.id = id
         return hostRepository.save(host)
     }
 

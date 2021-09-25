@@ -7,6 +7,7 @@ import pl.edu.agh.dockerbuddy.controller.response.DefaultResponse
 import pl.edu.agh.dockerbuddy.controller.response.ResponseType
 import pl.edu.agh.dockerbuddy.model.metric.HostSummary
 import pl.edu.agh.dockerbuddy.service.MetricService
+import javax.validation.Valid
 
 @CrossOrigin
 @RestController
@@ -14,7 +15,7 @@ import pl.edu.agh.dockerbuddy.service.MetricService
 class MetricController(val metricService: MetricService) {
 
     @PostMapping
-    fun addMetric(@RequestBody hostSummary: HostSummary): ResponseEntity<DefaultResponse> {
+    fun addMetric(@RequestBody @Valid hostSummary: HostSummary): ResponseEntity<DefaultResponse> {
             metricService.postMetric(hostSummary, hostSummary.id)
             return ResponseEntity.status(HttpStatus.OK)
                     .body(DefaultResponse(ResponseType.SUCCESS, "Metric uploaded", null))

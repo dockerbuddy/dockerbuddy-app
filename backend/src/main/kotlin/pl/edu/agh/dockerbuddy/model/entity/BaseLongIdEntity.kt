@@ -1,8 +1,10 @@
 package pl.edu.agh.dockerbuddy.model.entity
 
 import com.fasterxml.jackson.annotation.JsonIgnore
+import lombok.ToString
 import javax.persistence.*
 
+@ToString
 @MappedSuperclass
 class BaseLongIdEntity {
     @Id
