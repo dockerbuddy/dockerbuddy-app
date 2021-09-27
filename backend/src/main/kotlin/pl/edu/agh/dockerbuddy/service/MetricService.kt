@@ -1,6 +1,5 @@
 package pl.edu.agh.dockerbuddy.service
 
-import io.reactivex.internal.util.ExceptionHelper
 import kotlinx.coroutines.*
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Qualifier
@@ -14,7 +13,6 @@ import pl.edu.agh.dockerbuddy.repository.HostRepository
 import pl.edu.agh.dockerbuddy.tools.appendAlertTypeToMetrics
 import pl.edu.agh.dockerbuddy.tools.checkForAlertSummary
 import javax.persistence.EntityNotFoundException
-import kotlin.math.log
 
 @Service
 class MetricService(
@@ -25,7 +23,7 @@ class MetricService(
     val influxDbProxy: InfluxDbProxy
 ) {
 
-    private val logger = LoggerFactory.getLogger(ExceptionHelper::class.java)
+    private val logger = LoggerFactory.getLogger(MetricService::class.java)
 
     fun postMetric(hostSummary: HostSummary, hostId: Long){
         logger.info("Processing new metrics for host $hostId")

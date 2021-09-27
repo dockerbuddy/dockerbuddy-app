@@ -14,7 +14,7 @@ class HostService (
     private val hostRepository: HostRepository,
     private val inMemory: InMemory,
 ){
-    private val logger = LoggerFactory.getLogger(ExceptionHelper::class.java)
+    private val logger = LoggerFactory.getLogger(HostService::class.java)
 
     fun addHost(host: Host): Host {
         logger.info("New host received. Attempting to add: $host")

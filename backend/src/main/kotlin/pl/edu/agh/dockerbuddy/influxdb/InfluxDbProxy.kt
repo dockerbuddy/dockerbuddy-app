@@ -27,7 +27,7 @@ class InfluxDbProxy {
     @Value("\${influxdb.url}")
     lateinit var url: String
 
-    private val logger = LoggerFactory.getLogger(ExceptionHelper::class.java)
+    private val logger = LoggerFactory.getLogger(InfluxDbProxy::class.java)
 
     val checklist = mutableListOf<String>()
 

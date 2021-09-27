@@ -1,6 +1,5 @@
 package pl.edu.agh.dockerbuddy.controller.exceptionhandler
 
-import io.reactivex.internal.util.ExceptionHelper
 import org.slf4j.LoggerFactory
 import org.springframework.core.Ordered
 import org.springframework.core.annotation.Order
@@ -18,7 +17,7 @@ import javax.validation.ConstraintViolationException
 
 @ControllerAdvice
 class ExceptionHandler {
-    private val logger = LoggerFactory.getLogger(ExceptionHelper::class.java)
+    private val logger = LoggerFactory.getLogger(pl.edu.agh.dockerbuddy.controller.exceptionhandler.ExceptionHandler::class.java)
 
     @ExceptionHandler(value = [ EntityNotFoundException::class ])
     fun handleEntityNotFound(ex: EntityNotFoundException): ResponseEntity<DefaultResponse> {

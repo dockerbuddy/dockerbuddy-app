@@ -16,7 +16,7 @@ import pl.edu.agh.dockerbuddy.influxdb.InfluxDbProxy
 class InfluxController (
     val influxDbProxy: InfluxDbProxy
 ){
-    private val logger = LoggerFactory.getLogger(ExceptionHelper::class.java)
+    private val logger = LoggerFactory.getLogger(InfluxController::class.java)
 
     @GetMapping
     fun getHostMetricFromRange(
