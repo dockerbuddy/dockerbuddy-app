@@ -1,12 +1,14 @@
 package pl.edu.agh.dockerbuddy.model.entity
 
 import com.fasterxml.jackson.annotation.JsonAlias
+import lombok.ToString
 import pl.edu.agh.dockerbuddy.model.RuleType
 import java.lang.IllegalArgumentException
 import javax.persistence.*
 import javax.validation.constraints.Max
 import javax.validation.constraints.Min
 
+@ToString
 @Table(name = "abstract_rule")
 @Entity
 class AbstractRule (

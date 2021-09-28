@@ -16,7 +16,7 @@ import pl.edu.agh.dockerbuddy.influxdb.InfluxDbProxy
 class InfluxController (
     val influxDbProxy: InfluxDbProxy
 ){
-    private val logger = LoggerFactory.getLogger(ExceptionHelper::class.java)
+    private val logger = LoggerFactory.getLogger(InfluxController::class.java)
 
     @GetMapping
     fun getHostMetricFromRange(
@@ -25,7 +25,8 @@ class InfluxController (
         @RequestParam start: String, // TODO choose time representation and apply regex
         @RequestParam(required = false) end: String? // TODO choose time representation and apply regex
     ): ResponseEntity<DefaultResponse> {
-        logger.info("[GET /api/v2/influxdb] getHostMetricFromRange: " +
+        logger.info("GET /api/v2/influxdb")
+        logger.debug("getHostMetricFromRange: " +
                 "metricType: $metricType, " +
                 "hostId: $hostId, " +
                 "start: $start, " +

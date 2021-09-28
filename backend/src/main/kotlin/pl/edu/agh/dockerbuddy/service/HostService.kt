@@ -14,10 +14,24 @@ class HostService (
     private val hostRepository: HostRepository,
     private val inMemory: InMemory,
 ){
-    private val logger = LoggerFactory.getLogger(ExceptionHelper::class.java)
+    private val logger = LoggerFactory.getLogger(HostService::class.java)
 
     fun addHost(host: Host): Host {
         logger.info("New host received. Attempting to add: $host")
+        return hostRepository.save(host)
+    }
+
+    fun deleteHost(id: Long) {
+        logger.info("Deleting host $id")
+        if (!hostRepository.existsById(id)) throw EntityNotFoundException("Host $id does not exist")
+        inMemory.deleteHost(id)
+        return hostRepository.deleteById(id)
+    }
+
+    fun updateHost(id: Long, host: Host): Host {
+        if (!hostRepository.existsById(id)) throw EntityNotFoundException("Host $id does not exist")
+        logger.info("Host $id update: $host")
+        host.id = id
         return hostRepository.save(host)
     }
 
@@ -26,11 +40,11 @@ class HostService (
         val hostsWithSummary = mutableListOf<HostWithSummary>()
         val hosts = hostRepository.findAll()
 
-        logger.info("Processing found hosts:")
+        logger.info("Processing ${hosts.size} found hosts")
         for (host in hosts) {
-            logger.info("> $host")
+            logger.debug("> $host")
             val hostSummary = inMemory.getHostSummary(host.id!!)
-            logger.info("Found newest host summary: $hostSummary") // TODO change message
+            logger.debug("Found newest host summary: $hostSummary")
             hostsWithSummary.add(
                 HostWithSummary(
                     host.id!!,

@@ -27,7 +27,7 @@ class InfluxDbProxy {
     @Value("\${influxdb.url}")
     lateinit var url: String
 
-    private val logger = LoggerFactory.getLogger(ExceptionHelper::class.java)
+    private val logger = LoggerFactory.getLogger(InfluxDbProxy::class.java)
 
     val checklist = mutableListOf<String>()
 
@@ -43,7 +43,8 @@ class InfluxDbProxy {
     }
 
     suspend fun saveMetric(hostId: Long, hostSummary: HostSummary) {
-        logger.info("Saving metric $hostSummary for host with id $hostId")
+        logger.info("Saving metric for host $hostId")
+        logger.debug("$hostSummary")
         val influxDBClient = InfluxDBClientKotlinFactory.create(url, token.toCharArray(), organization, bucket)
         val writeApi = influxDBClient.getWriteKotlinApi()
 
@@ -63,9 +64,9 @@ class InfluxDbProxy {
             .time(Instant.now().toEpochMilli(), WritePrecision.MS)
         writeApi.writePoint(hostPoint)
 
-        logger.info("Processing container metrics for host with id $hostId")
+        logger.info("Processing container metrics for host $hostId")
         for (container in hostSummary.containers) {
-            logger.info("> $container")
+            logger.debug("> $container")
             val containerPoint = Point.measurement("container")
                 .addTag("host_id", hostId.toString())
                 .addTag("metric_id", hostSummary.id.toString())
@@ -106,7 +107,7 @@ class InfluxDbProxy {
 
         if (result.isEmpty()) throw EntityNotFoundException("No records found")
 
-        logger.info("Records fetched form InfluxDB: $result")
+        logger.info("${result.size} records fetched form InfluxDB")
         return result
     }
 }
