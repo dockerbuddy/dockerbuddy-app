@@ -5,7 +5,7 @@ import pl.edu.agh.dockerbuddy.model.AlertType
 
 @ToString
 data class BasicMetric(
-        val value: Double,
+        val used: Double,
         val total: Double,
         val percent: Double,
         var alertType: AlertType?,
