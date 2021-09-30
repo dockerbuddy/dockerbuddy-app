@@ -20,28 +20,28 @@ class ExceptionHandler {
     private val logger = LoggerFactory.getLogger(pl.edu.agh.dockerbuddy.controller.exceptionhandler.ExceptionHandler::class.java)
 
     @ExceptionHandler(value = [ EntityNotFoundException::class ])
-    fun handleEntityNotFound(ex: EntityNotFoundException): ResponseEntity<DefaultResponse> {
+    fun handleEntityNotFound(ex: EntityNotFoundException): ResponseEntity<DefaultResponse<Any?>> {
         logger.warn(ex.message)
         return ResponseEntity.status(HttpStatus.NOT_FOUND)
             .body(DefaultResponse(ResponseType.ERROR, ex.message ?: "No message provided", null))
     }
 
     @ExceptionHandler(value = [ IllegalArgumentException::class ])
-    fun handleIllegalArgumentException(ex: IllegalArgumentException):ResponseEntity<DefaultResponse> {
+    fun handleIllegalArgumentException(ex: IllegalArgumentException):ResponseEntity<DefaultResponse<Any?>> {
         logger.error("IllegalArgumentException: " + ex.message)
         return ResponseEntity.status(HttpStatus.BAD_REQUEST)
             .body(DefaultResponse(ResponseType.ERROR, ex.message ?: "No message provided", null))
     }
 
     @ExceptionHandler(value = [ ConstraintViolationException::class, org.hibernate.exception.ConstraintViolationException::class ])
-    fun handleIllegalArgumentException(ex: Exception):ResponseEntity<DefaultResponse> {
+    fun handleIllegalArgumentException(ex: Exception):ResponseEntity<DefaultResponse<Any?>> {
         logger.error("ConstraintViolationException: " + ex.message)
         return ResponseEntity.status(HttpStatus.BAD_REQUEST)
             .body(DefaultResponse(ResponseType.ERROR, ex.message ?: "No message provided", null))
     }
 
     @ExceptionHandler(value = [MethodArgumentNotValidException::class])
-    fun handleValidationExceptions(ex: MethodArgumentNotValidException):ResponseEntity<DefaultResponse> {
+    fun handleValidationExceptions(ex: MethodArgumentNotValidException):ResponseEntity<DefaultResponse<Any?>> {
         val errors: MutableMap<String, String> = HashMap()
         ex.bindingResult.allErrors.forEach { error ->
             val fieldName = (error as FieldError).field
@@ -55,7 +55,7 @@ class ExceptionHandler {
 
     @Order(Ordered.LOWEST_PRECEDENCE)
     @ExceptionHandler(value = [ Exception::class ])
-    fun handleOtherException(ex: Exception): ResponseEntity<DefaultResponse> {
+    fun handleOtherException(ex: Exception): ResponseEntity<DefaultResponse<Any?>> {
         logger.error("An unhandled exception occurred: " + ex.message)
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
             .body(DefaultResponse(ResponseType.ERROR, ex.message ?: "No message provided", null))
