@@ -23,17 +23,17 @@ class InfluxController (
 
     @ApiOperation(value = "Get host's metrics form a range of time")
     @ApiImplicitParams(value = [
-        ApiImplicitParam(name = "metricType", value = "Type of a metric"),
-        ApiImplicitParam(name = "hostId", value = "Id of a host"),
-        ApiImplicitParam(name = "start", value = "Start time, eg -1d, -10m, etc."),
-        ApiImplicitParam(name = "end", value = "End time, must be greater than start time"),
+        ApiImplicitParam(name = "metricType", value = "Type of a metric", dataTypeClass = String::class),
+        ApiImplicitParam(name = "hostId", value = "Id of a host", dataTypeClass = Long::class, example = "1"),
+        ApiImplicitParam(name = "start", value = "Start time, eg -1d, -10m, etc.", dataTypeClass = String::class),
+        ApiImplicitParam(name = "end", value = "End time, must be greater than start time", dataTypeClass = String::class),
     ])
     @GetMapping(produces = ["application/json"])
     fun getHostMetricFromRange(
         @RequestParam metricType: String,
         @RequestParam hostId: Long,
         @RequestParam start: String, // TODO choose time representation and apply regex
-        @RequestParam(required = false) end: String? // TODO choose time representation and apply regex
+        @RequestParam(required = false, defaultValue = "now()") end: String // TODO choose time representation and apply regex
     ): ResponseEntity<DefaultResponse<List<CustomFluxRecord>>> {
         logger.info("GET /api/v2/influxdb")
         logger.debug("getHostMetricFromRange: " +

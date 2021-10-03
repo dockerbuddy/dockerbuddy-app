@@ -42,7 +42,7 @@ class HostController (
 
     @ApiOperation(value = "Delete host")
     @ApiImplicitParams(value = [
-           ApiImplicitParam(name = "id", value = "Id of a host")
+           ApiImplicitParam(name = "id", value = "Id of a host", dataTypeClass = Long::class, example = "1")
     ])
     @DeleteMapping(value =["/{id}"], produces = ["application/json"])
     fun deleteHost(@PathVariable id: Long): ResponseEntity<DefaultResponse<Any?>> {
@@ -53,7 +53,7 @@ class HostController (
 
     @ApiOperation(value = "Update host")
     @ApiImplicitParams(value = [
-        ApiImplicitParam(name = "id", value = "Id of a host")
+        ApiImplicitParam(name = "id", value = "Id of a host", dataTypeClass = Long::class, example = "1")
     ])
     @PutMapping(value = ["/{id}"], produces = ["application/json"])
     fun updateHost(@PathVariable id: Long, @RequestBody @Valid host: Host): ResponseEntity<DefaultResponse<Host>> {

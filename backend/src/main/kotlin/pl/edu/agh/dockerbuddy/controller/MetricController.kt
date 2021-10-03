@@ -17,7 +17,7 @@ import javax.validation.Valid
 @RequestMapping("/api/v2/metrics")
 class MetricController(val metricService: MetricService) {
 
-    @ApiOperation(value = "Add new metric")
+    @ApiOperation(value = "Add new metric reading")
     @PostMapping(produces = ["application/json"])
     fun addMetric(@RequestBody @Valid hostSummary: HostSummary): ResponseEntity<DefaultResponse<Any?>> {
             metricService.postMetric(hostSummary, hostSummary.id)
