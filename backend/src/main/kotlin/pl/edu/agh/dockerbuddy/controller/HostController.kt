@@ -33,11 +33,21 @@ class HostController (
 
     @ApiOperation(value = "Get all hosts with their summaries")
     @GetMapping(produces = ["application/json"])
-    fun getHostsWithSummary(): ResponseEntity<DefaultResponse<List<HostWithSummary>>> {
-            val hostsWithSummary = hostService.getHostsWithSummary()
-            if (hostsWithSummary.isEmpty()) throw EntityNotFoundException("No hosts were found")
+    fun getAllHostsWithSummary(): ResponseEntity<DefaultResponse<List<HostWithSummary>>> {
+            val hostsWithSummary = hostService.getAllHostsWithSummary()
             return ResponseEntity.status(HttpStatus.OK)
                 .body(DefaultResponse(ResponseType.SUCCESS, "Hosts fetched", hostsWithSummary))
+    }
+
+    @ApiOperation(value = "Get specific host with summary")
+    @ApiImplicitParams(value = [
+        ApiImplicitParam(name = "id", value = "Id of a host", dataTypeClass = Long::class, example = "1")
+    ])
+    @GetMapping(value =["/{id}"], produces = ["application/json"])
+    fun getHostWithSummary(@PathVariable id: Long): ResponseEntity<DefaultResponse<HostWithSummary>> {
+        val hostsWithSummary = hostService.getHostWithSummary(id)
+        return ResponseEntity.status(HttpStatus.OK)
+            .body(DefaultResponse(ResponseType.SUCCESS, "Hosts fetched", hostsWithSummary))
     }
 
     @ApiOperation(value = "Delete host")
