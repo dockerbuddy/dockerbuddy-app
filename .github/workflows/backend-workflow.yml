@@ -2,10 +2,16 @@ name: Backend workflow v1.0
 
 on:
   push:
-    branches: [ main ]
+    branches: 
+      - main
+    paths:
+      - 'backend/**'
 
   pull_request:
-    branches: [ main ]
+    branches: 
+      - main
+    paths:
+      - 'backend/**'
 
 jobs:
   build:
