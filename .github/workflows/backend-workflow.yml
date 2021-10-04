@@ -2,14 +2,15 @@ name: Backend workflow v1.0
 
 on:
   push:
-    branches: [ $default-branch ]
+    branches: [ main ]
 
   pull_request:
-    branches: [ $default-branch ]
+    branches: [ main ]
 
 jobs:
   build:
-
+    name: Build and Test
+    
     runs-on: ubuntu-latest
 
     steps:
@@ -24,4 +25,6 @@ jobs:
         cache: maven
         
     - name: Step 3 - Build with Maven
-      run: mvn -B package --file pom.xml
+      run: |
+        cd backend
+        mvn -B package --file pom.xml
