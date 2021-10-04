@@ -29,7 +29,7 @@ class MetricService(
         logger.info("Processing new metrics for host $hostId")
         logger.debug("$hostSummary")
         val host: Host = hostRepository.findByIdOrNull(hostId) ?:
-            throw EntityNotFoundException("Host with id $hostId not found. Cannot add metric")
+            throw EntityNotFoundException("Host $hostId not found. Cannot add metric")
         appendAlertTypeToMetrics(hostSummary, host.rules)
 
         val prevHostSummary: HostSummary? = inMemory.getHostSummary(hostId)
