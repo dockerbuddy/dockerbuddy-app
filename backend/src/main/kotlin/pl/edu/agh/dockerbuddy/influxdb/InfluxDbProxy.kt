@@ -5,9 +5,11 @@ import com.influxdb.client.domain.WritePrecision
 import com.influxdb.client.write.Point
 import io.reactivex.internal.util.ExceptionHelper
 import kotlinx.coroutines.channels.toList
+import org.dom4j.rule.Rule
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Service
+import pl.edu.agh.dockerbuddy.model.AlertType
 import pl.edu.agh.dockerbuddy.model.RuleType
 import pl.edu.agh.dockerbuddy.model.metric.BasicMetric
 import pl.edu.agh.dockerbuddy.model.metric.HostSummary
@@ -131,21 +133,30 @@ class InfluxDbProxy {
         writeApi.writePoint(alertPoint)
     }
 
-    suspend fun queryAlerts(hostId: Long?, start: String, end: String?): List<CustomFluxRecord> {
+    suspend fun queryAlerts(hostId: Long?, start: String, end: String?): List<AlertRecord> {
 
         val influxDBClient = InfluxDBClientKotlinFactory.create(url, token.toCharArray(), organization, bucket)
         val fluxQuery = ("from(bucket: \"$bucket\")\n"
                 + " |> range(start: $start, stop: ${end ?: "now()"})"
                 + " |> filter(fn: (r) => (" +
-                "r._measurement == \"alerts\" " +
+                "r._measurement == \"alerts\" and " +
+                "r._field == \"percent\" " +
                 if (hostId != null) " and r.host_id == \"$hostId\"))" else "))"
                 )
 
-        influxDBClient.getQueryKotlinApi().query(fluxQuery).toList().forEach { logger.info(it.toString()) }
+        val result = influxDBClient.getQueryKotlinApi().query(fluxQuery).toList().map {
+            logger.info(it.values.toString())
+            AlertRecord(
+                    it.values["host_id"].toString().toLong(),
+                    AlertType.valueOf(it.values["alert_type"].toString()),
+                    RuleType.valueOf(it.values["rule_type"].toString()),
+                    it.value as Double,
+                    it.time.toString()
+            ) }
 
-//        if (result.isEmpty()) throw EntityNotFoundException("No records found")
-//
-//        logger.info("${result.size} records fetched form InfluxDB")
-        return listOf(CustomFluxRecord("1", 2.0))
+        if (result.isEmpty()) throw EntityNotFoundException("No records found")
+
+        logger.info("${result.size} records fetched form InfluxDB")
+        return result
     }
 }
