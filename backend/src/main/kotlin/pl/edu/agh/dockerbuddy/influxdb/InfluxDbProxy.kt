@@ -130,4 +130,22 @@ class InfluxDbProxy {
 
         writeApi.writePoint(alertPoint)
     }
+
+    suspend fun queryAlerts(hostId: Long?, start: String, end: String?): List<CustomFluxRecord> {
+
+        val influxDBClient = InfluxDBClientKotlinFactory.create(url, token.toCharArray(), organization, bucket)
+        val fluxQuery = ("from(bucket: \"$bucket\")\n"
+                + " |> range(start: $start, stop: ${end ?: "now()"})"
+                + " |> filter(fn: (r) => (" +
+                "r._measurement == \"alerts\" " +
+                if (hostId != null) " and r.host_id == \"$hostId\"))" else "))"
+                )
+
+        influxDBClient.getQueryKotlinApi().query(fluxQuery).toList().forEach { logger.info(it.toString()) }
+
+//        if (result.isEmpty()) throw EntityNotFoundException("No records found")
+//
+//        logger.info("${result.size} records fetched form InfluxDB")
+        return listOf(CustomFluxRecord("1", 2.0))
+    }
 }
