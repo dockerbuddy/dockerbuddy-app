@@ -34,23 +34,26 @@ class HostService (
         return hostRepository.save(host)
     }
 
-    fun getHostWithSummary(id: Long): HostWithSummary {
-        logger.info("Fetching host $id")
-        val foundHost = hostRepository.findById(id)
-        if (foundHost.isEmpty) throw EntityNotFoundException("Host $id does not exist")
-        val host = foundHost.get()
+    // TODO: consider if needed
+//    fun getHostWithSummary(id: Long): HostWithSummary {
+//        logger.info("Fetching host $id")
+//        val foundHost = hostRepository.findById(id)
+//        if (foundHost.isEmpty) throw EntityNotFoundException("Host $id does not exist")
+//        val host = foundHost.get()
+//
+//        logger.info("Fetching host $id summary")
+//        val hostSummary =  inMemory.getHostSummary(id)
+//        return HostWithSummary(
+//            host.id!!,
+//            host.hostName!!,
+//            host.ip!!,
+//            host.hostRules,
+//            host.containersRules,
+//            hostSummary
+//        )
+//    }
 
-        logger.info("Fetching host $id summary")
-        val hostSummary =  inMemory.getHostSummary(id)
-        return HostWithSummary(
-            host.id!!,
-            host.hostName!!,
-            host.ip!!,
-            hostSummary
-        )
-    }
-
-    fun getAllHostsWithSummary(): List<HostWithSummary> {
+    fun getAllHostsWithSummaries(): List<HostWithSummary> {
         logger.info("Fetching all hosts with summary")
         val hostsWithSummary = mutableListOf<HostWithSummary>()
         val hosts = hostRepository.findAll()
@@ -66,6 +69,8 @@ class HostService (
                     host.id!!,
                     host.hostName!!,
                     host.ip!!,
+                    host.hostRules,
+                    host.containersRules,
                     hostSummary
                 )
             )

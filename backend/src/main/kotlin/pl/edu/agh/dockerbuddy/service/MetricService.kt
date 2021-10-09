@@ -30,12 +30,12 @@ class MetricService(
         logger.debug("$hostSummary")
         val host: Host = hostRepository.findByIdOrNull(hostId) ?:
             throw EntityNotFoundException("Host $hostId not found. Cannot add metric")
-        appendAlertTypeToMetrics(hostSummary, host.rules)
+        appendAlertTypeToMetrics(hostSummary, host.hostRules)
 
         val prevHostSummary: HostSummary? = inMemory.getHostSummary(hostId)
         if (prevHostSummary != null){
             logger.info("Host found in cache. Checking for alerts...")
-            checkForAlertSummary(hostSummary, prevHostSummary)
+            checkForAlertSummary(hostSummary, prevHostSummary) // TODO: check for containers alerts
             logger.info("Metrics updated")
             logger.debug("$hostSummary")
         } else {

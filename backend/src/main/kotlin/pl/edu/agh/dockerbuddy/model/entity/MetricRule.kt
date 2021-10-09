@@ -9,9 +9,9 @@ import javax.validation.constraints.Max
 import javax.validation.constraints.Min
 
 @ToString
-@Table(name = "abstract_rule")
+@Table(name = "metric_rule")
 @Entity
-class AbstractRule (
+class MetricRule (
     @Enumerated(EnumType.STRING)
     @Column(name = "type", nullable = false)
     @JsonAlias("ruleType")
