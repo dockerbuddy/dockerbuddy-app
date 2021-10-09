@@ -86,14 +86,14 @@ class InfluxDbProxy {
         }
     }
 
-    suspend fun queryInfluxDb(metricType: String, hostId: Long, start: String, end: String?): List<CustomFluxRecord> {
+    suspend fun queryInfluxDb(metricType: String, hostId: Long, start: String, end: String): List<CustomFluxRecord> {
 
         if (metricType !in checklist)
             throw IllegalArgumentException("Unknown metric type: $metricType")
 
         val influxDBClient = InfluxDBClientKotlinFactory.create(url, token.toCharArray(), organization, bucket)
         val fluxQuery = ("from(bucket: \"$bucket\")\n"
-                + " |> range(start: $start, stop: ${end ?: "now()"})"
+                + " |> range(start: $start, stop: $end)"
                 + " |> filter(fn: (r) => (" +
                     "r._measurement == \"host_stats\" and " +
                     "r.host_id == \"$hostId\" and " +
