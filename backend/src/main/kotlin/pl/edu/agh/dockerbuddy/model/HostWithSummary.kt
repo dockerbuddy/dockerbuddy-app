@@ -10,7 +10,7 @@ data class HostWithSummary(
     val id: Long,
     val hostName: String,
     val ip: String,
-    val hostRules: MutableSet<MetricRule>,
-    val containersRules: MutableSet<ContainerRule>,
+    val hostRules: List<MetricRule>,
+    val containersRules: List<ContainerRule>,
     val hostSummary: HostSummary?
 )

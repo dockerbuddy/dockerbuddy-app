@@ -38,18 +38,6 @@ class HostController (
                 .body(DefaultResponse(ResponseType.SUCCESS, "Hosts fetched", hostsWithSummary))
     }
 
-    // TODO: consider if needed
-//    @ApiOperation(value = "Get specific host with summary")
-//    @ApiImplicitParams(value = [
-//        ApiImplicitParam(name = "id", value = "Id of a host", dataTypeClass = Long::class, example = "1")
-//    ])
-//    @GetMapping(value =["/{id}"], produces = ["application/json"])
-//    fun getHostWithSummary(@PathVariable id: Long): ResponseEntity<DefaultResponse<HostWithSummary>> {
-//        val hostsWithSummary = hostService.getHostWithSummary(id)
-//        return ResponseEntity.status(HttpStatus.OK)
-//            .body(DefaultResponse(ResponseType.SUCCESS, "Hosts fetched", hostsWithSummary))
-//    }
-
     @ApiOperation(value = "Delete host")
     @ApiImplicitParams(value = [
            ApiImplicitParam(name = "id", value = "Id of a host", dataTypeClass = Long::class, example = "1")

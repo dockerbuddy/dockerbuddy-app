@@ -2,6 +2,7 @@ package pl.edu.agh.dockerbuddy.model.entity
 
 import com.fasterxml.jackson.annotation.JsonAlias
 import lombok.ToString
+import pl.edu.agh.dockerbuddy.model.AlertType
 import pl.edu.agh.dockerbuddy.model.RuleType
 import javax.persistence.*
 
@@ -9,8 +10,12 @@ import javax.persistence.*
 @Table(name = "container_rule")
 @Entity
 class ContainerRule(
-    @Column(name = "container_id", nullable = false)
-    var containerId: String
+    @Column(name = "container_name", nullable = false)
+    var containerName: String,
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "alert_type", nullable = false)
+    var alertType: AlertType // type of the alert to be thrown upon rule violation. Chosen by user
 ): BaseLongIdEntity() {
     @Enumerated(EnumType.STRING)
     @Column(name = "type", nullable = false)
