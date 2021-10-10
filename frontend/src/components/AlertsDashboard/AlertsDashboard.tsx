@@ -1,6 +1,7 @@
 import {
   Container,
   Grid,
+  IconButton,
   InputAdornment,
   TextField,
   Typography,
@@ -12,36 +13,47 @@ import {
   AlertsResponseElementParsed,
 } from "../../common/types";
 import AlertsList from "./AlertsList";
+import { Sync } from "@material-ui/icons";
 
 const AlertsDashboard: React.FC = () => {
   const [alerts, setAlerts] = useState<AlertsResponseElementParsed[]>([]);
+  const [days, setDays] = useState<string>("1");
 
-  useEffect(() => {
-    const fetchAlerts = async () => {
-      const response = await fetch(`${proxy}/influxdb/alerts?start=-${30}d`, {
+  const fetchAlerts = async () => {
+    const response = await fetch(
+      `${proxy}/influxdb/alerts?start=-${parseInt(days)}d`,
+      {
         headers: {
           "Content-Type": "application/json",
         },
-      });
-
-      if (!response.ok) {
-        //DO SOMETHING
-        return;
       }
+    );
 
-      const json: AlertsResponse = await response.json();
-      console.log(json);
-      const alertsParsed: AlertsResponseElementParsed[] = json.body.map(
-        (alert) => ({
-          ...alert,
-          time: new Date(alert.time),
-        })
-      );
-      setAlerts(alertsParsed);
-    };
+    if (!response.ok) {
+      //DO SOMETHING
+      return;
+    }
 
+    const json: AlertsResponse = await response.json();
+    console.log(json);
+    const alertsParsed: AlertsResponseElementParsed[] = json.body.map(
+      (alert) => ({
+        ...alert,
+        time: new Date(alert.time),
+      })
+    );
+    setAlerts(alertsParsed);
+  };
+
+  useEffect(() => {
     fetchAlerts();
   }, []);
+
+  const refresh = async () => {
+    const value = parseInt(days);
+    if (isNaN(value) || value <= 0) return;
+    fetchAlerts();
+  };
 
   return (
     <Container maxWidth="md">
@@ -64,8 +76,16 @@ const AlertsDashboard: React.FC = () => {
                 endAdornment: (
                   <InputAdornment position="end">days</InputAdornment>
                 ),
+                inputProps: { min: 0 },
               }}
+              value={days}
+              onChange={(event) => setDays(event.target.value)}
             />
+          </Grid>
+          <Grid item>
+            <IconButton onClick={refresh}>
+              <Sync color="primary" />
+            </IconButton>
           </Grid>
         </Grid>
         <Grid item>

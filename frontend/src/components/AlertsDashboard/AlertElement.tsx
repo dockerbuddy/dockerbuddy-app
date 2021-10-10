@@ -1,6 +1,7 @@
 import { Box, Divider, Grid, Typography } from "@material-ui/core";
 import { Alert } from "@material-ui/lab";
 import React from "react";
+import { Link } from "react-router-dom";
 import { AlertsResponseElementParsed, AlertType } from "../../common/types";
 import { parseDateToDDMMYYYY, parseDateToHour } from "../../util/util";
 
@@ -23,11 +24,13 @@ const AlertElement: React.FC<AlertElementProps> = ({ alert, showDate }) => {
           <Divider light />
         </Box>
       )}
-
-      <Alert severity={severity}>
-        <strong>{parseDateToHour(alert.time)}</strong> Host {alert.hostId}{" "}
-        {alert.ruleType} is {alert.percent}%
-      </Alert>
+      {/* TODO Change after @Patryk Skupień merge his branch >:( */}
+      <Link to={`/host/${alert.hostId}`} style={{ textDecoration: "none" }}>
+        <Alert severity={severity}>
+          <strong>{parseDateToHour(alert.time)}</strong> Host {alert.hostId}{" "}
+          {alert.ruleType} is {alert.percent}%
+        </Alert>
+      </Link>
     </Grid>
   );
 };
