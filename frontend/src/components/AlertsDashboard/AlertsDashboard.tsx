@@ -5,14 +5,20 @@ import {
   TextField,
   Typography,
 } from "@material-ui/core";
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { proxy } from "../../common/api";
-import { AlertsResponse } from "../../common/types";
+import {
+  AlertsResponse,
+  AlertsResponseElementParsed,
+} from "../../common/types";
+import AlertsList from "./AlertsList";
 
 const AlertsDashboard: React.FC = () => {
+  const [alerts, setAlerts] = useState<AlertsResponseElementParsed[]>([]);
+
   useEffect(() => {
     const fetchAlerts = async () => {
-      const response = await fetch(`${proxy}/influxdb/alerts?start=-${1}d`, {
+      const response = await fetch(`${proxy}/influxdb/alerts?start=-${30}d`, {
         headers: {
           "Content-Type": "application/json",
         },
@@ -25,6 +31,13 @@ const AlertsDashboard: React.FC = () => {
 
       const json: AlertsResponse = await response.json();
       console.log(json);
+      const alertsParsed: AlertsResponseElementParsed[] = json.body.map(
+        (alert) => ({
+          ...alert,
+          time: new Date(alert.time),
+        })
+      );
+      setAlerts(alertsParsed);
     };
 
     fetchAlerts();
@@ -54,6 +67,9 @@ const AlertsDashboard: React.FC = () => {
               }}
             />
           </Grid>
+        </Grid>
+        <Grid item>
+          <AlertsList alerts={alerts} />
         </Grid>
       </Grid>
     </Container>
