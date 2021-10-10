@@ -152,9 +152,8 @@ class InfluxDbProxy {
                     RuleType.valueOf(it.values["rule_type"].toString()),
                     it.value as Double,
                     it.time.toString()
-            ) }
-
-        if (result.isEmpty()) throw EntityNotFoundException("No records found")
+            ) }.sortedByDescending { it.time }
+        //sorry for sorting here but there are some problems with pagination functions in influx
 
         logger.info("${result.size} records fetched form InfluxDB")
         return result
