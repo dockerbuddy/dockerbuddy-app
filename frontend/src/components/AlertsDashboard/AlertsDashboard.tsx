@@ -5,11 +5,33 @@ import {
   TextField,
   Typography,
 } from "@material-ui/core";
-import React from "react";
+import React, { useEffect } from "react";
+import { proxy } from "../../common/api";
+import { AlertsResponse } from "../../common/types";
 
 const AlertsDashboard: React.FC = () => {
+  useEffect(() => {
+    const fetchAlerts = async () => {
+      const response = await fetch(`${proxy}/influxdb/alerts?start=-${1}d`, {
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+
+      if (!response.ok) {
+        //DO SOMETHING
+        return;
+      }
+
+      const json: AlertsResponse = await response.json();
+      console.log(json);
+    };
+
+    fetchAlerts();
+  }, []);
+
   return (
-    <Container maxWidth="lg">
+    <Container maxWidth="md">
       <Grid container direction="column" spacing={2}>
         <Grid item>
           <Typography variant="h4">Alerts</Typography>

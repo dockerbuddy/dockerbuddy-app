@@ -55,3 +55,17 @@ export enum AlertType {
   WARN = "warning",
   CRITICAL = "error",
 }
+
+export interface AlertsResponse {
+  type: string;
+  message: string;
+  body: AlertsResponseElement[];
+}
+
+export interface AlertsResponseElement {
+  alertType: AlertType;
+  hostId: number;
+  percent: number;
+  ruleType: string;
+  time: string;
+}
