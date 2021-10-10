@@ -51,4 +51,26 @@ class InfluxController (
         }
         return response
     }
+
+    @GetMapping("/alerts")
+    fun getAlerts(
+            @RequestParam(required = false) hostId: Long?,
+            @RequestParam start: String, // TODO choose time representation and apply regex
+            @RequestParam(required = false) end: String? // TODO choose time representation and apply regex
+    ): ResponseEntity<DefaultResponse> {
+        logger.info("GET /api/v2/influxdb/alerts")
+        logger.debug("getAlerts: " +
+                "hostId: $hostId, " +
+                "start: $start, " +
+                "end: $end, "
+        )
+
+        var response: ResponseEntity<DefaultResponse>
+        runBlocking {
+            val result = influxDbProxy.queryAlerts(hostId, start, end)
+            response =  ResponseEntity.status(HttpStatus.OK)
+                    .body(DefaultResponse(ResponseType.SUCCESS, "Influx records fetched", result))
+        }
+        return response
+    }
 }
