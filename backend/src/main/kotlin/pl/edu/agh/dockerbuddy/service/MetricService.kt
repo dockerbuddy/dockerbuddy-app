@@ -7,6 +7,7 @@ import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 import pl.edu.agh.dockerbuddy.influxdb.InfluxDbProxy
 import pl.edu.agh.dockerbuddy.inmemory.InMemory
+import pl.edu.agh.dockerbuddy.model.RuleType
 import pl.edu.agh.dockerbuddy.model.entity.Host
 import pl.edu.agh.dockerbuddy.model.metric.HostSummary
 import pl.edu.agh.dockerbuddy.repository.HostRepository
@@ -47,6 +48,20 @@ class MetricService(
 
         CoroutineScope(Dispatchers.IO).launch {
             influxDbProxy.saveMetric(hostId, hostSummary)
+        }
+
+        CoroutineScope(Dispatchers.IO).launch {
+            //I know how it looks but this is the way to handle Boolean?
+            if (hostSummary.cpuUsage.alert == true)
+                influxDbProxy.saveAlert(hostId, hostSummary.cpuUsage, RuleType.CpuUsage)
+
+            if (hostSummary.diskUsage.alert == true)
+                influxDbProxy.saveAlert(hostId, hostSummary.diskUsage, RuleType.DiskUsage)
+
+            if (hostSummary.memoryUsage.alert == true)
+                influxDbProxy.saveAlert(hostId, hostSummary.memoryUsage, RuleType.MemoryUsage)
+
+            //TODO handle containers we'll probably need additional argument in saveAlert function
         }
     }
 }
