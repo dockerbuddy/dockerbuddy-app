@@ -1,5 +1,6 @@
 import React from "react";
 import AddHost from "../components/AddHost/AddHost";
+import AlertsDashboard from "../components/AlertsDashboard/AlertsDashboard";
 import Dashboard from "../components/Dashboard/Dashboard";
 
 interface Route {
@@ -26,5 +27,10 @@ export const openRoutes: Route[] = [
     path: "/addHost",
     exact: true,
     component: AddHost,
+  },
+  {
+    path: "/alerts",
+    exact: true,
+    component: AlertsDashboard,
   },
 ];
