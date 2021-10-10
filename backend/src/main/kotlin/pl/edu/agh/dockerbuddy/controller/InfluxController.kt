@@ -53,6 +53,12 @@ class InfluxController (
         return response
     }
 
+    @ApiOperation(value = "Get host's alerts form a range of time")
+    @ApiImplicitParams(value = [
+        ApiImplicitParam(name = "hostId", value = "Id of a host", dataTypeClass = Long::class, example = "1"),
+        ApiImplicitParam(name = "start", value = "Start time, eg -1d, -10m, etc.", dataTypeClass = String::class),
+        ApiImplicitParam(name = "end", value = "End time, must be greater than start time", dataTypeClass = String::class),
+    ])
     @GetMapping("/alerts")
     fun getAlerts(
             @RequestParam(required = false) hostId: Long?,
