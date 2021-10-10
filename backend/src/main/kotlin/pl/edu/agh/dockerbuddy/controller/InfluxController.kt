@@ -9,6 +9,7 @@ import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 import pl.edu.agh.dockerbuddy.controller.response.DefaultResponse
 import pl.edu.agh.dockerbuddy.controller.response.ResponseType
+import pl.edu.agh.dockerbuddy.influxdb.AlertRecord
 import pl.edu.agh.dockerbuddy.influxdb.CustomFluxRecord
 import pl.edu.agh.dockerbuddy.influxdb.InfluxDbProxy
 
@@ -57,7 +58,7 @@ class InfluxController (
             @RequestParam(required = false) hostId: Long?,
             @RequestParam start: String, // TODO choose time representation and apply regex
             @RequestParam(required = false) end: String? // TODO choose time representation and apply regex
-    ): ResponseEntity<DefaultResponse> {
+    ): ResponseEntity<DefaultResponse<List<AlertRecord>>> {
         logger.info("GET /api/v2/influxdb/alerts")
         logger.debug("getAlerts: " +
                 "hostId: $hostId, " +
@@ -65,7 +66,7 @@ class InfluxController (
                 "end: $end, "
         )
 
-        var response: ResponseEntity<DefaultResponse>
+        var response: ResponseEntity<DefaultResponse<List<AlertRecord>>>
         runBlocking {
             val result = influxDbProxy.queryAlerts(hostId, start, end)
             response =  ResponseEntity.status(HttpStatus.OK)
