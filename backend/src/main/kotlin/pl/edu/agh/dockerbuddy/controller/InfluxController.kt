@@ -49,12 +49,11 @@ class InfluxController (
             @RequestParam(required = false) end: String? // TODO choose time representation and apply regex
     ): ResponseEntity<DefaultResponse> {
         logger.info("GET /api/v2/influxdb/alerts")
-//        logger.debug("getHostMetricFromRange: " +
-//                "metricType: $metricType, " +
-//                "hostId: $hostId, " +
-//                "start: $start, " +
-//                "end: $end"
-//        )
+        logger.debug("getAlerts: " +
+                "hostId: $hostId, " +
+                "start: $start, " +
+                "end: $end, "
+        )
 
         var response: ResponseEntity<DefaultResponse>
         runBlocking {
