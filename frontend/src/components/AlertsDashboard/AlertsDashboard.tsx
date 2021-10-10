@@ -1,4 +1,6 @@
 import {
+  Box,
+  CircularProgress,
   Container,
   Grid,
   IconButton,
@@ -18,8 +20,10 @@ import { Sync } from "@material-ui/icons";
 const AlertsDashboard: React.FC = () => {
   const [alerts, setAlerts] = useState<AlertsResponseElementParsed[]>([]);
   const [days, setDays] = useState<string>("1");
+  const [isFetching, setIsFetching] = useState<boolean>(false);
 
   const fetchAlerts = async () => {
+    setIsFetching(true);
     const response = await fetch(
       `${proxy}/influxdb/alerts?start=-${parseInt(days)}d`,
       {
@@ -43,6 +47,7 @@ const AlertsDashboard: React.FC = () => {
       })
     );
     setAlerts(alertsParsed);
+    setIsFetching(false);
   };
 
   useEffect(() => {
@@ -89,7 +94,13 @@ const AlertsDashboard: React.FC = () => {
           </Grid>
         </Grid>
         <Grid item>
-          <AlertsList alerts={alerts} />
+          {isFetching ? (
+            <Box justifyContent="center" display="flex" mt={5}>
+              <CircularProgress />
+            </Box>
+          ) : (
+            <AlertsList alerts={alerts} />
+          )}
         </Grid>
       </Grid>
     </Container>
