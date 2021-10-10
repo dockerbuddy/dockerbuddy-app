@@ -24,6 +24,7 @@ const AlertsDashboard: React.FC = () => {
               variant="outlined"
               type="number"
               size="small"
+              style={{ width: "60%" }}
               InputProps={{
                 endAdornment: (
                   <InputAdornment position="end">days</InputAdornment>
