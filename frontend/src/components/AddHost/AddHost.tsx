@@ -31,8 +31,14 @@ interface AddHostFormData {
   diskCrit: string;
 }
 
-const AddHost: React.FC = () => {
-  const { register, errors, handleSubmit } = useForm<AddHostFormData>();
+interface AddHostProps {
+  defaultData?: AddHostFormData;
+}
+
+const AddHost: React.FC<AddHostProps> = ({ defaultData = {} }) => {
+  const { register, errors, handleSubmit } = useForm<AddHostFormData>({
+    defaultValues: defaultData,
+  });
   const [error, setError] = useState<string>("");
   const [hostId, setHostId] = useState<string>("");
 
