@@ -6,7 +6,7 @@ const alertText = (
   metricName: string,
   value: number
 ): string => {
-  return `Host ${hostId} ${metricName} is ${value * 100}%`;
+  return `Host ${hostId} ${metricName} is ${value}%`;
 };
 
 export const showAlert = (
