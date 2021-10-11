@@ -66,7 +66,12 @@ const HostBoard: React.FC<RouteComponentProps<HParam>> = ({ match }) => {
               </Grid>
             </Grid>
           </CardContent>
-          <HostMenu anchorEl={anchorEl} open={open} handleClose={handleClose} />
+          <HostMenu
+            anchorEl={anchorEl}
+            open={open}
+            handleClose={handleClose}
+            hostId={hostData.id}
+          />
         </Card>
       ) : (
         <Alert severity="error"> Host not found </Alert>
