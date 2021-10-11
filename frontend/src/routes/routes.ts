@@ -1,6 +1,7 @@
 import React from "react";
 import { RouteComponentProps } from "react-router-dom";
 import AddHost from "../components/AddHost/AddHost";
+import EditHost from "../components/AddHost/EditHost";
 import AlertsDashboard from "../components/AlertsDashboard/AlertsDashboard";
 import Dashboard from "../components/Dashboard/Dashboard";
 import HostBoard from "../components/HostBoard/HostBoard";
@@ -39,5 +40,10 @@ export const openRoutes: Route[] = [
     path: "/host/:id(\\d+)",
     exact: true,
     component: HostBoard,
+  },
+  {
+    path: "/host/:id(\\d+)/edit",
+    exact: true,
+    component: EditHost,
   },
 ];

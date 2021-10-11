@@ -10,7 +10,11 @@ import {
 } from "@material-ui/core";
 import { useForm } from "react-hook-form";
 import { proxy } from "../../common/api";
-import { PostHostResponse, StandardApiResponse } from "../../common/types";
+import {
+  PostHostResponse,
+  StandardApiResponse,
+  AddHostFormData,
+} from "../../common/types";
 import { Alert, AlertTitle } from "@material-ui/lab";
 import { Link } from "react-router-dom";
 
@@ -18,17 +22,6 @@ interface Rule {
   ruleType: string;
   warnLevel: number;
   criticalLevel: number;
-}
-
-interface AddHostFormData {
-  hostName: string;
-  ip: string;
-  cpuWarn: string;
-  cpuCrit: string;
-  memWarn: string;
-  memCrit: string;
-  diskWarn: string;
-  diskCrit: string;
 }
 
 interface AddHostProps {
