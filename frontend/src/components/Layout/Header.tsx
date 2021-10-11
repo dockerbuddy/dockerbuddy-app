@@ -35,6 +35,14 @@ const Header: React.FC = () => {
               DockerBuddy
             </Typography>
           </Link>
+          <Link
+            to="/alerts"
+            style={{ textDecoration: "none", marginRight: "10px" }}
+          >
+            <Button variant="outlined" color="primary">
+              Alerts
+            </Button>
+          </Link>
           <Link to="/addHost" style={{ textDecoration: "none" }}>
             <Button variant="outlined" color="primary">
               Add host

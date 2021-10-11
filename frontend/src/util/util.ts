@@ -13,3 +13,25 @@ export function humanFileSize(size: number): string {
     ["B", "kB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB"][i]
   );
 }
+
+function addZero(i: number) {
+  if (i < 10) {
+    return "0" + i;
+  }
+  return i;
+}
+
+export function parseDateToHour(date: Date): string {
+  const h = addZero(date.getHours());
+  const m = addZero(date.getMinutes());
+  const s = addZero(date.getSeconds());
+  return h + ":" + m + ":" + s;
+}
+
+export function parseDateToDDMMYYYY(date: Date): string {
+  const dd = String(date.getDate()).padStart(2, "0");
+  const mm = String(date.getMonth() + 1).padStart(2, "0"); //January is 0!
+  const yyyy = date.getFullYear();
+
+  return dd + "." + mm + "." + yyyy;
+}
