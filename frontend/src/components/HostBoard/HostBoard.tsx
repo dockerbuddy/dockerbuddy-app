@@ -1,4 +1,11 @@
-import { Card, CardContent, CardHeader, Typography } from "@material-ui/core";
+import {
+  Card,
+  CardContent,
+  Grid,
+  IconButton,
+  Typography,
+} from "@material-ui/core";
+import SettingsIcon from "@material-ui/icons/Settings";
 import { Alert } from "@material-ui/lab";
 import React from "react";
 import { RouteComponentProps } from "react-router-dom";
@@ -16,15 +23,37 @@ const HostBoard: React.FC<RouteComponentProps<HParam>> = ({ match }) => {
     <>
       {hostData !== undefined ? (
         <Card>
-          <CardHeader
-            title={
-              <Typography variant="h6" style={{ display: "inline-block" }}>
-                Host: {hostData.hostName}
-              </Typography>
-            }
-          />
           <CardContent>
-            <InfluxHistory hostId={hostId} />
+            <Grid container direction="column" spacing={3}>
+              <Grid item container direction="column" spacing={1}>
+                <Grid item container justify="space-between">
+                  <Grid item>
+                    <Typography
+                      variant="h4"
+                      style={{ display: "inline-block" }}
+                    >
+                      {hostData.hostName}
+                    </Typography>
+                  </Grid>
+                  <Grid item>
+                    <IconButton aria-label="settings">
+                      <SettingsIcon color="primary" />
+                    </IconButton>
+                  </Grid>
+                </Grid>
+                <Grid item>
+                  <Typography variant="subtitle1">ID: {hostData.id}</Typography>
+                </Grid>
+                <Grid item>
+                  <Typography variant="subtitle1">
+                    IP Address: {hostData.ip}
+                  </Typography>
+                </Grid>
+              </Grid>
+              <Grid item>
+                <InfluxHistory hostId={hostId} />
+              </Grid>
+            </Grid>
           </CardContent>
         </Card>
       ) : (
