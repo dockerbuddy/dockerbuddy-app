@@ -1,9 +1,9 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { makeStyles, Grid } from "@material-ui/core";
 import { Alert } from "@material-ui/lab";
 import HostCardComponent from "./HostCardComponent";
-import { selectHost } from "../../hosts/hostsSlice";
-import { useAppSelector } from "../../redux/hooks";
+import { selectHost, updateHostsAsync } from "../../hosts/hostsSlice";
+import { useAppDispatch, useAppSelector } from "../../redux/hooks";
 import { FullHostSummary } from "../../common/types";
 
 const useStyles = makeStyles(() => ({
@@ -26,6 +26,12 @@ const Dashboard: React.FC = () => {
   const classes = useStyles();
   const hostsData = useAppSelector(selectHost);
 
+  const dispatch = useAppDispatch();
+
+  useEffect(() => {
+    dispatch(updateHostsAsync());
+  }, []);
+
   return (
     <div className={classes.root}>
       <Grid container spacing={2}>
@@ -34,8 +40,7 @@ const Dashboard: React.FC = () => {
             <Alert severity="error"> BRAK POLACZENIA Z SERWEREM </Alert>
           </Grid>
         )}
-        {hostsData.status === "LOADING" && <p>LOADING</p>}
-        {hostsData.status === "LOADED" &&
+        {(hostsData.status === "LOADED" || hostsData.status === "LOADING") &&
           Object.values(hostsData.hosts).map((obj: FullHostSummary) => {
             return (
               <Grid item xs={6} key={obj.ip}>
@@ -43,6 +48,8 @@ const Dashboard: React.FC = () => {
               </Grid>
             );
           })}
+        {hostsData.status === "LOADING" &&
+          Object.keys(hostsData.hosts).length == 0 && <p>LOADING</p>}
       </Grid>
     </div>
   );
