@@ -35,7 +35,6 @@ class HostController (
     @GetMapping(produces = ["application/json"])
     fun getHostsWithSummary(): ResponseEntity<DefaultResponse<List<HostWithSummary>>> {
             val hostsWithSummary = hostService.getHostsWithSummary()
-            if (hostsWithSummary.isEmpty()) throw EntityNotFoundException("No hosts were found")
             return ResponseEntity.status(HttpStatus.OK)
                 .body(DefaultResponse(ResponseType.SUCCESS, "Hosts fetched", hostsWithSummary))
     }
