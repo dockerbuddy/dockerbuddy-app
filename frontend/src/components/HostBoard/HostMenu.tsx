@@ -2,7 +2,7 @@ import { Menu, MenuItem, ListItemIcon, ListItemText } from "@material-ui/core";
 import { Edit, HighlightOff } from "@material-ui/icons";
 import React from "react";
 import { proxy } from "../../common/api";
-import { useHistory } from "react-router-dom";
+import { Link, useHistory } from "react-router-dom";
 
 interface HostMenuProps {
   anchorEl: null | HTMLElement;
@@ -25,6 +25,7 @@ const HostMenu: React.FC<HostMenuProps> = ({
 
     if (!response.ok) {
       //DO SOMETHING
+      return;
     }
 
     history.push("/");
@@ -40,12 +41,17 @@ const HostMenu: React.FC<HostMenuProps> = ({
         "aria-labelledby": "basic-button",
       }}
     >
-      <MenuItem onClick={handleClose}>
-        <ListItemIcon>
-          <Edit fontSize="small" />
-        </ListItemIcon>
-        <ListItemText>Edit host</ListItemText>
-      </MenuItem>
+      <Link
+        to={`/host/${hostId}/edit`}
+        style={{ textDecoration: "none", color: "inherit" }}
+      >
+        <MenuItem>
+          <ListItemIcon>
+            <Edit fontSize="small" />
+          </ListItemIcon>
+          <ListItemText>Edit host</ListItemText>
+        </MenuItem>
+      </Link>
       <MenuItem onClick={deleteHost}>
         <ListItemIcon>
           <HighlightOff fontSize="small" />
