@@ -11,6 +11,7 @@ import React from "react";
 import { RouteComponentProps } from "react-router-dom";
 import { selectHost } from "../../hosts/hostsSlice";
 import { useAppSelector } from "../../redux/hooks";
+import HostMenu from "./HostMenu";
 import InfluxHistory from "./InfluxHistory/InfluxHistory";
 
 type HParam = { id: string };
@@ -18,6 +19,16 @@ type HParam = { id: string };
 const HostBoard: React.FC<RouteComponentProps<HParam>> = ({ match }) => {
   const hostId = parseInt(match.params.id);
   const hostData = useAppSelector(selectHost).hosts[hostId];
+  const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
+  const open = Boolean(anchorEl);
+
+  const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handleClose = () => {
+    setAnchorEl(null);
+  };
 
   return (
     <>
@@ -36,7 +47,7 @@ const HostBoard: React.FC<RouteComponentProps<HParam>> = ({ match }) => {
                     </Typography>
                   </Grid>
                   <Grid item>
-                    <IconButton aria-label="settings">
+                    <IconButton aria-label="settings" onClick={handleClick}>
                       <SettingsIcon color="primary" />
                     </IconButton>
                   </Grid>
@@ -55,6 +66,7 @@ const HostBoard: React.FC<RouteComponentProps<HParam>> = ({ match }) => {
               </Grid>
             </Grid>
           </CardContent>
+          <HostMenu anchorEl={anchorEl} open={open} handleClose={handleClose} />
         </Card>
       ) : (
         <Alert severity="error"> Host not found </Alert>
