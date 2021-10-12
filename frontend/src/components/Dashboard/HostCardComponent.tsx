@@ -5,11 +5,9 @@ import {
   CardHeader,
   CardContent,
   Typography,
-  IconButton,
   Grid,
 } from "@material-ui/core";
 import { Alert } from "@material-ui/lab";
-import SettingsIcon from "@material-ui/icons/Settings";
 import { humanFileSize } from "../../util/util";
 import ProgressBarComponent from "./ProgressBarComponent";
 import ContainerCardComponent from "./ContainerCardComponent";
@@ -50,11 +48,6 @@ const HostCardComponent: React.FC<{ host: FullHostSummary }> = (props) => {
               {": " + host.ip}
             </Typography>
           </>
-        }
-        action={
-          <IconButton aria-label="settings" className={classes.settingsColor}>
-            <SettingsIcon />
-          </IconButton>
         }
       />
       <Link

@@ -24,7 +24,7 @@ const AlertElement: React.FC<AlertElementProps> = ({ alert, showDate }) => {
           <Divider light />
         </Box>
       )}
-      {/* TODO Change after @Patryk Skupień merge his branch >:( */}
+
       <Link to={`/host/${alert.hostId}`} style={{ textDecoration: "none" }}>
         <Alert severity={severity}>
           <strong>{parseDateToHour(alert.time)}</strong> Host {alert.hostId}{" "}
