@@ -75,7 +75,7 @@ const EditHost: React.FC<RouteComponentProps<HParam>> = ({ match }) => {
   return (
     <Box>
       {formData != null ? (
-        <AddHost defaultData={formData} />
+        <AddHost defaultData={formData} method={"PUT"} editHostId={hostId} />
       ) : (
         <Box justifyContent="center" display="flex" mt={5}>
           <CircularProgress />
