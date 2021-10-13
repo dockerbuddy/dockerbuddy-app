@@ -109,7 +109,7 @@ class InfluxDbProxy {
             it.value as Double
         ) }
 
-        if (result.isEmpty()) throw EntityNotFoundException("No records found")
+        if (result.isEmpty()) emptyList<CustomFluxRecord>()
 
         logger.info("${result.size} records fetched form InfluxDB")
         return result

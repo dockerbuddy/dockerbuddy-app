@@ -11,6 +11,7 @@ import pl.edu.agh.dockerbuddy.model.RuleType
 import pl.edu.agh.dockerbuddy.model.entity.Host
 import pl.edu.agh.dockerbuddy.model.metric.HostSummary
 import pl.edu.agh.dockerbuddy.repository.HostRepository
+import pl.edu.agh.dockerbuddy.tools.appendAlertTypeToContainers
 import pl.edu.agh.dockerbuddy.tools.appendAlertTypeToMetrics
 import pl.edu.agh.dockerbuddy.tools.checkForAlertSummary
 import javax.persistence.EntityNotFoundException
@@ -30,8 +31,9 @@ class MetricService(
         logger.info("Processing new metrics for host $hostId")
         logger.debug("$hostSummary")
         val host: Host = hostRepository.findByIdOrNull(hostId) ?:
-            throw EntityNotFoundException("Host with id $hostId not found. Cannot add metric")
-        appendAlertTypeToMetrics(hostSummary, host.rules)
+            throw EntityNotFoundException("Host $hostId not found. Cannot add metric")
+        appendAlertTypeToMetrics(hostSummary, host.hostRules)
+        appendAlertTypeToContainers(hostSummary.containers, host.containersRules.toList())
 
         val prevHostSummary: HostSummary? = inMemory.getHostSummary(hostId)
         if (prevHostSummary != null){
@@ -41,6 +43,7 @@ class MetricService(
             logger.debug("$hostSummary")
         } else {
             logger.info("No data for host $hostId in cache. Adding an entry...")
+            // TODO check if initial metrics do not violate rules
         }
 
         inMemory.saveHostSummary(hostId, hostSummary)

@@ -9,7 +9,6 @@ import pl.edu.agh.dockerbuddy.controller.response.ResponseType
 import pl.edu.agh.dockerbuddy.model.HostWithSummary
 import pl.edu.agh.dockerbuddy.model.entity.Host
 import pl.edu.agh.dockerbuddy.service.HostService
-import javax.persistence.EntityNotFoundException
 import javax.validation.Valid
 
 @Api(tags = ["Hosts"])
@@ -44,10 +43,21 @@ class HostController (
 
     @ApiOperation(value = "Get all hosts with their summaries")
     @GetMapping(produces = ["application/json"])
-    fun getHostsWithSummary(): ResponseEntity<DefaultResponse<List<HostWithSummary>>> {
-            val hostsWithSummary = hostService.getHostsWithSummary()
+    fun getAllHostsWithSummaries(): ResponseEntity<DefaultResponse<List<HostWithSummary>>> {
+            val hostsWithSummary = hostService.getAllHostsWithSummaries()
             return ResponseEntity.status(HttpStatus.OK)
                 .body(DefaultResponse(ResponseType.SUCCESS, "Hosts fetched", hostsWithSummary))
+    }
+
+    @ApiOperation(value = "Get specific host with summary")
+    @ApiImplicitParams(value = [
+        ApiImplicitParam(name = "id", value = "Id of a host", dataTypeClass = Long::class, example = "1")
+    ])
+    @GetMapping(value =["/{id}"], produces = ["application/json"])
+    fun getHostWithSummary(@PathVariable id: Long): ResponseEntity<DefaultResponse<HostWithSummary>> {
+        val hostsWithSummary = hostService.getHostWithSummary(id)
+        return ResponseEntity.status(HttpStatus.OK)
+            .body(DefaultResponse(ResponseType.SUCCESS, "Hosts fetched", hostsWithSummary))
     }
 
     @ApiOperation(value = "Delete host")
