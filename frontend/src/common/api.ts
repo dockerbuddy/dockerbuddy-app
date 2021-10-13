@@ -7,3 +7,11 @@ export function fetchHosts(): Promise<Response> {
     },
   });
 }
+
+export function getHostSummary(id: number): Promise<Response> {
+  return fetch(`${proxy}/hosts/${id}`, {
+    headers: {
+      "Content-Type": "application/json",
+    },
+  });
+}

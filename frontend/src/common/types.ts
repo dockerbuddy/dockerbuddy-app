@@ -31,6 +31,15 @@ export interface FullHostSummary {
   ip: string;
   id: number;
   hostSummary: HostSummary;
+  containerRules: ContainerRule[];
+  hostRules: any[]; //todo not any
+}
+
+export interface ContainerRule {
+  alertType: AlertType;
+  containerName: string;
+  id: number; //todo obowiazkowe?
+  type: RuleType;
 }
 
 export interface ContainerSummary {
@@ -54,4 +63,11 @@ export enum AlertType {
   OK = "success",
   WARN = "warning",
   CRITICAL = "error",
+}
+
+export enum RuleType {
+  MEMORY_USAGE = "MemoryUsage",
+  DISK_USAGE = "DiskUsage",
+  CPU_USAGE = "CpuUsage",
+  CONTAINER_STATE = "ContainerState",
 }

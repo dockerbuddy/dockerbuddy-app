@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Box,
   Button,
@@ -13,6 +13,10 @@ import { proxy } from "../../common/api";
 import { PostHostResponse, StandardApiResponse } from "../../common/types";
 import { Alert, AlertTitle } from "@material-ui/lab";
 import { Link } from "react-router-dom";
+import { useAppDispatch, useAppSelector } from "../../redux/hooks";
+import { selectHost, updateHostsAsync } from "../../hosts/hostsSlice";
+import { ContainerSummary } from "../../hosts/types";
+import AddContainerRules from "./AddContainerRules";
 
 interface Rule {
   ruleType: string;
@@ -31,10 +35,28 @@ interface AddHostFormData {
   diskCrit: string;
 }
 
+export interface ContainersInfo {
+  containersRules: any[]; //todo not any
+  containers: ContainerSummary[];
+}
+
 const AddHost: React.FC = () => {
   const { register, errors, handleSubmit } = useForm<AddHostFormData>();
   const [error, setError] = useState<string>("");
   const [hostId, setHostId] = useState<string>("");
+  const [containers, setContainers] = useState<ContainersInfo>();
+  const dispatch = useAppDispatch();
+
+  const hostsData = useAppSelector(selectHost).hosts;
+
+  console.log(containers);
+
+  useEffect(() => {
+    const host = hostsData[Number.parseInt(hostId)];
+    const containersRules = host?.containerRules;
+    const containers = host?.hostSummary?.containers;
+    setContainers({ containersRules, containers });
+  }, [hostsData]);
 
   const handleAdd = async (data: AddHostFormData) => {
     setError("");
@@ -107,6 +129,7 @@ const AddHost: React.FC = () => {
     if (response.ok) {
       const hostResponse: PostHostResponse = result.body;
       setHostId(hostResponse.id.toString());
+      dispatch(updateHostsAsync());
     } else {
       setError(result.message);
     }
@@ -308,6 +331,7 @@ const AddHost: React.FC = () => {
           )}
         </form>
       </Box>
+      <AddContainerRules info={containers} hostId={hostId} />
     </Container>
   );
 };
