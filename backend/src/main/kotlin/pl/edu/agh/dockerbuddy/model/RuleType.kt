@@ -1,5 +1,5 @@
 package pl.edu.agh.dockerbuddy.model
 
 enum class RuleType {
-    MemoryUsage, DiskUsage, CpuUsage
+    MemoryUsage, DiskUsage, CpuUsage, ContainerState
 }

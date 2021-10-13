@@ -10,7 +10,7 @@ class AlertService(val template: SimpMessagingTemplate) {
     private val logger = LoggerFactory.getLogger(AlertService::class.java)
 
     fun sendMessage(hostSummary: HostSummary){
-        logger.info("Alert detected. Sending message...")
+        logger.info("Sending newest data to frontend")
         template.convertAndSend("/alerts", hostSummary)
     }
 }

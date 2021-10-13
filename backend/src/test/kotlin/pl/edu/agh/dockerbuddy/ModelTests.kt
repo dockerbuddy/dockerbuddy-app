@@ -9,7 +9,7 @@ import org.mockito.Mockito
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest
-import pl.edu.agh.dockerbuddy.model.entity.AbstractRule
+import pl.edu.agh.dockerbuddy.model.entity.MetricRule
 import pl.edu.agh.dockerbuddy.model.entity.BaseLongIdEntity
 import pl.edu.agh.dockerbuddy.model.entity.Host
 import pl.edu.agh.dockerbuddy.model.RuleType
@@ -68,7 +68,7 @@ class ModelTests (
     @Test
     fun hostRulesInitTest() {
         val host = Host("name", "192.168.1.1")
-        assertTrue(host.rules.isEmpty())
+        assertTrue(host.hostRules.isEmpty())
     }
 
     @Test
@@ -76,35 +76,35 @@ class ModelTests (
         val host = Host(
             "name",
             "192.168.1.1",
-            mutableListOf(Mockito.mock(AbstractRule::class.java)))
-        assertFalse(host.rules.isEmpty())
+            mutableSetOf(Mockito.mock(MetricRule::class.java)))
+        assertFalse(host.hostRules.isEmpty())
     }
 
     @Test
     fun abstractRuleAlertLevelTest() {
         assertThrows(IllegalArgumentException::class.java, fun() {
-            AbstractRule(RuleType.DiskUsage, 50, 10)
+            MetricRule(RuleType.DiskUsage, 50, 10)
         })
     }
 
     @Test
     fun abstractRuleMinAlertLevelConstraintTest() {
-        val abstractRule1 = AbstractRule(RuleType.DiskUsage, -1, 20)
+        val abstractRule1 = MetricRule(RuleType.DiskUsage, -1, 20)
         var violations = validator.validate(abstractRule1)
         assertFalse(violations.isEmpty())
 
-        val abstractRule2 = AbstractRule(RuleType.DiskUsage, -2, -1)
+        val abstractRule2 = MetricRule(RuleType.DiskUsage, -2, -1)
         violations = validator.validate(abstractRule2)
         assertFalse(violations.isEmpty())
     }
 
     @Test
     fun abstractRuleMaxAlertLevelConstraintTest() {
-        val abstractRule1 = AbstractRule(RuleType.DiskUsage, 50, 105)
+        val abstractRule1 = MetricRule(RuleType.DiskUsage, 50, 105)
         var violations = validator.validate(abstractRule1)
         assertFalse(violations.isEmpty())
 
-        val abstractRule2 = AbstractRule(RuleType.DiskUsage, 105, 150)
+        val abstractRule2 = MetricRule(RuleType.DiskUsage, 105, 150)
         violations = validator.validate(abstractRule2)
         assertFalse(violations.isEmpty())
     }
@@ -119,10 +119,10 @@ class ModelTests (
     @Test
     fun saveAbstractRuleToDBTest() {
         val host = Host("host", "192.168.1.55")
-        val abstractRule = AbstractRule(RuleType.DiskUsage, 50, 90)
-        host.rules.add(abstractRule)
+        val abstractRule = MetricRule(RuleType.DiskUsage, 50, 90)
+        host.hostRules.add(abstractRule)
         hostRepository.save(host) // AbstractRule is persisted when updated host is saved to DB
         assertEquals(abstractRule, abstractRuleRepository.findAll().first())
-        assertEquals(abstractRule, hostRepository.findAll().first().rules.first())
+        assertEquals(abstractRule, hostRepository.findAll().first().hostRules.first())
     }
 }

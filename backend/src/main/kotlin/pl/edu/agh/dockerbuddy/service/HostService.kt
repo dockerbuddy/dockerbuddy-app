@@ -1,6 +1,5 @@
 package pl.edu.agh.dockerbuddy.service
 
-import io.reactivex.internal.util.ExceptionHelper
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import pl.edu.agh.dockerbuddy.inmemory.InMemory
@@ -35,6 +34,24 @@ class HostService (
         return hostRepository.save(host)
     }
 
+    fun getHostWithSummary(id: Long): HostWithSummary {
+        logger.info("Fetching host $id")
+        val foundHost = hostRepository.findById(id)
+        if (foundHost.isEmpty) throw EntityNotFoundException("Host $id does not exist")
+        val host = foundHost.get()
+
+        logger.info("Fetching host $id summary")
+        val hostSummary =  inMemory.getHostSummary(id)
+        return HostWithSummary(
+            host.id!!,
+            host.hostName!!,
+            host.ip!!,
+            host.hostRules.toList(),
+            host.containersRules.toList(),
+            hostSummary
+        )
+    }
+
     fun getHostWithSettings(id: Long): Host {
         logger.info("Fetching host $id")
         val foundHost = hostRepository.findById(id)
@@ -42,10 +59,11 @@ class HostService (
         return foundHost.get()
     }
 
-    fun getHostsWithSummary(): List<HostWithSummary> {
+    fun getAllHostsWithSummaries(): List<HostWithSummary> {
         logger.info("Fetching all hosts with summary")
         val hostsWithSummary = mutableListOf<HostWithSummary>()
         val hosts = hostRepository.findAll()
+        if (hosts.isEmpty()) return emptyList()
 
         logger.info("Processing ${hosts.size} found hosts")
         for (host in hosts) {
@@ -57,6 +75,8 @@ class HostService (
                     host.id!!,
                     host.hostName!!,
                     host.ip!!,
+                    host.hostRules.toList(),
+                    host.containersRules.toList(),
                     hostSummary
                 )
             )
