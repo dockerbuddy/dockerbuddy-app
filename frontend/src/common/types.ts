@@ -5,6 +5,7 @@ export interface StandardApiResponse {
 }
 
 export interface Rule {
+  type: any;
   ruleType: string;
   warnLevel: number;
   criticalLevel: number;
@@ -54,4 +55,37 @@ export enum AlertType {
   OK = "success",
   WARN = "warning",
   CRITICAL = "error",
+}
+
+export interface AlertsResponse {
+  type: string;
+  message: string;
+  body: AlertsResponseElement[];
+}
+
+export interface AlertsResponseElement {
+  alertType: AlertType;
+  hostId: number;
+  percent: number;
+  ruleType: string;
+  time: string;
+}
+
+export interface AlertsResponseElementParsed {
+  alertType: AlertType;
+  hostId: number;
+  percent: number;
+  ruleType: string;
+  time: Date;
+}
+
+export interface AddHostFormData {
+  hostName: string;
+  ip: string;
+  cpuWarn: string;
+  cpuCrit: string;
+  memWarn: string;
+  memCrit: string;
+  diskWarn: string;
+  diskCrit: string;
 }

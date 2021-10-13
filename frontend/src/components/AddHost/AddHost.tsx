@@ -10,7 +10,11 @@ import {
 } from "@material-ui/core";
 import { useForm } from "react-hook-form";
 import { proxy } from "../../common/api";
-import { PostHostResponse, StandardApiResponse } from "../../common/types";
+import {
+  PostHostResponse,
+  StandardApiResponse,
+  AddHostFormData,
+} from "../../common/types";
 import { Alert, AlertTitle } from "@material-ui/lab";
 import { Link } from "react-router-dom";
 
@@ -20,19 +24,20 @@ interface Rule {
   criticalLevel: number;
 }
 
-interface AddHostFormData {
-  hostName: string;
-  ip: string;
-  cpuWarn: string;
-  cpuCrit: string;
-  memWarn: string;
-  memCrit: string;
-  diskWarn: string;
-  diskCrit: string;
+interface AddHostProps {
+  defaultData?: AddHostFormData;
+  method?: string;
+  editHostId?: number | null;
 }
 
-const AddHost: React.FC = () => {
-  const { register, errors, handleSubmit } = useForm<AddHostFormData>();
+const AddHost: React.FC<AddHostProps> = ({
+  defaultData = {},
+  method = "POST",
+  editHostId = null,
+}) => {
+  const { register, errors, handleSubmit } = useForm<AddHostFormData>({
+    defaultValues: defaultData,
+  });
   const [error, setError] = useState<string>("");
   const [hostId, setHostId] = useState<string>("");
 
@@ -94,8 +99,10 @@ const AddHost: React.FC = () => {
       rules: rules,
     };
 
-    const response = await fetch(`${proxy}/hosts`, {
-      method: "POST",
+    const url =
+      method === "POST" ? `${proxy}/hosts` : `${proxy}/hosts/${editHostId}`;
+    const response = await fetch(url, {
+      method: method,
       headers: {
         "Content-Type": "application/json",
       },
@@ -115,14 +122,18 @@ const AddHost: React.FC = () => {
   return (
     <Container maxWidth="md">
       <Box textAlign="center" m={2}>
-        <Typography variant="h4">Add new host</Typography>
+        <Typography variant="h4">
+          {method === "PUT" ? "Edit" : "Add new"} host
+        </Typography>
       </Box>
       <Box>
         <form onSubmit={handleSubmit(handleAdd)}>
           {hostId ? (
             <>
               <Alert severity="success">
-                <AlertTitle>Host added</AlertTitle>
+                <AlertTitle>
+                  Host {method === "PUT" ? "modified" : "added"}
+                </AlertTitle>
                 This is your unique host identifier: <strong>{hostId}</strong>
                 <br />
                 You will have to pass it in agent{"'"}s config

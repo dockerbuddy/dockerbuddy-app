@@ -52,6 +52,13 @@ class HostService (
         )
     }
 
+    fun getHostWithSettings(id: Long): Host {
+        logger.info("Fetching host $id")
+        val foundHost = hostRepository.findById(id)
+        if (foundHost.isEmpty) throw EntityNotFoundException("Host $id does not exist")
+        return foundHost.get()
+    }
+
     fun getAllHostsWithSummaries(): List<HostWithSummary> {
         logger.info("Fetching all hosts with summary")
         val hostsWithSummary = mutableListOf<HostWithSummary>()
