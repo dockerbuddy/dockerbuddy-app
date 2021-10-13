@@ -48,11 +48,8 @@ fun checkForAlerts(containersSummaries: List<ContainerSummary>, prevContainersSu
 fun appendAlertTypeToContainers(containers: List<ContainerSummary>, rules: List<ContainerRule>) {
     val containerMap = containers.associateBy { it.name }
     for (rule in rules) {
-        if (rule.containerName !in containerMap.keys) {
-            // TODO case when such container does not exist -> additional alerts in form of messages?
-        } else {
-            addAlertTypeToContainer(containerMap[rule.containerName]!!, rule)
-        }
+        if (rule.containerName !in containerMap.keys) continue // TODO case when such container does not exist -> additional alerts in form of messages?
+        addAlertTypeToContainer(containerMap[rule.containerName]!!, rule)
     }
 }
 
