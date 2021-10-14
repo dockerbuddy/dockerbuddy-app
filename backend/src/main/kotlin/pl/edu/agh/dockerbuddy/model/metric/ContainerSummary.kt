@@ -9,7 +9,7 @@ data class ContainerSummary(
     val name: String,
     val image: String,
     //TODO replace to enum after @Bartłomiej Plewnia will define them
-    val status: String,
+    val status: String, // TODO state or status?
     val cpuUsage: BasicMetric,
     val memoryUsage: BasicMetric,
     var alertType: AlertType?,

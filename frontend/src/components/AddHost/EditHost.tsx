@@ -1,4 +1,4 @@
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
+/* eslint-disable */
 import { Box, CircularProgress } from "@material-ui/core";
 import React, { useEffect, useState } from "react";
 import { RouteComponentProps } from "react-router-dom";
@@ -42,7 +42,8 @@ const EditHost: React.FC<RouteComponentProps<HParam>> = ({ match }) => {
       diskCrit: "",
     };
 
-    jsonBody.rules.forEach((rule: Rule) => {
+    //@ts-ignore
+    jsonBody.hostRules.forEach((rule: Rule) => {
       console.log(rule.type);
       if (rule.type === "CpuUsage")
         res = {

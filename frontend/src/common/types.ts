@@ -15,7 +15,8 @@ export interface PostHostResponse {
   id: number;
   hostName: string;
   ip: string;
-  rules: Rule[];
+  hostRules: Rule[]; //todo rename to HostRule[];
+  containersRules: ContainerRule[];
 }
 
 export interface HostSummary {
@@ -32,15 +33,26 @@ export interface FullHostSummary {
   ip: string;
   id: number;
   hostSummary: HostSummary;
+  containersRules: ContainerRule[];
+  hostRules: any[]; //todo not any
+}
+
+export interface ContainerRule {
+  alertType: AlertType;
+  containerName: string;
+  id: number; //todo obowiazkowe?
+  type: RuleType;
 }
 
 export interface ContainerSummary {
-  id: string;
+  id: string; //todo change id to number
   name: string;
   image: string;
   status: string; //TODO DEFINE STATUS AFTER IT GETS CHANGED ON BACKEND
   cpuUsage: BasicMetric;
   memoryUsage: BasicMetric;
+  alertType: AlertType;
+  alert: boolean;
 }
 
 export interface BasicMetric {
@@ -55,6 +67,13 @@ export enum AlertType {
   OK = "success",
   WARN = "warning",
   CRITICAL = "error",
+}
+
+export enum RuleType {
+  MEMORY_USAGE = "MemoryUsage",
+  DISK_USAGE = "DiskUsage",
+  CPU_USAGE = "CpuUsage",
+  CONTAINER_STATE = "ContainerState",
 }
 
 export interface AlertsResponse {
