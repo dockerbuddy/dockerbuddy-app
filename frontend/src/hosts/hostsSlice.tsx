@@ -44,13 +44,14 @@ export const hostsSlice = createSlice({
           state.status = "ERROR";
           state.hosts = [];
         } else if (hosts.length > 0) {
-          state.status = "LOADED";
+          state.hosts = [];
           hosts.forEach((e: FullHostSummary) => {
             state.hosts[e.id] = e;
           });
-        } else {
           state.status = "LOADED";
+        } else {
           state.hosts = [];
+          state.status = "LOADED";
         }
       });
   },

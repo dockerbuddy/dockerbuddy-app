@@ -30,16 +30,16 @@ class HostController (
                 .body(DefaultResponse(ResponseType.SUCCESS, "Host added", savedHost))
     }
 
-    @ApiOperation(value = "Get specific host with its settings")
-    @ApiImplicitParams(value = [
-        ApiImplicitParam(name = "id", value = "Id of a host", dataTypeClass = Long::class, example = "1")
-    ])
-    @GetMapping(value =["/{id}"], produces = ["application/json"])
-    fun getHostWithSettings(@PathVariable id: Long): ResponseEntity<DefaultResponse<Host>> {
-        val hostsWithSummary = hostService.getHostWithSettings(id)
-        return ResponseEntity.status(HttpStatus.OK)
-                .body(DefaultResponse(ResponseType.SUCCESS, "Hosts fetched", hostsWithSummary))
-    }
+//  @ApiOperation(value = "Get specific host with its settings")
+//  @ApiImplicitParams(value = [
+//      ApiImplicitParam(name = "id", value = "Id of a host", dataTypeClass = Long::class, example = "1")
+//  ])
+//  @GetMapping(value =["/{id}"], produces = ["application/json"])
+//  fun getHostWithSettings(@PathVariable id: Long): ResponseEntity<DefaultResponse<Host>> {
+//      val hostsWithSummary = hostService.getHostWithSettings(id)
+//      return ResponseEntity.status(HttpStatus.OK)
+//              .body(DefaultResponse(ResponseType.SUCCESS, "Hosts fetched", hostsWithSummary))
+//  }
 
     @ApiOperation(value = "Get all hosts with their summaries")
     @GetMapping(produces = ["application/json"])

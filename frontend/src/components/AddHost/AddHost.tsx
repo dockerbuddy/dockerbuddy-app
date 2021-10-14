@@ -14,9 +14,13 @@ import {
   PostHostResponse,
   StandardApiResponse,
   AddHostFormData,
+  ContainerRule,
 } from "../../common/types";
 import { Alert, AlertTitle } from "@material-ui/lab";
 import { Link } from "react-router-dom";
+import { useAppDispatch, useAppSelector } from "../../redux/hooks";
+import { selectHost, updateHostsAsync } from "../../hosts/hostsSlice";
+import AddContainerRules from "./AddContainerRules";
 
 interface Rule {
   ruleType: string;
@@ -40,6 +44,8 @@ const AddHost: React.FC<AddHostProps> = ({
   });
   const [error, setError] = useState<string>("");
   const [hostId, setHostId] = useState<string>("");
+  const dispatch = useAppDispatch();
+  const allHosts = useAppSelector(selectHost).hosts;
 
   const handleAdd = async (data: AddHostFormData) => {
     setError("");
@@ -51,6 +57,7 @@ const AddHost: React.FC<AddHostProps> = ({
     const diskCrit = parseInt(data.diskCrit);
 
     const rules: Rule[] = [];
+    let containersRules: ContainerRule[] = [];
 
     if (cpuWarn >= cpuCrit) {
       setError(
@@ -93,10 +100,15 @@ const AddHost: React.FC<AddHostProps> = ({
         criticalLevel: diskCrit,
       });
 
+    if (editHostId !== null) {
+      containersRules = allHosts[editHostId].containersRules;
+    }
+
     const json = {
       hostName: data.hostName,
       ip: data.ip,
-      rules: rules,
+      hostRules: rules,
+      containersRules: containersRules,
     };
 
     const url =
@@ -114,6 +126,7 @@ const AddHost: React.FC<AddHostProps> = ({
     if (response.ok) {
       const hostResponse: PostHostResponse = result.body;
       setHostId(hostResponse.id.toString());
+      dispatch(updateHostsAsync());
     } else {
       setError(result.message);
     }
@@ -319,6 +332,11 @@ const AddHost: React.FC<AddHostProps> = ({
           )}
         </form>
       </Box>
+      <AddContainerRules
+        hostId={
+          hostId === "" && editHostId != null ? editHostId.toString() : hostId
+        }
+      />
     </Container>
   );
 };
