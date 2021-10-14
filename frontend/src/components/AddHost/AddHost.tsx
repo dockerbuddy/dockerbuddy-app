@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import {
   Box,
   Button,
@@ -17,9 +17,8 @@ import {
 } from "../../common/types";
 import { Alert, AlertTitle } from "@material-ui/lab";
 import { Link } from "react-router-dom";
-import { useAppDispatch, useAppSelector } from "../../redux/hooks";
-import { selectHost, updateHostsAsync } from "../../hosts/hostsSlice";
-import { ContainerSummary } from "../../hosts/types";
+import { useAppDispatch } from "../../redux/hooks";
+import { updateHostsAsync } from "../../hosts/hostsSlice";
 import AddContainerRules from "./AddContainerRules";
 
 interface Rule {
@@ -34,11 +33,6 @@ interface AddHostProps {
   editHostId?: number | null;
 }
 
-export interface ContainersInfo {
-  containersRules: any[]; //todo not any
-  containers: ContainerSummary[];
-}
-
 const AddHost: React.FC<AddHostProps> = ({
   defaultData = {},
   method = "POST",
@@ -49,19 +43,7 @@ const AddHost: React.FC<AddHostProps> = ({
   });
   const [error, setError] = useState<string>("");
   const [hostId, setHostId] = useState<string>("");
-  const [containers, setContainers] = useState<ContainersInfo>();
   const dispatch = useAppDispatch();
-
-  const hostsData = useAppSelector(selectHost).hosts;
-
-  console.log(containers);
-
-  useEffect(() => {
-    const host = hostsData[Number.parseInt(hostId)];
-    const containersRules = host?.containerRules;
-    const containers = host?.hostSummary?.containers;
-    setContainers({ containersRules, containers });
-  }, [hostsData]);
 
   const handleAdd = async (data: AddHostFormData) => {
     setError("");
@@ -342,7 +324,7 @@ const AddHost: React.FC<AddHostProps> = ({
           )}
         </form>
       </Box>
-      <AddContainerRules info={containers} hostId={hostId} />
+      <AddContainerRules hostId={hostId} />
     </Container>
   );
 };

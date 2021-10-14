@@ -32,7 +32,7 @@ export interface FullHostSummary {
   ip: string;
   id: number;
   hostSummary: HostSummary;
-  containerRules: ContainerRule[];
+  containersRules: ContainerRule[];
   hostRules: any[]; //todo not any
 }
 
