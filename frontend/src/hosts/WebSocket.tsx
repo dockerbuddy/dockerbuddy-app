@@ -12,8 +12,8 @@ const WebSocketProvider: React.FC = ({ children }) => {
   const { enqueueSnackbar } = useSnackbar();
   const dispatch = useAppDispatch();
 
-  const socket = new SockJS(socketProxy);
-  const stompClient = Stomp.over(socket);
+  const stompClient = Stomp.over(() => new SockJS(socketProxy));
+  stompClient.connectionTimeout = 5000;
 
   useEffect(() => {
     dispatch(updateHostsAsync()).then(() => {
