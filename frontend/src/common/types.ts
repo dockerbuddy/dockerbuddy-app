@@ -15,7 +15,8 @@ export interface PostHostResponse {
   id: number;
   hostName: string;
   ip: string;
-  rules: Rule[];
+  hostRules: Rule[]; //todo rename to HostRule[];
+  containersRules: ContainerRule[];
 }
 
 export interface HostSummary {

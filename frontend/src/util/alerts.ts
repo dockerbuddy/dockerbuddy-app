@@ -46,7 +46,7 @@ export const showAlert = (
     );
 
   summaryParsed.containers.forEach((cont) => {
-    if (cont.alert)
+    if (cont.alert) {
       enqueueSnackbar(
         // eslint-disable-next-line prettier/prettier
         alertText(Number.parseInt(cont.id), "Container", 0), //todo expand or create container specific alerts
@@ -54,7 +54,7 @@ export const showAlert = (
         // @ts-ignore
         { variant: AlertType[cont.alertType] }
       );
-
+    }
     if (cont.cpuUsage.alert)
       enqueueSnackbar(
         // eslint-disable-next-line prettier/prettier
