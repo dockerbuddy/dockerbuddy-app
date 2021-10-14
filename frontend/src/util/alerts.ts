@@ -44,4 +44,33 @@ export const showAlert = (
       // @ts-ignore
       { variant: AlertType[summaryParsed.memoryUsage.alertType] }
     );
+
+  summaryParsed.containers.forEach((cont) => {
+    if (cont.alert)
+      enqueueSnackbar(
+        // eslint-disable-next-line prettier/prettier
+        alertText(Number.parseInt(cont.id), "Container", 0), //todo expand or create container specific alerts
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore
+        { variant: AlertType[cont.alertType] }
+      );
+
+    if (cont.cpuUsage.alert)
+      enqueueSnackbar(
+        // eslint-disable-next-line prettier/prettier
+          alertText(Number.parseInt(cont.id), "CPU usage", cont.cpuUsage.percent),
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore
+        { variant: AlertType[cont.cpuUsage.alertType] }
+      );
+
+    if (cont.memoryUsage.alert)
+      enqueueSnackbar(
+        // eslint-disable-next-line prettier/prettier
+          alertText(Number.parseInt(cont.id), "Memory usage", cont.memoryUsage.percent),
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore
+        { variant: AlertType[cont.memoryUsage.alertType] }
+      );
+  });
 };

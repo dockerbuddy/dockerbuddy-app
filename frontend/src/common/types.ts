@@ -44,12 +44,14 @@ export interface ContainerRule {
 }
 
 export interface ContainerSummary {
-  id: string;
+  id: string; //todo change id to number
   name: string;
   image: string;
   status: string; //TODO DEFINE STATUS AFTER IT GETS CHANGED ON BACKEND
   cpuUsage: BasicMetric;
   memoryUsage: BasicMetric;
+  alertType: AlertType;
+  alert: boolean;
 }
 
 export interface BasicMetric {
