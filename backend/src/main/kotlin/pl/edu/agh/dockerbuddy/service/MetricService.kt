@@ -14,6 +14,7 @@ import pl.edu.agh.dockerbuddy.repository.HostRepository
 import pl.edu.agh.dockerbuddy.tools.appendAlertTypeToContainers
 import pl.edu.agh.dockerbuddy.tools.appendAlertTypeToMetrics
 import pl.edu.agh.dockerbuddy.tools.checkForAlertSummary
+import pl.edu.agh.dockerbuddy.tools.initialCheckForAlertSummary
 import javax.persistence.EntityNotFoundException
 
 @Service
@@ -43,7 +44,7 @@ class MetricService(
             logger.debug("$hostSummary")
         } else {
             logger.info("No data for host $hostId in cache. Adding an entry...")
-            // TODO check if initial metrics do not violate rules
+            initialCheckForAlertSummary(hostSummary)
         }
 
         inMemory.saveHostSummary(hostId, hostSummary)

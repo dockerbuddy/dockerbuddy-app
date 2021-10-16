@@ -1,6 +1,7 @@
 package pl.edu.agh.dockerbuddy.tools
 
 import pl.edu.agh.dockerbuddy.model.AlertType
+import pl.edu.agh.dockerbuddy.model.ContainerStateType
 import pl.edu.agh.dockerbuddy.model.RuleType
 import pl.edu.agh.dockerbuddy.model.entity.ContainerRule
 import pl.edu.agh.dockerbuddy.model.entity.MetricRule
@@ -31,6 +32,20 @@ fun checkForAlertSummary(hostSummary: HostSummary, prevHostSummary: HostSummary)
     checkForAlerts(hostSummary.containers, prevHostSummary.containers)
 }
 
+fun initialCheckForAlertSummary(hostSummary: HostSummary) {
+    val mockPrevHostSummary = HostSummary(
+        0,
+        "",
+        BasicMetric(0.0, 0.0, 0.0, null, false),
+        BasicMetric(0.0, 0.0, 0.0, null, false),
+        BasicMetric(0.0, 0.0, 0.0, null, false),
+        hostSummary.containers.toMutableList()
+    )
+    mockPrevHostSummary.containers.map { it.copy() }.forEach { it.alert = false }
+
+    checkForAlertSummary(hostSummary, mockPrevHostSummary)
+}
+
 fun checkForAlert(basicMetric: BasicMetric, prevBasicMetric: BasicMetric){
     basicMetric.alert = basicMetric.alertType != prevBasicMetric.alertType
 }
@@ -39,7 +54,7 @@ fun checkForAlerts(containersSummaries: List<ContainerSummary>, prevContainersSu
     val containers = containersSummaries.associateBy { it.id }
     val prevContainers = prevContainersSummaries.associateBy { it.id }
     for (cont in containers) {
-        if (cont.key !in prevContainers.keys) continue // TODO case when there's new container -> AlertType.NewCont ?
+        if (cont.key !in prevContainers.keys) continue // TODO case when there's new container
         val container = cont.value
         container.alert = container.alertType != prevContainers[container.id]!!.alertType
     }
@@ -48,12 +63,12 @@ fun checkForAlerts(containersSummaries: List<ContainerSummary>, prevContainersSu
 fun appendAlertTypeToContainers(containers: List<ContainerSummary>, rules: List<ContainerRule>) {
     val containerMap = containers.associateBy { it.name }
     for (rule in rules) {
-        if (rule.containerName !in containerMap.keys) continue // TODO case when such container does not exist -> additional alerts in form of messages?
+        if (rule.containerName !in containerMap.keys) continue // TODO case when such container does not exist
         addAlertTypeToContainer(containerMap[rule.containerName]!!, rule)
     }
 }
 
 fun addAlertTypeToContainer(containerSummary: ContainerSummary, rule: ContainerRule) = when {
-    containerSummary.status != "running" -> containerSummary.alertType = rule.alertType
+    containerSummary.status != ContainerStateType.RUNNING.state -> containerSummary.alertType = rule.alertType
     else -> containerSummary.alertType = AlertType.OK
 }
