@@ -123,7 +123,7 @@ class InfluxDbProxy {
 
         val alertPoint = Point.measurement("alerts")
                 .addTag("host_id", hostId.toString())
-                .addTag("alert_type", basicMetric.alertType.toString())
+//                .addTag("alert_type", basicMetric.alertType.toString())
                 .addTag("rule_type", ruleType.toString())
                 .addField("value", basicMetric.value)
                 .addField("total", basicMetric.total)

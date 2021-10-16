@@ -14,7 +14,7 @@ import org.springframework.web.socket.config.annotation.EnableWebSocketMessageBr
 @EnableWebSocketMessageBroker
 class WebSocketConfig : WebSocketMessageBrokerConfigurer {
     override fun configureMessageBroker(config: MessageBrokerRegistry) {
-        config.enableSimpleBroker("/alerts") // TODO change name and add new channels
+        config.enableSimpleBroker("/alerts", "/metrics") // TODO change name and add new channels
     }
 
     override fun registerStompEndpoints(registry: StompEndpointRegistry) {
