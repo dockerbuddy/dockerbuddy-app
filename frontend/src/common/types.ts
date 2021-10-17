@@ -52,7 +52,6 @@ export interface ContainerSummary {
   cpuUsage: BasicMetric;
   memoryUsage: BasicMetric;
   alertType: AlertType;
-  alert: boolean;
 }
 
 export interface BasicMetric {
