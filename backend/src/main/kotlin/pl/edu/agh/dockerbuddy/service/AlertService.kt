@@ -1,8 +1,12 @@
 package pl.edu.agh.dockerbuddy.service
 
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import org.slf4j.LoggerFactory
 import org.springframework.messaging.simp.SimpMessagingTemplate
 import org.springframework.stereotype.Service
+import pl.edu.agh.dockerbuddy.influxdb.InfluxDbProxy
 import pl.edu.agh.dockerbuddy.model.Alert
 import pl.edu.agh.dockerbuddy.model.AlertType
 import pl.edu.agh.dockerbuddy.model.RuleType
@@ -13,12 +17,15 @@ import pl.edu.agh.dockerbuddy.model.metric.HostSummary
 import pl.edu.agh.dockerbuddy.tools.addAlertType
 
 @Service
-class AlertService(val template: SimpMessagingTemplate) {
+class AlertService(val template: SimpMessagingTemplate, val influxDbProxy: InfluxDbProxy) {
     private val logger = LoggerFactory.getLogger(AlertService::class.java)
 
     fun sendAlert(alert: Alert) {
         logger.info("Sending alert...")
         template.convertAndSend("/alerts", alert)
+        CoroutineScope(Dispatchers.IO).launch {
+            influxDbProxy.saveAlert(alert)
+        }
     }
 
     fun checkForAlertSummary(hostSummary: HostSummary, prevHostSummary: HostSummary){
