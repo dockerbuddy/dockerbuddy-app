@@ -8,13 +8,9 @@ import org.springframework.messaging.simp.SimpMessagingTemplate
 import org.springframework.stereotype.Service
 import pl.edu.agh.dockerbuddy.influxdb.InfluxDbProxy
 import pl.edu.agh.dockerbuddy.model.Alert
-import pl.edu.agh.dockerbuddy.model.AlertType
-import pl.edu.agh.dockerbuddy.model.RuleType
-import pl.edu.agh.dockerbuddy.model.entity.MetricRule
 import pl.edu.agh.dockerbuddy.model.metric.BasicMetric
 import pl.edu.agh.dockerbuddy.model.metric.ContainerSummary
 import pl.edu.agh.dockerbuddy.model.metric.HostSummary
-import pl.edu.agh.dockerbuddy.tools.addAlertType
 
 @Service
 class AlertService(val template: SimpMessagingTemplate, val influxDbProxy: InfluxDbProxy) {
@@ -36,9 +32,9 @@ class AlertService(val template: SimpMessagingTemplate, val influxDbProxy: Influ
     }
 
     fun checkForAlert(basicMetric: BasicMetric, prevBasicMetric: BasicMetric, hostSummary: HostSummary, metricName: String){
-        if (basicMetric.state != prevBasicMetric.state) {
+        if (basicMetric.alertType != prevBasicMetric.alertType) {
             val alertMessage = "Host ${hostSummary.id}: $metricName is ${basicMetric.percent}%"
-            sendAlert(Alert(hostSummary.id, basicMetric.state!!, alertMessage))
+            sendAlert(Alert(hostSummary.id, basicMetric.alertType!!, alertMessage))
         }
     }
 

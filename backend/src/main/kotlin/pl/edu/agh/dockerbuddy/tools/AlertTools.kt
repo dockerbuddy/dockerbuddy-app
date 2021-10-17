@@ -20,9 +20,9 @@ fun appendAlertTypeToMetrics(hostSummary: HostSummary, rules: MutableSet<MetricR
 }
 
 fun addAlertType(basicMetric: BasicMetric, rule: MetricRule) = when {
-    basicMetric.percent < rule.warnLevel.toDouble() -> basicMetric.state = AlertType.OK
-    basicMetric.percent > rule.criticalLevel.toDouble() -> basicMetric.state = AlertType.CRITICAL
-    else -> basicMetric.state = AlertType.WARN
+    basicMetric.percent < rule.warnLevel.toDouble() -> basicMetric.alertType = AlertType.OK
+    basicMetric.percent > rule.criticalLevel.toDouble() -> basicMetric.alertType = AlertType.CRITICAL
+    else -> basicMetric.alertType = AlertType.WARN
 }
 
 fun appendAlertTypeToContainers(containers: List<ContainerSummary>, rules: List<ContainerRule>) {
