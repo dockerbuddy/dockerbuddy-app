@@ -14,12 +14,11 @@ import org.springframework.web.socket.config.annotation.EnableWebSocketMessageBr
 @EnableWebSocketMessageBroker
 class WebSocketConfig : WebSocketMessageBrokerConfigurer {
     override fun configureMessageBroker(config: MessageBrokerRegistry) {
-        config.enableSimpleBroker("/alerts", "/metrics") // TODO change name and add new channels
+        config.enableSimpleBroker("/alerts", "/metrics")
     }
 
     override fun registerStompEndpoints(registry: StompEndpointRegistry) {
         registry.addEndpoint("/api/v2/ws")
-                //TODO it should not stay this way on prod
                 .setAllowedOriginPatterns("*")
                 .withSockJS()
     }
