@@ -69,7 +69,7 @@ const HostCardComponent: React.FC<{ host: FullHostSummary }> = (props) => {
           )}
           {hostSummary?.memoryUsage !== undefined ? (
             <ProgressBarComponent
-              name="Vmem"
+              name="Memory"
               used={humanFileSize(hostSummary.memoryUsage.value)}
               total={humanFileSize(hostSummary.memoryUsage.total)}
               percent={hostSummary.memoryUsage.percent}
@@ -82,8 +82,7 @@ const HostCardComponent: React.FC<{ host: FullHostSummary }> = (props) => {
           {hostSummary?.cpuUsage !== undefined ? (
             <ProgressBarComponent
               name="CPU"
-              used={humanFileSize(hostSummary.cpuUsage.value)}
-              total={humanFileSize(hostSummary.cpuUsage.total)}
+              used={hostSummary.cpuUsage.value + "%"}
               percent={hostSummary.cpuUsage.percent}
             />
           ) : (
