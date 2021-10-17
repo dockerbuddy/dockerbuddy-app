@@ -60,7 +60,6 @@ export interface BasicMetric {
   total: number;
   percent: number;
   alertType: AlertType;
-  alert: boolean;
 }
 
 export enum AlertType {
@@ -107,4 +106,10 @@ export interface AddHostFormData {
   memCrit: string;
   diskWarn: string;
   diskCrit: string;
+}
+
+export interface Alert {
+  hostId: number;
+  alertType: AlertType;
+  alertMessage: string;
 }
