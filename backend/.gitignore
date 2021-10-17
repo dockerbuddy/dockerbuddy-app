@@ -107,3 +107,4 @@ test-output
 atlassian-ide-plugin.xml
 .gradletasknamecache
 /data/
+/src/main/resources/static/

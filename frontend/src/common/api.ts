@@ -1,4 +1,7 @@
-export const proxy = "http://localhost:8080/api/v2";
+export const proxy =
+  process.env.NODE_ENV === "production"
+    ? "/api/v2"
+    : "http://localhost:8080/api/v2";
 
 export const socketProxy = proxy + "/ws";
 
