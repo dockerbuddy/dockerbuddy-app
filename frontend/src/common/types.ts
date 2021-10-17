@@ -84,16 +84,14 @@ export interface AlertsResponse {
 export interface AlertsResponseElement {
   alertType: AlertType;
   hostId: number;
-  percent: number;
-  ruleType: string;
+  alertMessage: string;
   time: string;
 }
 
 export interface AlertsResponseElementParsed {
   alertType: AlertType;
   hostId: number;
-  percent: number;
-  ruleType: string;
+  alertMessage: string;
   time: Date;
 }
 
