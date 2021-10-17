@@ -18,7 +18,7 @@ class AlertService(val template: SimpMessagingTemplate) {
 
     fun sendAlert(alert: Alert) {
         logger.info("Sending alert...")
-        template.convertAndSend("/metrics", alert)
+        template.convertAndSend("/alerts", alert)
     }
 
     fun checkForAlertSummary(hostSummary: HostSummary, prevHostSummary: HostSummary){

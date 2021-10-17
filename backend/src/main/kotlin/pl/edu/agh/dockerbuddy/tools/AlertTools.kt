@@ -14,6 +14,7 @@ fun appendAlertTypeToMetrics(hostSummary: HostSummary, rules: MutableSet<MetricR
             RuleType.CpuUsage -> addAlertType(hostSummary.cpuUsage, rule)
             RuleType.MemoryUsage -> addAlertType(hostSummary.memoryUsage, rule)
             RuleType.DiskUsage -> addAlertType(hostSummary.diskUsage, rule)
+            else -> break
         }
     }
 }
