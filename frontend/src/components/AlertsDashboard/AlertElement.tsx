@@ -27,8 +27,7 @@ const AlertElement: React.FC<AlertElementProps> = ({ alert, showDate }) => {
 
       <Link to={`/host/${alert.hostId}`} style={{ textDecoration: "none" }}>
         <Alert severity={severity}>
-          <strong>{parseDateToHour(alert.time)}</strong> Host {alert.hostId}{" "}
-          {alert.alertMessage}
+          <strong>{parseDateToHour(alert.time)}</strong> {alert.alertMessage}
         </Alert>
       </Link>
     </Grid>
