@@ -15,7 +15,12 @@ fun appendAlertTypeToMetrics(hostSummary: HostSummary, rules: MutableSet<MetricR
             RuleType.CpuUsage -> addAlertType(hostSummary.cpuUsage, rule)
             RuleType.MemoryUsage -> addAlertType(hostSummary.memoryUsage, rule)
             RuleType.DiskUsage -> addAlertType(hostSummary.diskUsage, rule)
-//            else -> continue
+            else -> continue
+        }
+    }
+    hostSummary.containers.forEach {
+        if (it.alertType == null) {
+            it.alertType = AlertType.OK
         }
     }
 }
@@ -30,6 +35,11 @@ fun appendAlertTypeToContainers(containers: List<ContainerSummary>, rules: List<
     for (rule in rules) {
         if (rule.containerName !in containerMap.keys) continue // TODO case when such container does not exist
         addAlertTypeToContainer(containerMap[rule.containerName]!!, rule)
+    }
+    containers.forEach {
+        if (it.alertType == null) {
+            it.alertType = AlertType.OK
+        }
     }
 }
 
