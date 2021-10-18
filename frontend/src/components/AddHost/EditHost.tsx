@@ -42,7 +42,6 @@ const EditHost: React.FC<RouteComponentProps<HParam>> = ({ match }) => {
       diskCrit: "",
     };
 
-    //@ts-ignore
     jsonBody.hostRules.forEach((rule: Rule) => {
       console.log(rule.type);
       if (rule.type === "CpuUsage")

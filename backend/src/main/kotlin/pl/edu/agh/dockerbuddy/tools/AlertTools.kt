@@ -14,6 +14,7 @@ fun appendAlertTypeToMetrics(hostSummary: HostSummary, rules: MutableSet<MetricR
             RuleType.CpuUsage -> addAlertType(hostSummary.cpuUsage, rule)
             RuleType.MemoryUsage -> addAlertType(hostSummary.memoryUsage, rule)
             RuleType.DiskUsage -> addAlertType(hostSummary.diskUsage, rule)
+            else -> break
         }
     }
 }
@@ -22,27 +23,6 @@ fun addAlertType(basicMetric: BasicMetric, rule: MetricRule) = when {
     basicMetric.percent < rule.warnLevel.toDouble() -> basicMetric.alertType = AlertType.OK
     basicMetric.percent > rule.criticalLevel.toDouble() -> basicMetric.alertType = AlertType.CRITICAL
     else -> basicMetric.alertType = AlertType.WARN
-}
-
-fun checkForAlertSummary(hostSummary: HostSummary, prevHostSummary: HostSummary){
-    checkForAlert(hostSummary.diskUsage, prevHostSummary.diskUsage)
-    checkForAlert(hostSummary.cpuUsage, prevHostSummary.cpuUsage)
-    checkForAlert(hostSummary.memoryUsage, prevHostSummary.memoryUsage)
-    checkForAlerts(hostSummary.containers, prevHostSummary.containers)
-}
-
-fun checkForAlert(basicMetric: BasicMetric, prevBasicMetric: BasicMetric){
-    basicMetric.alert = basicMetric.alertType != prevBasicMetric.alertType
-}
-
-fun checkForAlerts(containersSummaries: List<ContainerSummary>, prevContainersSummaries: List<ContainerSummary>) {
-    val containers = containersSummaries.associateBy { it.id }
-    val prevContainers = prevContainersSummaries.associateBy { it.id }
-    for (cont in containers) {
-        if (cont.key !in prevContainers.keys) continue // TODO case when there's new container -> AlertType.NewCont ?
-        val container = cont.value
-        container.alert = container.alertType != prevContainers[container.id]!!.alertType
-    }
 }
 
 fun appendAlertTypeToContainers(containers: List<ContainerSummary>, rules: List<ContainerRule>) {
