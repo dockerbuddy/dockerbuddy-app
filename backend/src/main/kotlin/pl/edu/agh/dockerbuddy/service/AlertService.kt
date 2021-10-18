@@ -9,6 +9,10 @@ import org.springframework.stereotype.Service
 import pl.edu.agh.dockerbuddy.influxdb.InfluxDbProxy
 import pl.edu.agh.dockerbuddy.model.Alert
 import pl.edu.agh.dockerbuddy.model.AlertType
+import pl.edu.agh.dockerbuddy.model.ContainerStateType
+import pl.edu.agh.dockerbuddy.model.RuleType
+import pl.edu.agh.dockerbuddy.model.entity.ContainerRule
+import pl.edu.agh.dockerbuddy.model.entity.MetricRule
 import pl.edu.agh.dockerbuddy.model.metric.BasicMetric
 import pl.edu.agh.dockerbuddy.model.metric.ContainerSummary
 import pl.edu.agh.dockerbuddy.model.metric.HostSummary
@@ -47,7 +51,14 @@ class AlertService(val template: SimpMessagingTemplate, val influxDbProxy: Influ
         val containers = containersSummaries.associateBy { it.id }
         val prevContainers = prevContainersSummaries.associateBy { it.id }
         for (cont in containers) {
-            if (cont.key !in prevContainers.keys) continue // TODO case when there's new container -> AlertType.NewCont ?
+            if (cont.key !in prevContainers.keys) {
+                sendAlert(
+                    Alert(
+                    hostSummary.id,
+                    AlertType.WARN,
+                    "Host ${hostSummary.id}: new container: ${cont.value.name}"
+                ))
+            }
             val container = cont.value
             if (container.alertType != prevContainers[container.id]!!.alertType){
                 val alertMessage = "Host ${hostSummary.id}: something wrong with container ${container.id}"
@@ -69,6 +80,53 @@ class AlertService(val template: SimpMessagingTemplate, val influxDbProxy: Influ
         mockPrevHostSummary.containers.map { it.copy() }.forEach { it.alertType = AlertType.OK }
 
         checkForAlertSummary(hostSummary, mockPrevHostSummary)
+    }
+
+    fun appendAlertTypeToMetrics(hostSummary: HostSummary, rules: MutableSet<MetricRule>){
+        for (rule in rules) {
+            when (rule.type) {
+                RuleType.CpuUsage -> addAlertType(hostSummary.cpuUsage, rule)
+                RuleType.MemoryUsage -> addAlertType(hostSummary.memoryUsage, rule)
+                RuleType.DiskUsage -> addAlertType(hostSummary.diskUsage, rule)
+                else -> continue
+            }
+        }
+        hostSummary.containers.forEach {
+            if (it.alertType == null) {
+                it.alertType = AlertType.OK
+            }
+        }
+    }
+
+    fun addAlertType(basicMetric: BasicMetric, rule: MetricRule) = when {
+        basicMetric.percent < rule.warnLevel.toDouble() -> basicMetric.alertType = AlertType.OK
+        basicMetric.percent > rule.criticalLevel.toDouble() -> basicMetric.alertType = AlertType.CRITICAL
+        else -> basicMetric.alertType = AlertType.WARN
+    }
+
+    fun appendAlertTypeToContainers(hostSummary: HostSummary, rules: List<ContainerRule>) {
+        val containers = hostSummary.containers
+        val containerMap = containers.associateBy { it.name }
+        for (rule in rules) {
+            if (rule.containerName !in containerMap.keys) {
+                sendAlert(Alert(
+                    hostSummary.id,
+                    AlertType.CRITICAL,
+                    "Host ${hostSummary.id}: missing container ${rule.containerName}"
+                ))
+            }
+            addAlertTypeToContainer(containerMap[rule.containerName]!!, rule)
+        }
+        containers.forEach {
+            if (it.alertType == null) {
+                it.alertType = AlertType.OK
+            }
+        }
+    }
+
+    fun addAlertTypeToContainer(containerSummary: ContainerSummary, rule: ContainerRule) = when {
+        containerSummary.status != ContainerStateType.RUNNING.state -> containerSummary.alertType = rule.alertType
+        else -> containerSummary.alertType = AlertType.OK
     }
 
 }
