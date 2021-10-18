@@ -27,16 +27,18 @@ function LinearProgressWithLabel(
 const ProgressBarComponent: React.FC<{
   name: string;
   used: string;
-  total: string;
+  total?: string;
   percent: number;
-}> = ({ name, used, total, percent }) => {
+}> = ({ name, used, total = "", percent }) => {
   return (
     <Grid container justify="flex-start" alignItems="center" spacing={2}>
       <Grid item xs={2}>
         <Typography variant="subtitle1">{name + ":"}</Typography>
       </Grid>
       <Grid item xs={5}>
-        <Typography variant="subtitle1">{used + " / " + total}</Typography>
+        <Typography variant="subtitle1">
+          {used + (!!total ? ` / ${total}` : "")}
+        </Typography>
       </Grid>
       <Grid item xs={12} md={5}>
         <LinearProgressWithLabel variant="determinate" value={percent} />

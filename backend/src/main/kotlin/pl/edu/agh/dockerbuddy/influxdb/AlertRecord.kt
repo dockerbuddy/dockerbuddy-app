@@ -6,7 +6,6 @@ import pl.edu.agh.dockerbuddy.model.RuleType
 data class AlertRecord (
         val hostId: Long,
         val alertType: AlertType,
-        val ruleType: RuleType,
-        val percent: Double,
+        val alertMessage: String,
         val time: String
 )

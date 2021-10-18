@@ -13,5 +13,4 @@ data class ContainerSummary(
     val cpuUsage: BasicMetric,
     val memoryUsage: BasicMetric,
     var alertType: AlertType?,
-    var alert: Boolean?
 )

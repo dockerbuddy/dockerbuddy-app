@@ -52,7 +52,6 @@ export interface ContainerSummary {
   cpuUsage: BasicMetric;
   memoryUsage: BasicMetric;
   alertType: AlertType;
-  alert: boolean;
 }
 
 export interface BasicMetric {
@@ -60,7 +59,6 @@ export interface BasicMetric {
   total: number;
   percent: number;
   alertType: AlertType;
-  alert: boolean;
 }
 
 export enum AlertType {
@@ -85,16 +83,14 @@ export interface AlertsResponse {
 export interface AlertsResponseElement {
   alertType: AlertType;
   hostId: number;
-  percent: number;
-  ruleType: string;
+  alertMessage: string;
   time: string;
 }
 
 export interface AlertsResponseElementParsed {
   alertType: AlertType;
   hostId: number;
-  percent: number;
-  ruleType: string;
+  alertMessage: string;
   time: Date;
 }
 
@@ -107,4 +103,10 @@ export interface AddHostFormData {
   memCrit: string;
   diskWarn: string;
   diskCrit: string;
+}
+
+export interface Alert {
+  hostId: number;
+  alertType: AlertType;
+  alertMessage: string;
 }
