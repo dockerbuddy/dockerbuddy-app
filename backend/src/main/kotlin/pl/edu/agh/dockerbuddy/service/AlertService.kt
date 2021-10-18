@@ -61,7 +61,7 @@ class AlertService(val template: SimpMessagingTemplate, val influxDbProxy: Influ
             }
             val container = cont.value
             if (container.alertType != prevContainers[container.id]!!.alertType){
-                val alertMessage = "Host ${hostSummary.id}: something wrong with container ${container.id}"
+                val alertMessage = "Host ${hostSummary.id}: something wrong with container ${container.name}"
                 sendAlert(Alert(hostSummary.id, container.alertType!!, alertMessage))
             }
         }
@@ -125,8 +125,8 @@ class AlertService(val template: SimpMessagingTemplate, val influxDbProxy: Influ
     }
 
     fun addAlertTypeToContainer(containerSummary: ContainerSummary, rule: ContainerRule) = when {
-        containerSummary.status != ContainerStateType.RUNNING.state -> containerSummary.alertType = rule.alertType
+        !ContainerStateType.RUNNING.state.equals(containerSummary.status, ignoreCase = true) ->
+            containerSummary.alertType = rule.alertType
         else -> containerSummary.alertType = AlertType.OK
     }
-
 }
