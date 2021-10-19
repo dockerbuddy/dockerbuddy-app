@@ -51,12 +51,14 @@ Frontend should be available on port `3000`
 You can login to influx using generated credentials from `.env` file
 
 ## Realease
-For realeasing we are using bash script `build.sh`.
+For realeasing we are using bash script `build.sh`. You need to provide version as a first argument, for example:
+
+`./build.sh 1.0.0`
 ### Requirements
 - Apache Maven 3.8.3
 - Yarn 1.22.10
 - Docker
 - ???
 ### Artifacts
-Bash script is creating a jar file in `backend/target` which is containing both backend and frontend. It also creates a docker image `dockerbuddy`.
+Bash script is creating a jar file `dockerbuddy-verison` which is containing both backend and frontend. It also creates a docker image `dockerbuddy`.
 
