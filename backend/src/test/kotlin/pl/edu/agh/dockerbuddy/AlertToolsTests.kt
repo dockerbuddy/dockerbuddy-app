@@ -2,8 +2,8 @@ package pl.edu.agh.dockerbuddy
 //
 //import org.junit.jupiter.api.Assertions
 //import org.junit.jupiter.api.Test
-//import pl.edu.agh.dockerbuddy.model.AlertType
-//import pl.edu.agh.dockerbuddy.model.RuleType
+//import pl.edu.agh.dockerbuddy.model.alert.AlertType
+//import pl.edu.agh.dockerbuddy.model.rule.RuleType
 //import pl.edu.agh.dockerbuddy.model.entity.MetricRule
 //import pl.edu.agh.dockerbuddy.model.metric.BasicMetric
 //import pl.edu.agh.dockerbuddy.tools.addAlertType

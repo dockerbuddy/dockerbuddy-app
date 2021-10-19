@@ -1,7 +1,7 @@
 package pl.edu.agh.dockerbuddy.model.metric
 
 import lombok.ToString
-import pl.edu.agh.dockerbuddy.model.AlertType
+import pl.edu.agh.dockerbuddy.model.alert.AlertType
 
 @ToString
 data class BasicMetric(

@@ -7,10 +7,10 @@ import org.slf4j.LoggerFactory
 import org.springframework.messaging.simp.SimpMessagingTemplate
 import org.springframework.stereotype.Service
 import pl.edu.agh.dockerbuddy.influxdb.InfluxDbProxy
-import pl.edu.agh.dockerbuddy.model.Alert
-import pl.edu.agh.dockerbuddy.model.AlertType
-import pl.edu.agh.dockerbuddy.model.ContainerStateType
-import pl.edu.agh.dockerbuddy.model.RuleType
+import pl.edu.agh.dockerbuddy.model.alert.Alert
+import pl.edu.agh.dockerbuddy.model.alert.AlertType
+import pl.edu.agh.dockerbuddy.model.types.ContainerStateType
+import pl.edu.agh.dockerbuddy.model.types.RuleType
 import pl.edu.agh.dockerbuddy.model.entity.ContainerRule
 import pl.edu.agh.dockerbuddy.model.entity.MetricRule
 import pl.edu.agh.dockerbuddy.model.metric.BasicMetric
@@ -36,6 +36,9 @@ class AlertService(val template: SimpMessagingTemplate, val influxDbProxy: Influ
         for (mt in MetricType.values()) {
             if (hostMetrics.containsKey(mt) && prevHostMetrics.containsKey(mt)) {
                 checkForAlert(hostMetrics[mt]!!, prevHostMetrics[mt]!!, hostSummary)
+            }
+            else {
+                logger.warn("Missing metric $mt for host ${hostSummary.id}")
             }
         }
         checkForAlerts(hostSummary.containers, prevHostSummary.containers, hostSummary)
@@ -65,11 +68,13 @@ class AlertService(val template: SimpMessagingTemplate, val influxDbProxy: Influ
                     hostSummary.id,
                     AlertType.WARN,
                     "Host ${hostSummary.id}: new container: ${cont.value.name}"
-                ))
+                )
+                )
             }
             val container = cont.value
             if (container.alertType != prevContainers[container.id]!!.alertType){
-                val alertMessage = "Host ${hostSummary.id}: something wrong with container ${container.name}"
+                val alertMessage = "Host ${hostSummary.id}: something wrong with container ${container.name}. " +
+                        "Statue: ${container.status}"
                 sendAlert(Alert(hostSummary.id, container.alertType!!, alertMessage))
             }
         }
@@ -120,11 +125,13 @@ class AlertService(val template: SimpMessagingTemplate, val influxDbProxy: Influ
         val containerMap = containers.associateBy { it.name }
         for (rule in rules) {
             if (rule.containerName !in containerMap.keys) {
-                sendAlert(Alert(
+                sendAlert(
+                    Alert(
                     hostSummary.id,
                     AlertType.CRITICAL,
                     "Host ${hostSummary.id}: missing container ${rule.containerName}"
-                ))
+                )
+                )
             }
             addAlertTypeToContainer(containerMap[rule.containerName]!!, rule)
         }

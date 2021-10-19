@@ -7,8 +7,8 @@ import kotlinx.coroutines.channels.toList
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Service
-import pl.edu.agh.dockerbuddy.model.Alert
-import pl.edu.agh.dockerbuddy.model.AlertType
+import pl.edu.agh.dockerbuddy.model.alert.Alert
+import pl.edu.agh.dockerbuddy.model.alert.AlertType
 import pl.edu.agh.dockerbuddy.model.metric.HostSummary
 import pl.edu.agh.dockerbuddy.model.metric.MetricType
 import java.lang.IllegalArgumentException

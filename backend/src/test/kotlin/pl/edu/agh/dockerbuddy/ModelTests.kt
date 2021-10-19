@@ -12,7 +12,7 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest
 import pl.edu.agh.dockerbuddy.model.entity.MetricRule
 import pl.edu.agh.dockerbuddy.model.entity.BaseLongIdEntity
 import pl.edu.agh.dockerbuddy.model.entity.Host
-import pl.edu.agh.dockerbuddy.model.RuleType
+import pl.edu.agh.dockerbuddy.model.types.RuleType
 import pl.edu.agh.dockerbuddy.repository.AbstractRuleRepository
 import pl.edu.agh.dockerbuddy.repository.HostRepository
 import javax.validation.Validation

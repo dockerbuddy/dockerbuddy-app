@@ -2,8 +2,8 @@ package pl.edu.agh.dockerbuddy.model.entity
 
 import com.fasterxml.jackson.annotation.JsonAlias
 import lombok.ToString
-import pl.edu.agh.dockerbuddy.model.AlertType
-import pl.edu.agh.dockerbuddy.model.RuleType
+import pl.edu.agh.dockerbuddy.model.alert.AlertType
+import pl.edu.agh.dockerbuddy.model.types.RuleType
 import javax.persistence.*
 
 @ToString
