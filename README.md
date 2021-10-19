@@ -3,7 +3,7 @@
 ## Running app with docker
 Image is of Docker Buddy is available on [DockerHub](https://hub.docker.com/repository/docker/kraleppa/dockerbuddy)
 ```
-docker run --name dockerbuddy --env-file .env -p 8080:8080 -d dockerbuddy
+docker run --name dockerbuddy --env-file .env -p 8080:8080 -d kraleppa/dockerbuddy:v1.0.1-beta
 ```
 
 See [Environment variables](#environment-variables).
