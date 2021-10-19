@@ -16,6 +16,7 @@ import pl.edu.agh.dockerbuddy.model.entity.MetricRule
 import pl.edu.agh.dockerbuddy.model.metric.BasicMetric
 import pl.edu.agh.dockerbuddy.model.metric.ContainerSummary
 import pl.edu.agh.dockerbuddy.model.metric.HostSummary
+import pl.edu.agh.dockerbuddy.model.metric.MetricType
 
 @Service
 class AlertService(val template: SimpMessagingTemplate, val influxDbProxy: InfluxDbProxy) {
@@ -30,24 +31,31 @@ class AlertService(val template: SimpMessagingTemplate, val influxDbProxy: Influ
     }
 
     fun checkForAlertSummary(hostSummary: HostSummary, prevHostSummary: HostSummary){
-        checkForAlert(hostSummary.diskUsage, prevHostSummary.diskUsage, hostSummary, "disk usage")
-        checkForAlert(hostSummary.cpuUsage, prevHostSummary.cpuUsage, hostSummary, "cpu usage")
-        checkForAlert(hostSummary.memoryUsage, prevHostSummary.memoryUsage, hostSummary, "memory usage")
+        val hostMetrics = hostSummary.metrics.associateBy { it.metricType }
+        val prevHostMetrics = prevHostSummary.metrics.associateBy { it.metricType }
+        for (mt in MetricType.values()) {
+            if (hostMetrics.containsKey(mt) && prevHostMetrics.containsKey(mt)) {
+                checkForAlert(hostMetrics[mt]!!, prevHostMetrics[mt]!!, hostSummary)
+            }
+        }
         checkForAlerts(hostSummary.containers, prevHostSummary.containers, hostSummary)
     }
 
-    fun checkForAlert(basicMetric: BasicMetric, prevBasicMetric: BasicMetric, hostSummary: HostSummary, metricName: String){
+    fun checkForAlert(basicMetric: BasicMetric, prevBasicMetric: BasicMetric, hostSummary: HostSummary){
         if (basicMetric.alertType == null) return
-        logger.debug("Checking basic metric: $metricName")
+        logger.debug("Checking basic metric: ${basicMetric.metricType}")
         if (basicMetric.alertType != prevBasicMetric.alertType) {
-            val alertMessage = "Host ${hostSummary.id}: $metricName is ${basicMetric.percent}%"
+            val alertMessage = "Host ${hostSummary.id}: ${basicMetric.metricType} is ${basicMetric.percent}%"
             logger.info(alertMessage)
             logger.debug("$basicMetric")
             sendAlert(Alert(hostSummary.id, basicMetric.alertType!!, alertMessage))
         }
     }
 
-    fun checkForAlerts(containersSummaries: List<ContainerSummary>, prevContainersSummaries: List<ContainerSummary>, hostSummary: HostSummary) {
+    fun checkForAlerts(
+        containersSummaries: List<ContainerSummary>,
+        prevContainersSummaries: List<ContainerSummary>, hostSummary: HostSummary
+    ) {
         val containers = containersSummaries.associateBy { it.id }
         val prevContainers = prevContainersSummaries.associateBy { it.id }
         for (cont in containers) {
@@ -72,9 +80,11 @@ class AlertService(val template: SimpMessagingTemplate, val influxDbProxy: Influ
         val mockPrevHostSummary = HostSummary(
             -1,
             "123",
-            BasicMetric(0.0, 0.0, 0.0, AlertType.OK),
-            BasicMetric(0.0, 0.0, 0.0, AlertType.OK),
-            BasicMetric(0.0, 0.0, 0.0, AlertType.OK),
+            listOf(
+                BasicMetric(MetricType.cpu_usage, 0.0, 0.0, 0.0, AlertType.OK),
+                BasicMetric(MetricType.disk_usage, 0.0, 0.0, 0.0, AlertType.OK),
+                BasicMetric(MetricType.memory_usage, 0.0, 0.0, 0.0, AlertType.OK)
+            ),
             hostSummary.containers.toMutableList()
         )
         mockPrevHostSummary.containers.map { it.copy() }.forEach { it.alertType = AlertType.OK }
@@ -83,11 +93,12 @@ class AlertService(val template: SimpMessagingTemplate, val influxDbProxy: Influ
     }
 
     fun appendAlertTypeToMetrics(hostSummary: HostSummary, rules: MutableSet<MetricRule>){
+        val hostMetrics = hostSummary.metrics.associateBy { it.metricType }
         for (rule in rules) {
             when (rule.type) {
-                RuleType.CpuUsage -> addAlertType(hostSummary.cpuUsage, rule)
-                RuleType.MemoryUsage -> addAlertType(hostSummary.memoryUsage, rule)
-                RuleType.DiskUsage -> addAlertType(hostSummary.diskUsage, rule)
+                RuleType.CpuUsage -> addAlertType(hostMetrics[MetricType.cpu_usage]!!, rule)
+                RuleType.MemoryUsage -> addAlertType(hostMetrics[MetricType.memory_usage]!!, rule)
+                RuleType.DiskUsage -> addAlertType(hostMetrics[MetricType.disk_usage]!!, rule)
                 else -> continue
             }
         }

@@ -3,20 +3,16 @@ package pl.edu.agh.dockerbuddy.influxdb
 import com.influxdb.client.kotlin.InfluxDBClientKotlinFactory
 import com.influxdb.client.domain.WritePrecision
 import com.influxdb.client.write.Point
-import io.reactivex.internal.util.ExceptionHelper
 import kotlinx.coroutines.channels.toList
-import org.dom4j.rule.Rule
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Service
 import pl.edu.agh.dockerbuddy.model.Alert
 import pl.edu.agh.dockerbuddy.model.AlertType
-import pl.edu.agh.dockerbuddy.model.RuleType
-import pl.edu.agh.dockerbuddy.model.metric.BasicMetric
 import pl.edu.agh.dockerbuddy.model.metric.HostSummary
+import pl.edu.agh.dockerbuddy.model.metric.MetricType
 import java.lang.IllegalArgumentException
 import java.time.Instant
-import javax.persistence.EntityNotFoundException
 
 @Service
 class InfluxDbProxy {
@@ -56,17 +52,14 @@ class InfluxDbProxy {
         val hostPoint = Point.measurement("host_stats")
             .addTag("host_id", hostId.toString())
             .addTag("metric_id", hostSummary.id.toString())
-            .addField("memory_usage_total", hostSummary.memoryUsage.total)
-            .addField("memory_usage_value", hostSummary.memoryUsage.value)
-            .addField("memory_usage_percent", hostSummary.memoryUsage.percent)
-            .addField("disk_usage_total", hostSummary.diskUsage.total)
-            .addField("disk_usage_value", hostSummary.diskUsage.value)
-            .addField("disk_usage_percent", hostSummary.diskUsage.percent)
-            .addField("cpu_usage_total", hostSummary.cpuUsage.total)
-            .addField("cpu_usage_value", hostSummary.cpuUsage.value)
-            .addField("cpu_usage_percent", hostSummary.cpuUsage.percent)
 //            .time(hostSummary.timestamp, WritePrecision.MS) // TODO use provided timestamp
             .time(Instant.now().toEpochMilli(), WritePrecision.MS)
+        val hostMetrics = hostSummary.metrics.associateBy { it.metricType }
+        for (metricType in MetricType.values()) {
+            hostPoint.addField("${metricType}_total", hostMetrics[metricType]?.total)
+            hostPoint.addField("${metricType}_value", hostMetrics[metricType]?.value)
+            hostPoint.addField("${metricType}_percent", hostMetrics[metricType]?.percent)
+        }
         writeApi.writePoint(hostPoint)
 
         logger.info("Processing container metrics for host $hostId")
@@ -91,10 +84,10 @@ class InfluxDbProxy {
         }
     }
 
-    suspend fun queryInfluxDb(metricType: String, hostId: Long, start: String, end: String): List<CustomFluxRecord> {
+    suspend fun queryInfluxDb(metricTypeVariation: String, hostId: Long, start: String, end: String): List<CustomFluxRecord> {
 
-        if (metricType !in checklist)
-            throw IllegalArgumentException("Unknown metric type: $metricType")
+        if (metricTypeVariation !in checklist)
+            throw IllegalArgumentException("Unknown metric type: $metricTypeVariation")
 
         val influxDBClient = InfluxDBClientKotlinFactory.create(url, token.toCharArray(), organization, bucket)
         val fluxQuery = ("from(bucket: \"$bucket\")\n"
@@ -102,7 +95,7 @@ class InfluxDbProxy {
                 + " |> filter(fn: (r) => (" +
                     "r._measurement == \"host_stats\" and " +
                     "r.host_id == \"$hostId\" and " +
-                    "r._field == \"$metricType\"))"
+                    "r._field == \"$metricTypeVariation\"))"
                 )
 
         val result = influxDBClient.getQueryKotlinApi().query(fluxQuery).toList().map { CustomFluxRecord(
