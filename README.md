@@ -1,12 +1,16 @@
 # Docker Buddy
 
-
 ## Running app with docker
 Docker repository - TODO
 ```
 docker run --name dockerbuddy --env-file .env -p 8080:8080 -d dockerbuddy
 ```
+
 See [Environment variables](#environment-variables).
+### Requirements
+- Docker (duh)
+
+
 
 ## Runing app with jar file
 You can run application without docker with jar file
