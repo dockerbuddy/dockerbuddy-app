@@ -1,31 +1,40 @@
-# dockiera-app
-
-## Set up
-<ol>
-  <li>git clone https://github.com/agh-docker-monitoring/dockiera-app</li>
-  <li>Copy file .env-example</li>
-  <li>Change its name to .env</li>
-  <li>Change mock variables to your own. TOKEN can be a random sequence of char, you can use this https://randomkeygen.com/</li>
-  <li>Save .env</li>
-  <li>docker-compose -f docker-compose-prod.yml build to build images</li>
-  <li>docker-compose -f docker-compose-prod.yml up to run application</li>
-  <li>Application should be available at localhost:3000</li>
-  
-</ol>
+# Docker Buddy
 
 
-## DEV set up
-<ol>
-  <li>Copy file .env-example</li>
-  <li>Change its name to .env</li>
-  <li>Change mock variables to your own. TOKEN can be a random sequence of char, you can use this https://randomkeygen.com/</li>
-  <li>Save .env</li>
-  <li> cd frontned/ </li>
-  <li> yarn install (if you don't have yarn npm install --global yarn) </li>
-  <li> cd .. </li>
-  <li>In terminal type docker-compose up</li>
-  <li>On http://localhost:5000 should be simple json with your toke</li>
-  <li>On http://localhost:8086 should be login screen to influx</li>
-  <li>On http://localhost:3000 should be frontend</li>
-  <li>To log in to influx you need to type in credentials from .env</li>
-</ol>
+## Running app with docker
+Docker repository - TODO
+```
+docker run --name dockerbuddy --env-file .env -p 8080:8080 -d dockerbuddy
+```
+See [Environment variables](#environment-variables).
+
+## Runing app with jar file
+You can run application without docker with jar file
+```
+java -jar dockerbuddy.jar
+```
+See [Environment variables](#environment-variables).
+### Requirements
+- java 11
+- ???  
+
+## Environment variables
+We are using some environment variables - mostly for connection with influx
+- `INFLUXDB_URL` - influx URL
+- `INFLUXDB_USERNAME` - influx username
+- `INFLUXDB_PASSWORD` - influx password
+- `INFLUXDB_ORGANIZATION` - influx organization
+- `INFLUXDB_ADMIN_TOKEN` - influx admin token
+- `INFLUXDB_BUCKET` - bucket for storing metrics and alerts
+
+
+## Realease
+For realeasing we are using bash script `build.sh`.
+### Requirements
+- Apache Maven 3.8.3
+- Yarn 1.22.10
+- Docker
+- ???
+### Artifacts
+Bash script is creating a jar file in `backend/target` which is containing both backend and frontend. It also creates a docker image `dockerbuddy`.
+
