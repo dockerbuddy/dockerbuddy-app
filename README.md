@@ -10,8 +10,6 @@ See [Environment variables](#environment-variables).
 ### Requirements
 - Docker (duh)
 
-
-
 ## Runing app with jar file
 You can run application without docker with jar file
 ```
@@ -31,6 +29,26 @@ We are using some environment variables - mostly for connection with influx
 - `INFLUXDB_ADMIN_TOKEN` - influx admin token
 - `INFLUXDB_BUCKET` - bucket for storing metrics and alerts
 
+
+## Dev environment
+You can run Docker Buddy locally using docker-compose
+### Requirements
+- Docker
+- Yarn
+
+### Steps
+1. Generate `.env` file using `dev-env-generator.sh`. It creates random password and admin token for influx
+2. `cd frontned/`
+3. `yarn install`
+4. `cd ..`
+5. `docker-compose up`
+6. Coffee break ☕
+
+InfluxDB should be available on port `8086`
+Backend should be available on port `8080`
+Frontend should be available on port `3000`
+
+You can login to influx using generated credentials from `.env` file
 
 ## Realease
 For realeasing we are using bash script `build.sh`.
