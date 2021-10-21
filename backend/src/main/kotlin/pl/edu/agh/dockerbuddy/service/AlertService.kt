@@ -9,8 +9,8 @@ import org.springframework.stereotype.Service
 import pl.edu.agh.dockerbuddy.influxdb.InfluxDbProxy
 import pl.edu.agh.dockerbuddy.model.alert.Alert
 import pl.edu.agh.dockerbuddy.model.alert.AlertType
-import pl.edu.agh.dockerbuddy.model.types.ContainerState
-import pl.edu.agh.dockerbuddy.model.types.RuleType
+import pl.edu.agh.dockerbuddy.model.enums.ContainerState
+import pl.edu.agh.dockerbuddy.model.enums.RuleType
 import pl.edu.agh.dockerbuddy.model.entity.ContainerRule
 import pl.edu.agh.dockerbuddy.model.entity.MetricRule
 import pl.edu.agh.dockerbuddy.model.metric.BasicMetric
@@ -74,7 +74,7 @@ class AlertService(val template: SimpMessagingTemplate, val influxDbProxy: Influ
             val container = cont.value
             if (container.alertType != prevContainers[container.id]!!.alertType){
                 val alertMessage = "Host ${hostSummary.id}: something wrong with container ${container.name}. " +
-                        "Statue: ${container.status}"
+                        "State: ${container.status}"
                 sendAlert(Alert(hostSummary.id, container.alertType!!, alertMessage))
             }
         }

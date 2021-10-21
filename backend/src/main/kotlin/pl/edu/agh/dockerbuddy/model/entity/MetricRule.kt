@@ -2,7 +2,7 @@ package pl.edu.agh.dockerbuddy.model.entity
 
 import com.fasterxml.jackson.annotation.JsonAlias
 import lombok.ToString
-import pl.edu.agh.dockerbuddy.model.types.RuleType
+import pl.edu.agh.dockerbuddy.model.enums.RuleType
 import java.lang.IllegalArgumentException
 import javax.persistence.*
 import javax.validation.constraints.Max
@@ -12,10 +12,8 @@ import javax.validation.constraints.Min
 @Table(name = "metric_rule")
 @Entity
 class MetricRule (
-    @Enumerated(EnumType.STRING)
-    @Column(name = "type", nullable = false)
     @JsonAlias("ruleType")
-    var type: RuleType,
+    type: RuleType,
 
     @field:Min(0)
     @field:Max(100)
@@ -26,7 +24,7 @@ class MetricRule (
     @field:Max(100)
     @Column(name = "critical_level", nullable = false)
     var criticalLevel: Int
-): BaseLongIdEntity()  {
+): AbstractRule(type)  {
 
     init {
         if (warnLevel >= criticalLevel) {

@@ -12,7 +12,7 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest
 import pl.edu.agh.dockerbuddy.model.entity.MetricRule
 import pl.edu.agh.dockerbuddy.model.entity.BaseLongIdEntity
 import pl.edu.agh.dockerbuddy.model.entity.Host
-import pl.edu.agh.dockerbuddy.model.types.RuleType
+import pl.edu.agh.dockerbuddy.model.enums.RuleType
 import pl.edu.agh.dockerbuddy.repository.AbstractRuleRepository
 import pl.edu.agh.dockerbuddy.repository.HostRepository
 import javax.validation.Validation
@@ -32,13 +32,6 @@ class ModelTests (
     fun setUp() {
         val factory = Validation.buildDefaultValidatorFactory()
         validator = factory.validator
-    }
-
-    @Test
-    fun baseLongIdEntityCreationTest() {
-        val baseEntity = BaseLongIdEntity()
-        assertTrue(baseEntity.isNew())
-        assertNull(baseEntity.id)
     }
 
     @Test

@@ -3,7 +3,7 @@ package pl.edu.agh.dockerbuddy.model.metric
 import com.fasterxml.jackson.annotation.JsonAlias
 import lombok.ToString
 import pl.edu.agh.dockerbuddy.model.alert.AlertType
-import pl.edu.agh.dockerbuddy.model.types.ContainerState
+import pl.edu.agh.dockerbuddy.model.enums.ContainerState
 
 @ToString
 data class ContainerSummary(
