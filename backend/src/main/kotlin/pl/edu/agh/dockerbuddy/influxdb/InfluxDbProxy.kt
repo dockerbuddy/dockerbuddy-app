@@ -71,7 +71,7 @@ class InfluxDbProxy {
                 .addTag("container_id", container.id)
                 .addTag("container_name", container.name)
                 .addTag("image", container.image)
-                .addField("status", container.status)
+                .addField("status", container.status.toString())
                 .addField("memory_usage_total", container.memoryUsage.total)
                 .addField("memory_usage_value", container.memoryUsage.value)
                 .addField("memory_usage_percent", container.memoryUsage.percent)

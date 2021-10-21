@@ -9,7 +9,7 @@ import org.springframework.stereotype.Service
 import pl.edu.agh.dockerbuddy.influxdb.InfluxDbProxy
 import pl.edu.agh.dockerbuddy.model.alert.Alert
 import pl.edu.agh.dockerbuddy.model.alert.AlertType
-import pl.edu.agh.dockerbuddy.model.types.ContainerStateType
+import pl.edu.agh.dockerbuddy.model.types.ContainerState
 import pl.edu.agh.dockerbuddy.model.types.RuleType
 import pl.edu.agh.dockerbuddy.model.entity.ContainerRule
 import pl.edu.agh.dockerbuddy.model.entity.MetricRule
@@ -107,11 +107,8 @@ class AlertService(val template: SimpMessagingTemplate, val influxDbProxy: Influ
                 else -> continue
             }
         }
-        hostSummary.containers.forEach {
-            if (it.alertType == null) {
-                it.alertType = AlertType.OK
-            }
-        }
+
+        hostSummary.containers.map { if (it.alertType == null) it.alertType = AlertType.OK }
     }
 
     fun addAlertType(basicMetric: BasicMetric, rule: MetricRule) = when {
@@ -135,6 +132,7 @@ class AlertService(val template: SimpMessagingTemplate, val influxDbProxy: Influ
             }
             addAlertTypeToContainer(containerMap[rule.containerName]!!, rule)
         }
+
         containers.forEach {
             if (it.alertType == null) {
                 it.alertType = AlertType.OK
@@ -143,7 +141,7 @@ class AlertService(val template: SimpMessagingTemplate, val influxDbProxy: Influ
     }
 
     fun addAlertTypeToContainer(containerSummary: ContainerSummary, rule: ContainerRule) = when {
-        !ContainerStateType.RUNNING.state.equals(containerSummary.status, ignoreCase = true) ->
+        ContainerState.running != containerSummary.status ->
             containerSummary.alertType = rule.alertType
         else -> containerSummary.alertType = AlertType.OK
     }
