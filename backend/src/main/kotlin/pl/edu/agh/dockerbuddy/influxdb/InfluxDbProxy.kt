@@ -72,14 +72,17 @@ class InfluxDbProxy {
                 .addTag("container_name", container.name)
                 .addTag("image", container.image)
                 .addField("status", container.status.toString())
-                .addField("memory_usage_total", container.memoryUsage.total)
-                .addField("memory_usage_value", container.memoryUsage.value)
-                .addField("memory_usage_percent", container.memoryUsage.percent)
-                .addField("cpu_usage_total", container.cpuUsage.total)
-                .addField("cpu_usage_value", container.cpuUsage.value)
-                .addField("cpu_usage_percent", container.cpuUsage.percent)
 //                .time(hostSummary.timestamp, WritePrecision.MS) // TODO use provided timestamp
                 .time(Instant.now().toEpochMilli(), WritePrecision.MS)
+
+            val containerMetrics = container.metrics.associateBy { it.metricType }
+            for (metricType in MetricType.values()) {
+                if (metricType in containerMetrics.keys) {
+                    containerPoint.addField("${metricType}_total", hostMetrics[metricType]?.total)
+                    containerPoint.addField("${metricType}_value", hostMetrics[metricType]?.value)
+                    containerPoint.addField("${metricType}_percent", hostMetrics[metricType]?.percent)
+                }
+            }
             writeApi.writePoint(containerPoint)
         }
     }
