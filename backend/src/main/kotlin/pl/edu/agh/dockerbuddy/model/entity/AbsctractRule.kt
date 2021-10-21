@@ -14,5 +14,5 @@ abstract class AbstractRule(
     @Enumerated(EnumType.STRING)
     @Column(name = "type", nullable = false)
     @JsonAlias("ruleType")
-    var type: RuleType = RuleType.ContainerState
+    var type: RuleType
 ): BaseLongIdEntity()
