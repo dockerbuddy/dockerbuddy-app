@@ -12,7 +12,7 @@ import pl.edu.agh.dockerbuddy.model.alert.AlertType
 import pl.edu.agh.dockerbuddy.model.metric.HostSummary
 import pl.edu.agh.dockerbuddy.model.metric.MetricType
 import java.lang.IllegalArgumentException
-import java.time.Instant
+import java.time.*
 
 @Service
 class InfluxDbProxy {
@@ -52,8 +52,7 @@ class InfluxDbProxy {
         val hostPoint = Point.measurement("host_stats")
             .addTag("host_id", hostId.toString())
             .addTag("metric_id", hostSummary.id.toString())
-//            .time(hostSummary.timestamp, WritePrecision.MS) // TODO use provided timestamp
-            .time(Instant.now().toEpochMilli(), WritePrecision.MS)
+            .time(Instant.parse(hostSummary.timestamp).toEpochMilli(), WritePrecision.MS)
         val hostMetrics = hostSummary.metrics.associateBy { it.metricType }
         for (metricType in MetricType.values()) {
             hostPoint.addField("${metricType}_total", hostMetrics[metricType]?.total)
@@ -72,8 +71,7 @@ class InfluxDbProxy {
                 .addTag("container_name", container.name)
                 .addTag("image", container.image)
                 .addField("status", container.status.toString())
-//                .time(hostSummary.timestamp, WritePrecision.MS) // TODO use provided timestamp
-                .time(Instant.now().toEpochMilli(), WritePrecision.MS)
+                .time(Instant.parse(hostSummary.timestamp).toEpochMilli(), WritePrecision.MS)
 
             val containerMetrics = container.metrics.associateBy { it.metricType }
             for (metricType in MetricType.values()) {
