@@ -56,7 +56,7 @@ const AddContainerRules: React.FC<{
 
   const [sName, setSName] = useState<string>("");
   const [sAlertType, setSAlertType] = useState<string>("CRITICAL");
-  const [sRuleType, setSRuleType] = useState<string>("ContainerState");
+  const [sRuleType, setSRuleType] = useState<string>("CONTAINER_STATE");
   const [info, setInfo] = useState<ContainersInfo>();
 
   useEffect(() => {

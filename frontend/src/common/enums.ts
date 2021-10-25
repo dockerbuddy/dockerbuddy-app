@@ -11,10 +11,10 @@ export enum AlertType {
 }
 
 export enum RuleType {
-  MEMORY_USAGE = "MemoryUsage",
-  DISK_USAGE = "DiskUsage",
-  CPU_USAGE = "CpuUsage",
-  CONTAINER_STATE = "ContainerState",
+  MEMORY_USAGE = "MEMORY_USAGE",
+  DISK_USAGE = "DISK_USAGE",
+  CPU_USAGE = "CPU_USAGE",
+  CONTAINER_STATE = "CONTAINER_STATE",
 }
 
 export enum ContainerState {

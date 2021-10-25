@@ -20,9 +20,10 @@ import { Link } from "react-router-dom";
 import { useAppDispatch, useAppSelector } from "../../redux/hooks";
 import { selectHost, updateHostsAsync } from "../../redux/hostsSlice";
 import AddContainerRules from "./AddContainerRules";
+import { RuleType } from "../../common/enums";
 
 export interface Rule {
-  ruleType: string;
+  ruleType: RuleType;
   warnLevel: number;
   criticalLevel: number;
 }
@@ -99,21 +100,21 @@ const AddHost: React.FC<AddHostProps> = ({
     }
     if (!isNaN(cpuWarn) && !isNaN(cpuCrit))
       rules.push({
-        ruleType: "CpuUsage",
+        ruleType: RuleType.CPU_USAGE,
         warnLevel: cpuWarn,
         criticalLevel: cpuCrit,
       });
 
     if (!isNaN(memWarn) && !isNaN(memCrit))
       rules.push({
-        ruleType: "MemoryUsage",
+        ruleType: RuleType.MEMORY_USAGE,
         warnLevel: memWarn,
         criticalLevel: memCrit,
       });
 
     if (!isNaN(diskWarn) && !isNaN(diskCrit))
       rules.push({
-        ruleType: "DiskUsage",
+        ruleType: RuleType.DISK_USAGE,
         warnLevel: diskWarn,
         criticalLevel: diskCrit,
       });

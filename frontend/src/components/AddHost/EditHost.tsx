@@ -2,6 +2,7 @@ import { Box, CircularProgress } from "@material-ui/core";
 import React, { useEffect, useState } from "react";
 import { RouteComponentProps } from "react-router-dom";
 import { proxy } from "../../common/api";
+import { RuleType } from "../../common/enums";
 import { HostRule, StandardApiResponse } from "../../common/types";
 import AddHost, { AddHostFormData, PostHostResponse } from "./AddHost";
 
@@ -37,21 +38,21 @@ const EditHost: React.FC<RouteComponentProps<HParam>> = ({ match }) => {
     };
 
     jsonBody.hostRules.forEach((rule: HostRule) => {
-      if (rule.type === "CpuUsage")
+      if (rule.type === RuleType.CPU_USAGE)
         res = {
           ...res,
           cpuWarn: rule.warnLevel.toString(),
           cpuCrit: rule.criticalLevel.toString(),
         };
 
-      if (rule.type === "MemoryUsage")
+      if (rule.type === RuleType.MEMORY_USAGE)
         res = {
           ...res,
           memWarn: rule.warnLevel.toString(),
           memCrit: rule.criticalLevel.toString(),
         };
 
-      if (rule.type === "DiskUsage")
+      if (rule.type === RuleType.DISK_USAGE)
         res = {
           ...res,
           diskWarn: rule.warnLevel.toString(),

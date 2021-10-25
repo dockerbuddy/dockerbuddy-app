@@ -3,6 +3,7 @@ import { useSnackbar } from "notistack";
 import React, { useEffect } from "react";
 import SockJS from "sockjs-client";
 import { socketProxy } from "../common/api";
+import { AlertType } from "../common/enums";
 import { Alert, HostSummary } from "../common/types";
 import { useAppDispatch } from "../redux/hooks";
 import { updateHostsAsync, updateSingleHost } from "../redux/hostsSlice";
@@ -23,12 +24,11 @@ const WebSocketProvider: React.FC = ({ children }) => {
         });
         stompClient.subscribe("/alerts", (alert) => {
           const alertParsed: Alert = JSON.parse(alert.body);
-          enqueueSnackbar(
-            alertParsed.alertMessage,
+          enqueueSnackbar(alertParsed.alertMessage, {
             // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-            // @ts-ignore
-            { variant: AlertType[alertParsed.alertType] }
-          );
+            //@ts-ignore
+            variant: AlertType[alertParsed.alertType],
+          });
         });
       });
     });
