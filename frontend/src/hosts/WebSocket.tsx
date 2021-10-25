@@ -1,12 +1,11 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 import { Stomp } from "@stomp/stompjs";
 import { useSnackbar } from "notistack";
 import React, { useEffect } from "react";
 import SockJS from "sockjs-client";
 import { socketProxy } from "../common/api";
-import { Alert, AlertType, HostSummary } from "../common/types";
+import { Alert, HostSummary } from "../common/types";
 import { useAppDispatch } from "../redux/hooks";
-import { updateHostsAsync, updateSingleHost } from "./hostsSlice";
+import { updateHostsAsync, updateSingleHost } from "../redux/hostsSlice";
 
 const WebSocketProvider: React.FC = ({ children }) => {
   const { enqueueSnackbar } = useSnackbar();
@@ -24,7 +23,6 @@ const WebSocketProvider: React.FC = ({ children }) => {
         });
         stompClient.subscribe("/alerts", (alert) => {
           const alertParsed: Alert = JSON.parse(alert.body);
-          console.log("XD");
           enqueueSnackbar(
             alertParsed.alertMessage,
             // eslint-disable-next-line @typescript-eslint/ban-ts-comment
@@ -35,8 +33,7 @@ const WebSocketProvider: React.FC = ({ children }) => {
       });
     });
   }, []);
-
   return <>{children}</>;
 };
 
-export { WebSocketProvider };
+export default WebSocketProvider;

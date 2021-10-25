@@ -1,5 +1,5 @@
 import { configureStore, ThunkAction, Action } from "@reduxjs/toolkit";
-import hostReducer from "../hosts/hostsSlice";
+import hostReducer from "./hostsSlice";
 
 export const store = configureStore({
   reducer: {

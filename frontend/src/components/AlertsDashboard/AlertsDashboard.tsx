@@ -10,15 +10,12 @@ import {
 } from "@material-ui/core";
 import React, { useEffect, useState } from "react";
 import { proxy } from "../../common/api";
-import {
-  AlertsResponse,
-  AlertsResponseElementParsed,
-} from "../../common/types";
+import { AlertsResponseElement, StandardApiResponse } from "../../common/types";
 import AlertsList from "./AlertsList";
 import { Sync } from "@material-ui/icons";
 
 const AlertsDashboard: React.FC = () => {
-  const [alerts, setAlerts] = useState<AlertsResponseElementParsed[]>([]);
+  const [alerts, setAlerts] = useState<AlertsResponseElement[]>([]);
   const [days, setDays] = useState<string>("1");
   const [isFetching, setIsFetching] = useState<boolean>(false);
 
@@ -38,14 +35,13 @@ const AlertsDashboard: React.FC = () => {
       return;
     }
 
-    const json: AlertsResponse = await response.json();
-    console.log(json);
-    const alertsParsed: AlertsResponseElementParsed[] = json.body.map(
-      (alert) => ({
-        ...alert,
-        time: new Date(alert.time),
-      })
-    );
+    const json: StandardApiResponse<AlertsResponseElement[]> =
+      await response.json();
+
+    const alertsParsed: AlertsResponseElement[] = json.body.map((alert) => ({
+      ...alert,
+      time: new Date(alert.time),
+    }));
     setAlerts(alertsParsed);
     setIsFetching(false);
   };

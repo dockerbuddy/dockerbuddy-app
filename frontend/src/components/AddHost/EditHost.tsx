@@ -1,15 +1,9 @@
-/* eslint-disable */
 import { Box, CircularProgress } from "@material-ui/core";
 import React, { useEffect, useState } from "react";
 import { RouteComponentProps } from "react-router-dom";
 import { proxy } from "../../common/api";
-import {
-  AddHostFormData,
-  PostHostResponse,
-  Rule,
-  StandardApiResponse,
-} from "../../common/types";
-import AddHost from "./AddHost";
+import { HostRule, StandardApiResponse } from "../../common/types";
+import AddHost, { AddHostFormData, PostHostResponse } from "./AddHost";
 
 type HParam = { id: string };
 
@@ -28,7 +22,7 @@ const EditHost: React.FC<RouteComponentProps<HParam>> = ({ match }) => {
       return;
     }
 
-    const json: StandardApiResponse = await response.json();
+    const json: StandardApiResponse<PostHostResponse> = await response.json();
     const jsonBody: PostHostResponse = json.body;
 
     let res: AddHostFormData = {
@@ -42,8 +36,7 @@ const EditHost: React.FC<RouteComponentProps<HParam>> = ({ match }) => {
       diskCrit: "",
     };
 
-    jsonBody.hostRules.forEach((rule: Rule) => {
-      console.log(rule.type);
+    jsonBody.hostRules.forEach((rule: HostRule) => {
       if (rule.type === "CpuUsage")
         res = {
           ...res,

@@ -11,27 +11,45 @@ import {
 import { useForm } from "react-hook-form";
 import { proxy } from "../../common/api";
 import {
-  PostHostResponse,
   StandardApiResponse,
-  AddHostFormData,
   ContainerRule,
+  HostRule,
 } from "../../common/types";
 import { Alert, AlertTitle } from "@material-ui/lab";
 import { Link } from "react-router-dom";
 import { useAppDispatch, useAppSelector } from "../../redux/hooks";
-import { selectHost, updateHostsAsync } from "../../hosts/hostsSlice";
+import { selectHost, updateHostsAsync } from "../../redux/hostsSlice";
 import AddContainerRules from "./AddContainerRules";
 
-interface Rule {
+export interface Rule {
   ruleType: string;
   warnLevel: number;
   criticalLevel: number;
+}
+
+export interface AddHostFormData {
+  hostName: string;
+  ip: string;
+  cpuWarn: string;
+  cpuCrit: string;
+  memWarn: string;
+  memCrit: string;
+  diskWarn: string;
+  diskCrit: string;
 }
 
 interface AddHostProps {
   defaultData?: AddHostFormData;
   method?: string;
   editHostId?: number | null;
+}
+
+export interface PostHostResponse {
+  id: number;
+  hostName: string;
+  ip: string;
+  hostRules: HostRule[];
+  containersRules: ContainerRule[];
 }
 
 const AddHost: React.FC<AddHostProps> = ({
@@ -121,7 +139,7 @@ const AddHost: React.FC<AddHostProps> = ({
       body: JSON.stringify(json),
     });
 
-    const result: StandardApiResponse = await response.json();
+    const result: StandardApiResponse<PostHostResponse> = await response.json();
 
     if (response.ok) {
       const hostResponse: PostHostResponse = result.body;

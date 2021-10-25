@@ -1,5 +1,5 @@
 package pl.edu.agh.dockerbuddy.model.metric
 
 enum class MetricType {
-    memory_usage, disk_usage, cpu_usage
+    MEMORY_USAGE, DISK_USAGE, CPU_USAGE
 }

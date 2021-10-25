@@ -8,11 +8,12 @@ import {
   Grid,
 } from "@material-ui/core";
 import { Alert } from "@material-ui/lab";
-import { humanFileSize } from "../../util/util";
+import { humanFileSize, extractMetric } from "../../util/util";
 import ProgressBarComponent from "./ProgressBarComponent";
 import ContainerCardComponent from "./ContainerCardComponent";
-import { ContainerSummary, FullHostSummary } from "../../common/types";
+import { Container, Host } from "../../common/types";
 import { Link } from "react-router-dom";
+import { MetricType } from "../../common/enums";
 
 const useStyles = makeStyles((theme) => ({
   card: {
@@ -27,10 +28,17 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-const HostCardComponent: React.FC<{ host: FullHostSummary }> = (props) => {
+const HostCardComponent: React.FC<{ host: Host }> = (props) => {
   const classes = useStyles();
   const host = props.host;
   const hostSummary = props.host.hostSummary;
+
+  const diskUsage = extractMetric(hostSummary?.metrics, MetricType.DISK_USAGE);
+  const memoryUsage = extractMetric(
+    hostSummary?.metrics,
+    MetricType.MEMORY_USAGE
+  );
+  const cpuUsage = extractMetric(hostSummary?.metrics, MetricType.CPU_USAGE);
 
   return (
     <Card className={classes.card} variant="outlined">
@@ -55,35 +63,35 @@ const HostCardComponent: React.FC<{ host: FullHostSummary }> = (props) => {
         style={{ color: "inherit", textDecoration: "none" }}
       >
         <CardContent>
-          {hostSummary?.diskUsage !== undefined ? (
+          {diskUsage !== undefined ? (
             <ProgressBarComponent
               name="Disk"
-              used={humanFileSize(hostSummary.diskUsage.value)}
-              total={humanFileSize(hostSummary.diskUsage.total)}
-              percent={hostSummary.diskUsage.percent}
+              used={humanFileSize(diskUsage.value)}
+              total={humanFileSize(diskUsage.total)}
+              percent={diskUsage.percent}
             />
           ) : (
             <Grid item>
               <Alert severity="error"> NO DISC INFO </Alert>
             </Grid>
           )}
-          {hostSummary?.memoryUsage !== undefined ? (
+          {memoryUsage !== undefined ? (
             <ProgressBarComponent
               name="Memory"
-              used={humanFileSize(hostSummary.memoryUsage.value)}
-              total={humanFileSize(hostSummary.memoryUsage.total)}
-              percent={hostSummary.memoryUsage.percent}
+              used={humanFileSize(memoryUsage.value)}
+              total={humanFileSize(memoryUsage.total)}
+              percent={memoryUsage.percent}
             />
           ) : (
             <Grid item>
               <Alert severity="error"> NO VMEM INFO </Alert>
             </Grid>
           )}
-          {hostSummary?.cpuUsage !== undefined ? (
+          {cpuUsage !== undefined ? (
             <ProgressBarComponent
               name="CPU"
-              used={hostSummary.cpuUsage.value + "%"}
-              percent={hostSummary.cpuUsage.percent}
+              used={cpuUsage.value + "%"}
+              percent={cpuUsage.percent}
             />
           ) : (
             <Grid item>
@@ -97,7 +105,7 @@ const HostCardComponent: React.FC<{ host: FullHostSummary }> = (props) => {
               </Typography>
             </Grid>
             {host.hostSummary?.containers !== undefined ? (
-              host.hostSummary.containers.map((cont: ContainerSummary) => {
+              host.hostSummary.containers.map((cont: Container) => {
                 return (
                   <Grid item xs={4} key={cont.id}>
                     <ContainerCardComponent container={cont} />

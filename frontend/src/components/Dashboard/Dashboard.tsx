@@ -2,9 +2,9 @@ import React, { useEffect } from "react";
 import { makeStyles, Grid } from "@material-ui/core";
 import { Alert } from "@material-ui/lab";
 import HostCardComponent from "./HostCardComponent";
-import { selectHost, updateHostsAsync } from "../../hosts/hostsSlice";
+import { selectHost, updateHostsAsync } from "../../redux/hostsSlice";
 import { useAppDispatch, useAppSelector } from "../../redux/hooks";
-import { FullHostSummary } from "../../common/types";
+import { Host } from "../../common/types";
 
 const useStyles = makeStyles(() => ({
   root: {
@@ -41,7 +41,7 @@ const Dashboard: React.FC = () => {
           </Grid>
         )}
         {(hostsData.status === "LOADED" || hostsData.status === "LOADING") &&
-          Object.values(hostsData.hosts).map((obj: FullHostSummary) => {
+          Object.values(hostsData.hosts).map((obj: Host) => {
             return (
               <Grid item xs={6} key={obj.ip}>
                 <HostCardComponent host={obj} />

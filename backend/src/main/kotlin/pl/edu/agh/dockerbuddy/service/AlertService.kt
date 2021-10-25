@@ -86,9 +86,9 @@ class AlertService(val template: SimpMessagingTemplate, val influxDbProxy: Influ
             -1,
             "123",
             listOf(
-                BasicMetric(MetricType.cpu_usage, 0.0, 0.0, 0.0, AlertType.OK),
-                BasicMetric(MetricType.disk_usage, 0.0, 0.0, 0.0, AlertType.OK),
-                BasicMetric(MetricType.memory_usage, 0.0, 0.0, 0.0, AlertType.OK)
+                BasicMetric(MetricType.CPU_USAGE, 0.0, 0.0, 0.0, AlertType.OK),
+                BasicMetric(MetricType.DISK_USAGE, 0.0, 0.0, 0.0, AlertType.OK),
+                BasicMetric(MetricType.MEMORY_USAGE, 0.0, 0.0, 0.0, AlertType.OK)
             ),
             hostSummary.containers.toMutableList()
         )
@@ -101,9 +101,9 @@ class AlertService(val template: SimpMessagingTemplate, val influxDbProxy: Influ
         val hostMetrics = hostSummary.metrics.associateBy { it.metricType }
         for (rule in rules) {
             when (rule.type) {
-                RuleType.CpuUsage -> addAlertType(hostMetrics[MetricType.cpu_usage]!!, rule)
-                RuleType.MemoryUsage -> addAlertType(hostMetrics[MetricType.memory_usage]!!, rule)
-                RuleType.DiskUsage -> addAlertType(hostMetrics[MetricType.disk_usage]!!, rule)
+                RuleType.CPU_USAGE -> addAlertType(hostMetrics[MetricType.CPU_USAGE]!!, rule)
+                RuleType.MEMORY_USAGE -> addAlertType(hostMetrics[MetricType.MEMORY_USAGE]!!, rule)
+                RuleType.DISK_USAGE -> addAlertType(hostMetrics[MetricType.DISK_USAGE]!!, rule)
                 else -> continue
             }
         }
@@ -141,7 +141,7 @@ class AlertService(val template: SimpMessagingTemplate, val influxDbProxy: Influ
     }
 
     fun addAlertTypeToContainer(containerSummary: ContainerSummary, rule: ContainerRule) = when {
-        ContainerState.running != containerSummary.status ->
+        ContainerState.RUNNING != containerSummary.status ->
             containerSummary.alertType = rule.alertType
         else -> containerSummary.alertType = AlertType.OK
     }

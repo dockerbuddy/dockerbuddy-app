@@ -13,15 +13,16 @@ import {
 import { Alert, AlertTitle } from "@material-ui/lab";
 import React, { useEffect, useState } from "react";
 import { proxy } from "../../common/api";
-import { ContainerRule, ContainerSummary, RuleType } from "../../common/types";
+import { ContainerRule, Container } from "../../common/types";
 import ContainerRuleCard from "./ContainerRuleCard";
 import { Add } from "@material-ui/icons";
 import { useAppDispatch, useAppSelector } from "../../redux/hooks";
-import { selectHost, updateHostsAsync } from "../../hosts/hostsSlice";
+import { selectHost, updateHostsAsync } from "../../redux/hostsSlice";
+import { RuleType } from "../../common/enums";
 
 interface ContainersInfo {
   containersRules: ContainerRule[];
-  containers: ContainerSummary[];
+  containers: Container[];
 }
 
 const useStyles = makeStyles(() => ({
@@ -44,12 +45,7 @@ const alertTypes = [
   },
 ];
 
-const ruleTypes: RuleType[] = [
-  RuleType.CONTAINER_STATE,
-  RuleType.CPU_USAGE,
-  RuleType.DISK_USAGE,
-  RuleType.MEMORY_USAGE,
-];
+const ruleTypes: RuleType[] = Object.values(RuleType);
 
 const AddContainerRules: React.FC<{
   hostId: string;
@@ -146,13 +142,11 @@ const AddContainerRules: React.FC<{
                       onChange={(t) => setSName(t.target.value)}
                     >
                       {info && info.containers ? (
-                        Object.values(info.containers).map(
-                          (c: ContainerSummary) => (
-                            <MenuItem key={c.name} value={c.name}>
-                              {c.name}
-                            </MenuItem>
-                          )
-                        )
+                        Object.values(info.containers).map((c: Container) => (
+                          <MenuItem key={c.name} value={c.name}>
+                            {c.name}
+                          </MenuItem>
+                        ))
                       ) : (
                         <MenuItem key={"no-containers"} value={""}>
                           No containers found.
