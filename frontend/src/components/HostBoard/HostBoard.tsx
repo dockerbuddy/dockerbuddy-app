@@ -9,7 +9,7 @@ import SettingsIcon from "@material-ui/icons/Settings";
 import { Alert } from "@material-ui/lab";
 import React from "react";
 import { RouteComponentProps } from "react-router-dom";
-import { selectHost } from "../../hosts/hostsSlice";
+import { selectHost } from "../../redux/hostsSlice";
 import { useAppSelector } from "../../redux/hooks";
 import HostMenu from "./HostMenu";
 import InfluxHistory from "./InfluxHistory/InfluxHistory";

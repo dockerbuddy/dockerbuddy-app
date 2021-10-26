@@ -12,6 +12,7 @@ import javax.persistence.*
 class ContainerRule(
     @JsonAlias("ruleType")
     type: RuleType,
+    
 
     @Column(name = "container_name", nullable = false)
     var containerName: String,

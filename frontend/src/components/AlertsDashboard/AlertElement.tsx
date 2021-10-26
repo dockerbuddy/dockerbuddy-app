@@ -2,11 +2,12 @@ import { Box, Divider, Grid, Typography } from "@material-ui/core";
 import { Alert } from "@material-ui/lab";
 import React from "react";
 import { Link } from "react-router-dom";
-import { AlertsResponseElementParsed, AlertType } from "../../common/types";
+import { AlertsResponseElement } from "../../common/types";
 import { parseDateToDDMMYYYY, parseDateToHour } from "../../util/util";
+import { AlertType } from "../../common/enums";
 
 interface AlertElementProps {
-  alert: AlertsResponseElementParsed;
+  alert: AlertsResponseElement;
   showDate: boolean;
 }
 

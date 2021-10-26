@@ -1,12 +1,12 @@
 import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { RootState } from "../redux/store";
+import { RootState } from "./store";
 import { fetchHosts } from "../common/api";
-import { FullHostSummary, HostSummary } from "../common/types";
+import { Host, HostSummary } from "../common/types";
 
 export interface HostState {
   status: "LOADING" | "ERROR" | "LOADED";
   hosts: {
-    [id: number]: FullHostSummary;
+    [id: number]: Host;
   };
 }
 
@@ -45,7 +45,7 @@ export const hostsSlice = createSlice({
           state.hosts = [];
         } else if (hosts.length > 0) {
           state.hosts = [];
-          hosts.forEach((e: FullHostSummary) => {
+          hosts.forEach((e: Host) => {
             state.hosts[e.id] = e;
           });
           state.status = "LOADED";
@@ -58,6 +58,7 @@ export const hostsSlice = createSlice({
 });
 
 export const { updateSingleHost } = hostsSlice.actions;
+// eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
 export const selectHost = (state: RootState) => state.host;
 
 export default hostsSlice.reducer;

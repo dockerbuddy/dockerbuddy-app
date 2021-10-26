@@ -1,10 +1,13 @@
+import { MetricType } from "../common/enums";
+import { BasicMetric } from "../common/types";
+
 /* eslint-disable @typescript-eslint/no-explicit-any */
 export function capitalizeFirstLetter(string: string): string {
   return string.charAt(0).toUpperCase() + string.slice(1);
 }
 
-export function humanFileSize(size: number): string {
-  if (size === 0) return "0";
+export function humanFileSize(size: number | undefined): string {
+  if (size === 0 || size === undefined) return "0";
   const i = Math.floor(Math.log(+size) / Math.log(1024));
   const y: any = +size / Math.pow(1024, i); //TODO number throw error
   return (
@@ -34,4 +37,13 @@ export function parseDateToDDMMYYYY(date: Date): string {
   const yyyy = date.getFullYear();
 
   return dd + "." + mm + "." + yyyy;
+}
+
+export function extractMetric(
+  metrics: BasicMetric[],
+  type: MetricType
+): BasicMetric | undefined {
+  return metrics?.find(
+    (metric) => MetricType[metric.metricType] === type.valueOf()
+  );
 }
