@@ -6,8 +6,9 @@ import {
   CardContent,
   Typography,
 } from "@material-ui/core";
-import { humanFileSize } from "../../util/util";
-import { ContainerSummary } from "../../common/types";
+import { extractMetric, humanFileSize } from "../../util/util";
+import { Container } from "../../common/types";
+import { MetricType } from "../../common/enums";
 
 const useStyles = makeStyles((theme) => ({
   card: {
@@ -19,13 +20,11 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-const ContainerCardComponent: React.FC<{ container: ContainerSummary }> = (
-  props
-) => {
+const ContainerCardComponent: React.FC<{ container: Container }> = (props) => {
   const classes = useStyles();
 
-  const mem = props.container.memoryUsage.value;
-  const cpu = props.container.cpuUsage.value;
+  const mem = extractMetric(props.container.metrics, MetricType.MEMORY_USAGE);
+  const cpu = extractMetric(props.container.metrics, MetricType.CPU_USAGE);
   const name = props.container.name;
 
   return (
@@ -43,9 +42,9 @@ const ContainerCardComponent: React.FC<{ container: ContainerSummary }> = (
       />
       <CardContent>
         <Typography variant="subtitle2">
-          {"MEM: " + humanFileSize(mem)}
+          {"MEM: " + humanFileSize(mem?.value)}
         </Typography>
-        <Typography variant="subtitle2">{"CPU: " + cpu}</Typography>
+        <Typography variant="subtitle2">{"CPU: " + cpu?.value}</Typography>
       </CardContent>
     </Card>
   );

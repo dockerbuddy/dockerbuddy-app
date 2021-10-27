@@ -1,12 +1,12 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 import { Stomp } from "@stomp/stompjs";
 import { useSnackbar } from "notistack";
 import React, { useEffect } from "react";
 import SockJS from "sockjs-client";
 import { socketProxy } from "../common/api";
-import { Alert, AlertType, HostSummary } from "../common/types";
+import { AlertType } from "../common/enums";
+import { Alert, HostSummary } from "../common/types";
 import { useAppDispatch } from "../redux/hooks";
-import { updateHostsAsync, updateSingleHost } from "./hostsSlice";
+import { updateHostsAsync, updateSingleHost } from "../redux/hostsSlice";
 
 const WebSocketProvider: React.FC = ({ children }) => {
   const { enqueueSnackbar } = useSnackbar();
@@ -24,19 +24,16 @@ const WebSocketProvider: React.FC = ({ children }) => {
         });
         stompClient.subscribe("/alerts", (alert) => {
           const alertParsed: Alert = JSON.parse(alert.body);
-          console.log("XD");
-          enqueueSnackbar(
-            alertParsed.alertMessage,
+          enqueueSnackbar(alertParsed.alertMessage, {
             // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-            // @ts-ignore
-            { variant: AlertType[alertParsed.alertType] }
-          );
+            //@ts-ignore
+            variant: AlertType[alertParsed.alertType],
+          });
         });
       });
     });
   }, []);
-
   return <>{children}</>;
 };
 
-export { WebSocketProvider };
+export default WebSocketProvider;

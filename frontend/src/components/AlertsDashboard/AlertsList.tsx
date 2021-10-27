@@ -1,11 +1,11 @@
 import { Grid } from "@material-ui/core";
 import React from "react";
-import { AlertsResponseElementParsed } from "../../common/types";
+import { AlertsResponseElement } from "../../common/types";
 import { parseDateToDDMMYYYY } from "../../util/util";
 import AlertElement from "./AlertElement";
 
 interface AlertsListProps {
-  alerts: AlertsResponseElementParsed[];
+  alerts: AlertsResponseElement[];
 }
 
 const AlertsList: React.FC<AlertsListProps> = ({ alerts }) => {

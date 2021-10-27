@@ -6,8 +6,6 @@ import lombok.ToString
 data class HostSummary(
     val id: Long,
     val timestamp: String,
-    val memoryUsage: BasicMetric,
-    val diskUsage: BasicMetric,
-    val cpuUsage: BasicMetric,
+    val metrics: List<BasicMetric>,
     val containers: List<ContainerSummary>
 )

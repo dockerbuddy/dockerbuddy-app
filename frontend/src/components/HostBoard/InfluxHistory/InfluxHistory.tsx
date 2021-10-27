@@ -12,12 +12,6 @@ interface QueryFormData {
   end?: string;
 }
 
-export type InfluxResponse = {
-  message: string;
-  type: string;
-  body: InfluxBody[];
-};
-
 export type InfluxBody = {
   time: string;
   value: number;
@@ -38,15 +32,15 @@ const tmp: tmpp = {
 const InfluxHistory: React.FC<{ hostId: number }> = (props) => {
   const hostId: string = props.hostId.toString();
   const { register, errors, handleSubmit } = useForm<QueryFormData>();
-  const [hostHistory, setHostHistory] = useState<InfluxResponse>();
+  const [hostHistory, setHostHistory] = useState<InfluxBody[]>();
   const [error, setError] = useState<string>("");
 
   const handleQuery = async (data: QueryFormData) => {
     setError("");
     const response = await fetchHostHistory({ ...data, hostId });
-    const result: StandardApiResponse = await response.json();
+    const result: StandardApiResponse<InfluxBody[]> = await response.json();
     if (response.ok) {
-      setHostHistory(result);
+      setHostHistory(result.body);
     } else {
       setError(result.message);
     }
@@ -121,9 +115,7 @@ const InfluxHistory: React.FC<{ hostId: number }> = (props) => {
         </form>
       </Grid>
       <Grid item xs={10}>
-        {typeof hostHistory !== "undefined" && (
-          <MainChart body={hostHistory.body} />
-        )}
+        {typeof hostHistory !== "undefined" && <MainChart body={hostHistory} />}
       </Grid>
     </Grid>
   );

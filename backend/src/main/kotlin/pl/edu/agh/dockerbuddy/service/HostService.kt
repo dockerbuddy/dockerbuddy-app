@@ -46,8 +46,8 @@ class HostService (
             host.id!!,
             host.hostName!!,
             host.ip!!,
-            host.hostRules.toList(),
-            host.containersRules.toList(),
+            host.hostRules.toList().sortedBy { it.id },
+            host.containersRules.toList().sortedBy { it.id },
             hostSummary
         )
     }
@@ -56,7 +56,10 @@ class HostService (
         logger.info("Fetching host $id")
         val foundHost = hostRepository.findById(id)
         if (foundHost.isEmpty) throw EntityNotFoundException("Host $id does not exist")
-        return foundHost.get()
+        val host = foundHost.get()
+        host.containersRules.sortedBy { it.id }
+        host.hostRules.sortedBy { it.id }
+        return host
     }
 
     fun getAllHostsWithSummaries(): List<HostWithSummary> {
@@ -75,8 +78,8 @@ class HostService (
                     host.id!!,
                     host.hostName!!,
                     host.ip!!,
-                    host.hostRules.toList(),
-                    host.containersRules.toList(),
+                    host.hostRules.toList().sortedBy { it.id },
+                    host.containersRules.toList().sortedBy { it.id },
                     hostSummary
                 )
             )

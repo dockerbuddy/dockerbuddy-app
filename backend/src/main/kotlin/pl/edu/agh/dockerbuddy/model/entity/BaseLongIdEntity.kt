@@ -6,7 +6,7 @@ import javax.persistence.*
 
 @ToString
 @MappedSuperclass
-class BaseLongIdEntity {
+abstract class BaseLongIdEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false)
