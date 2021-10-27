@@ -1,6 +1,5 @@
 package pl.edu.agh.dockerbuddy.controller
 
-import io.reactivex.internal.util.ExceptionHelper
 import io.swagger.annotations.*
 import kotlinx.coroutines.*
 import org.slf4j.LoggerFactory
@@ -14,7 +13,6 @@ import pl.edu.agh.dockerbuddy.influxdb.CustomFluxRecord
 import pl.edu.agh.dockerbuddy.influxdb.InfluxDbProxy
 
 @Api(tags = ["Influx"])
-@CrossOrigin
 @RestController
 @RequestMapping("/api/v2/influxdb")
 class InfluxController (
@@ -33,8 +31,8 @@ class InfluxController (
     fun getHostMetricFromRange(
         @RequestParam metricType: String,
         @RequestParam hostId: Long,
-        @RequestParam start: String, // TODO choose time representation and apply regex
-        @RequestParam(required = false, defaultValue = "now()") end: String // TODO choose time representation and apply regex
+        @RequestParam start: String, // TODO choose time representation and apply regex -> UTC timestamp
+        @RequestParam(required = false, defaultValue = "now()") end: String // TODO choose time representation and apply regex -> UTC timestamp
     ): ResponseEntity<DefaultResponse<List<CustomFluxRecord>>> {
         logger.info("GET /api/v2/influxdb")
         logger.debug("getHostMetricFromRange: " +
@@ -62,8 +60,8 @@ class InfluxController (
     @GetMapping("/alerts")
     fun getAlerts(
             @RequestParam(required = false) hostId: Long?,
-            @RequestParam start: String, // TODO choose time representation and apply regex
-            @RequestParam(required = false) end: String? // TODO choose time representation and apply regex
+            @RequestParam start: String, // TODO choose time representation and apply regex -> UTC timestamp
+            @RequestParam(required = false) end: String? // TODO choose time representation and apply regex -> UTC timestamp
     ): ResponseEntity<DefaultResponse<List<AlertRecord>>> {
         logger.info("GET /api/v2/influxdb/alerts")
         logger.debug("getAlerts: " +
