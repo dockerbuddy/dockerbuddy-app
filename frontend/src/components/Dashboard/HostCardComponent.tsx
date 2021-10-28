@@ -18,7 +18,7 @@ import { MetricType } from "../../common/enums";
 const useStyles = makeStyles((theme) => ({
   card: {
     borderColor: "#1A1C19",
-    backgroundColor: "#1D1F22",
+    backgroundColor: "transparent",
   },
   settingsColor: {
     color: theme.palette.primary.main,
