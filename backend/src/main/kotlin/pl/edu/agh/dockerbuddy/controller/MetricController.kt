@@ -12,7 +12,6 @@ import pl.edu.agh.dockerbuddy.service.MetricService
 import javax.validation.Valid
 
 @Api(tags = ["Metrics"])
-@CrossOrigin
 @RestController
 @RequestMapping("/api/v2/metrics")
 class MetricController(val metricService: MetricService) {

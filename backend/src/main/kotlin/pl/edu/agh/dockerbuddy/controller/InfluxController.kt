@@ -1,26 +1,32 @@
 package pl.edu.agh.dockerbuddy.controller
 
-import io.reactivex.internal.util.ExceptionHelper
 import io.swagger.annotations.*
 import kotlinx.coroutines.*
 import org.slf4j.LoggerFactory
+import org.springframework.beans.factory.annotation.Value
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
+import org.springframework.validation.annotation.Validated
 import org.springframework.web.bind.annotation.*
 import pl.edu.agh.dockerbuddy.controller.response.DefaultResponse
 import pl.edu.agh.dockerbuddy.controller.response.ResponseType
 import pl.edu.agh.dockerbuddy.influxdb.AlertRecord
 import pl.edu.agh.dockerbuddy.influxdb.CustomFluxRecord
 import pl.edu.agh.dockerbuddy.influxdb.InfluxDbProxy
+import javax.validation.constraints.Pattern
 
 @Api(tags = ["Influx"])
-@CrossOrigin
 @RestController
+@Validated
 @RequestMapping("/api/v2/influxdb")
 class InfluxController (
     val influxDbProxy: InfluxDbProxy
 ){
     private val logger = LoggerFactory.getLogger(InfluxController::class.java)
+
+    companion object {
+        const val DATETIME_REGEX: String = "^[1-9]\\d{3}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}Z\$"
+    }
 
     @ApiOperation(value = "Get host's metrics form a range of time")
     @ApiImplicitParams(value = [
@@ -33,8 +39,8 @@ class InfluxController (
     fun getHostMetricFromRange(
         @RequestParam metricType: String,
         @RequestParam hostId: Long,
-        @RequestParam start: String, // TODO choose time representation and apply regex
-        @RequestParam(required = false, defaultValue = "now()") end: String // TODO choose time representation and apply regex
+        @RequestParam @Pattern(regexp = DATETIME_REGEX) start: String,
+        @RequestParam(required = false, defaultValue = "now()") end: String // FIXME default value that violates pattern
     ): ResponseEntity<DefaultResponse<List<CustomFluxRecord>>> {
         logger.info("GET /api/v2/influxdb")
         logger.debug("getHostMetricFromRange: " +
@@ -62,8 +68,8 @@ class InfluxController (
     @GetMapping("/alerts")
     fun getAlerts(
             @RequestParam(required = false) hostId: Long?,
-            @RequestParam start: String, // TODO choose time representation and apply regex
-            @RequestParam(required = false) end: String? // TODO choose time representation and apply regex
+            @RequestParam @Pattern(regexp = DATETIME_REGEX) start: String,
+            @RequestParam(required = false) end: String? // FIXME default value that violates pattern
     ): ResponseEntity<DefaultResponse<List<AlertRecord>>> {
         logger.info("GET /api/v2/influxdb/alerts")
         logger.debug("getAlerts: " +

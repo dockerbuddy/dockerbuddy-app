@@ -30,17 +30,18 @@ class InfluxDbProxy {
 
     private val logger = LoggerFactory.getLogger(InfluxDbProxy::class.java)
 
-    val checklist = mutableListOf<String>()
+    var checklist = mutableListOf<String>()
 
     init {
-        val metricTypes = listOf("memory_usage", "disk_usage", "cpu_usage")
+        val metricTypes = MetricType.values().map { it.toString() }
         val metricVariations = listOf("total", "value", "percent")
 
         for (metric in metricTypes) {
             for (variation in metricVariations) {
-                checklist.add(metric + "_" + variation)
+                checklist.add(metric.lowercase() + "_" + variation)
             }
         }
+        println(checklist)
     }
 
     suspend fun saveMetric(hostId: Long, hostSummary: HostSummary) {
@@ -55,9 +56,10 @@ class InfluxDbProxy {
             .time(Instant.parse(hostSummary.timestamp).toEpochMilli(), WritePrecision.MS)
         val hostMetrics = hostSummary.metrics.associateBy { it.metricType }
         for (metricType in MetricType.values()) {
-            hostPoint.addField("${metricType}_total", hostMetrics[metricType]?.total)
-            hostPoint.addField("${metricType}_value", hostMetrics[metricType]?.value)
-            hostPoint.addField("${metricType}_percent", hostMetrics[metricType]?.percent)
+            val metricTypeLowercase = metricType.toString().lowercase()
+            hostPoint.addField("${metricTypeLowercase}_total", hostMetrics[metricType]?.total)
+            hostPoint.addField("${metricTypeLowercase}_value", hostMetrics[metricType]?.value)
+            hostPoint.addField("${metricTypeLowercase}_percent", hostMetrics[metricType]?.percent)
         }
         writeApi.writePoint(hostPoint)
 
@@ -76,9 +78,10 @@ class InfluxDbProxy {
             val containerMetrics = container.metrics.associateBy { it.metricType }
             for (metricType in MetricType.values()) {
                 if (metricType in containerMetrics.keys) {
-                    containerPoint.addField("${metricType}_total", hostMetrics[metricType]?.total)
-                    containerPoint.addField("${metricType}_value", hostMetrics[metricType]?.value)
-                    containerPoint.addField("${metricType}_percent", hostMetrics[metricType]?.percent)
+                    val metricTypeLowercase = metricType.toString().lowercase()
+                    containerPoint.addField("${metricTypeLowercase}_total", hostMetrics[metricType]?.total)
+                    containerPoint.addField("${metricTypeLowercase}_value", hostMetrics[metricType]?.value)
+                    containerPoint.addField("${metricTypeLowercase}_percent", hostMetrics[metricType]?.percent)
                 }
             }
             writeApi.writePoint(containerPoint)
@@ -87,8 +90,9 @@ class InfluxDbProxy {
 
     suspend fun queryInfluxDb(metricTypeVariation: String, hostId: Long, start: String, end: String): List<CustomFluxRecord> {
 
-        if (metricTypeVariation !in checklist)
-            throw IllegalArgumentException("Unknown metric type: $metricTypeVariation")
+        val metricTypeVariationLowercase = metricTypeVariation.lowercase()
+        if (metricTypeVariationLowercase !in checklist)
+            throw IllegalArgumentException("Unknown metric type: $metricTypeVariationLowercase")
 
         val influxDBClient = InfluxDBClientKotlinFactory.create(url, token.toCharArray(), organization, bucket)
         val fluxQuery = ("from(bucket: \"$bucket\")\n"
@@ -96,7 +100,7 @@ class InfluxDbProxy {
                 + " |> filter(fn: (r) => (" +
                     "r._measurement == \"host_stats\" and " +
                     "r.host_id == \"$hostId\" and " +
-                    "r._field == \"$metricTypeVariation\"))"
+                    "r._field == \"$metricTypeVariationLowercase\"))"
                 )
 
         val result = influxDBClient.getQueryKotlinApi().query(fluxQuery).toList().map { CustomFluxRecord(
