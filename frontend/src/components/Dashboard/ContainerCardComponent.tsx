@@ -17,7 +17,7 @@ import { AllOutOutlined } from "@material-ui/icons";
 const useStyles = makeStyles((theme) => ({
   card: {
     borderColor: "#1A1C19",
-    backgroundColor: "#16171B",
+    backgroundColor: "transparent",
   },
   nameColor: {
     color: theme.palette.primary.main,

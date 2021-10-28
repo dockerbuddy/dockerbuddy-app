@@ -12,7 +12,5 @@ data class ContainerSummary(
     val image: String,
     @JsonAlias("state") val status: ContainerState,
     val metrics: List<BasicMetric>,
-//    val cpuUsage: BasicMetric,
-//    val memoryUsage: BasicMetric,
     var alertType: AlertType?,
 )

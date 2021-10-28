@@ -10,8 +10,8 @@ const theme = createMuiTheme({
       main: "#ff4b3a",
     },
     background: {
-      default: "#202125",
-      paper: "#16171B",
+      default: "rgba(8,1,9,1)",
+      paper: "rgba(8,1,9,1)",
     },
     text: {
       primary: "rgba(173,186,199,1)",
@@ -22,6 +22,18 @@ const theme = createMuiTheme({
   },
   typography: {
     fontFamily: ["Lexend Deca", "sans-serif"].join(","),
+  },
+  overrides: {
+    MuiCssBaseline: {
+      "@global": {
+        body: {
+          background:
+            "linear-gradient(40deg, rgba(26,19,59,1) 0%, rgba(8,1,9,1) 20%, rgba(8,1,9,1) 80%, rgba(62,45,9,1) 100%);",
+          backgroundRepeat: "no-repeat",
+          backgroundAttachment: "fixed",
+        },
+      },
+    },
   },
 });
 
