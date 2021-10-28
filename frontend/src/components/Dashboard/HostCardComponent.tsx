@@ -8,7 +8,7 @@ import {
   Grid,
 } from "@material-ui/core";
 import { Alert } from "@material-ui/lab";
-import { humanFileSize, extractMetric } from "../../util/util";
+import { extractMetric } from "../../util/util";
 import ProgressBarComponent from "./ProgressBarComponent";
 import ContainerCardComponent from "./ContainerCardComponent";
 import { Container, Host } from "../../common/types";
@@ -64,35 +64,21 @@ const HostCardComponent: React.FC<{ host: Host }> = (props) => {
       >
         <CardContent>
           {diskUsage !== undefined ? (
-            <ProgressBarComponent
-              name="Disk"
-              used={humanFileSize(diskUsage.value)}
-              total={humanFileSize(diskUsage.total)}
-              percent={diskUsage.percent}
-            />
+            <ProgressBarComponent name="Disk" metric={diskUsage} />
           ) : (
             <Grid item>
               <Alert severity="error"> NO DISC INFO </Alert>
             </Grid>
           )}
           {memoryUsage !== undefined ? (
-            <ProgressBarComponent
-              name="Memory"
-              used={humanFileSize(memoryUsage.value)}
-              total={humanFileSize(memoryUsage.total)}
-              percent={memoryUsage.percent}
-            />
+            <ProgressBarComponent name="Memory" metric={memoryUsage} />
           ) : (
             <Grid item>
               <Alert severity="error"> NO VMEM INFO </Alert>
             </Grid>
           )}
           {cpuUsage !== undefined ? (
-            <ProgressBarComponent
-              name="CPU"
-              used={cpuUsage.value + "%"}
-              percent={cpuUsage.percent}
-            />
+            <ProgressBarComponent name="CPU" metric={cpuUsage} />
           ) : (
             <Grid item>
               <Alert severity="error"> NO CPU INFO </Alert>
