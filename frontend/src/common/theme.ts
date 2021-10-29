@@ -23,20 +23,20 @@ const theme = createMuiTheme({
   typography: {
     fontFamily: ["Lexend Deca", "sans-serif"].join(","),
   },
-  // overrides: {
-  //   MuiCssBaseline: {
-  //     "@global": {
-  //       body: {
-  //         background:
-  //           "linear-gradient(40deg, rgba(26,19,59,1) 0%, rgba(8,1,9,1) 20%, rgba(8,1,9,1) 80%, rgba(62,45,9,1) 100%);",
-  //         // "linear-gradient(40deg, #fe6b8b 30%, #ff8e53 90%)",
-  //         // "linear-gradient(40deg, #a64258 30%, #a35a34 90%)",
-  //         backgroundRepeat: "no-repeat",
-  //         backgroundAttachment: "fixed",
-  //       },
-  //     },
-  //   },
-  // },
+  overrides: {
+    MuiCssBaseline: {
+      "@global": {
+        body: {
+          background:
+            "linear-gradient(40deg, rgba(26,19,59,1) 0%, rgba(8,1,9,1) 20%, rgba(8,1,9,1) 80%, rgba(62,45,9,1) 100%);",
+          // "linear-gradient(40deg, #fe6b8b 30%, #ff8e53 90%)",
+          // "linear-gradient(40deg, #a64258 30%, #a35a34 90%)",
+          backgroundRepeat: "no-repeat",
+          backgroundAttachment: "fixed",
+        },
+      },
+    },
+  },
 });
 
 const responsiveTheme = responsiveFontSizes(theme);
