@@ -25,6 +25,7 @@ class InfluxController (
     private val logger = LoggerFactory.getLogger(InfluxController::class.java)
 
     companion object {
+        //todo IMPROVE REGEX TO ACCEPT DATE AS ISOSTRING
         const val DATETIME_REGEX: String = "^[1-9]\\d{3}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}Z\$"
     }
 
@@ -39,7 +40,7 @@ class InfluxController (
     fun getHostMetricFromRange(
         @RequestParam metricType: String,
         @RequestParam hostId: Long,
-        @RequestParam @Pattern(regexp = DATETIME_REGEX) start: String,
+        @RequestParam /*@Pattern(regexp = DATETIME_REGEX)*/ start: String,
         @RequestParam(required = false, defaultValue = "now()") end: String // FIXME default value that violates pattern
     ): ResponseEntity<DefaultResponse<List<CustomFluxRecord>>> {
         logger.info("GET /api/v2/influxdb")
