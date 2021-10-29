@@ -12,7 +12,6 @@ import pl.edu.agh.dockerbuddy.service.HostService
 import javax.validation.Valid
 
 @Api(tags = ["Hosts"])
-@CrossOrigin
 @RestController
 @RequestMapping("/api/v2/hosts")
 class HostController (
