@@ -8,7 +8,11 @@ import {
   XAxis,
   YAxis,
 } from "recharts";
-import { InfluxBody } from "./InfluxHistory";
+
+export type InfluxBody = {
+  time: string;
+  value: number;
+};
 
 const MainChart: React.FC<{ body: InfluxBody[] }> = (props) => {
   return (

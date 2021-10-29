@@ -1,5 +1,6 @@
-import { MetricType } from "../common/enums";
+import { MetricType, AlertType } from "../common/enums";
 import { BasicMetric } from "../common/types";
+import { alertColors } from "./alertStyle";
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 export function capitalizeFirstLetter(string: string): string {
@@ -46,4 +47,14 @@ export function extractMetric(
   return metrics?.find(
     (metric) => MetricType[metric.metricType] === type.valueOf()
   );
+}
+
+export function alertTypeToColor(type: AlertType): string {
+  switch (type) {
+    case AlertType.CRITICAL:
+      return alertColors.red;
+    case AlertType.WARN:
+      return alertColors.yellow;
+  }
+  return alertColors.default;
 }
