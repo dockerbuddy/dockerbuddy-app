@@ -1,5 +1,5 @@
-import { MetricType, AlertType } from "../common/enums";
-import { BasicMetric } from "../common/types";
+import { MetricType, AlertType, RuleType } from "../common/enums";
+import { BasicMetric, HostRule } from "../common/types";
 import { alertColors } from "./alertStyle";
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
@@ -49,6 +49,13 @@ export function extractMetric(
   );
 }
 
+export function extractHostRule(
+  rules: HostRule[],
+  type: RuleType
+): HostRule | undefined {
+  return rules?.find((rule) => RuleType[rule.type] === type.valueOf());
+}
+
 export function alertTypeToColor(type: AlertType): string {
   switch (type) {
     case AlertType.CRITICAL:
@@ -57,4 +64,15 @@ export function alertTypeToColor(type: AlertType): string {
       return alertColors.yellow;
   }
   return alertColors.default;
+}
+
+export function paramsToString(params: any): string {
+  let result = "";
+  Object.keys(params).forEach((k) => {
+    result += `${k}=${params[k]}&`;
+  });
+  if (result.endsWith("&")) {
+    result = result.slice(0, -1);
+  }
+  return result;
 }

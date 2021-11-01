@@ -1,11 +1,14 @@
+/* eslint-disable */
 /* eslint-disable @typescript-eslint/ban-ts-comment */
 import {
   Button,
   Divider,
   Grid,
   InputLabel,
+  makeStyles,
   Select,
   TextField,
+  Theme,
   Typography,
 } from "@material-ui/core";
 import {
@@ -13,13 +16,14 @@ import {
   LocalizationProvider,
   TimePicker,
 } from "@mui/lab";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { proxy } from "../../../common/api";
 import { StandardApiResponse } from "../../../common/types";
 import MainChart, { InfluxBody } from "./MainChart";
 import AdapterDateFns from "@mui/lab/AdapterDateFns";
 import { DateRange } from "@mui/lab/DateRangePicker/RangeTypes";
 import plLocale from "date-fns/locale/pl";
+import { paramsToString } from "../../../util/util";
 
 type QueryParams = {
   metricType: string;
@@ -29,45 +33,28 @@ type QueryParams = {
 };
 
 type AllMetricQueries = {
-  CPU: string[];
-  Disk: string[];
-  Memory: string[];
+  Metric: string[];
 };
 
-const allMetricQueries: AllMetricQueries = {
-  CPU: ["cpu_usage_total", "cpu_usage_percent", "cpu_usage_value"],
-  Disk: ["disk_usage_total", "disk_usage_percent", "disk_usage_value"],
-  Memory: ["memory_usage_total", "memory_usage_percent", "memory_usage_value"],
-};
-
-const InfluxHistory: React.FC<{ hostId: number }> = (props) => {
+const InfluxHistory: React.FC<{ hostId: number, activeMetric: string}> = (props) => {
   const hostId: string = props.hostId.toString();
+
+  const allMetricQueries: AllMetricQueries = {
+    Metric: ["_TOTAL", "_PERCENT", "_VALUE"],
+  };
+
   const [hostHistory, setHostHistory] = useState<InfluxBody[]>();
   const [error, setError] = useState<string>("");
-
-  function fetchHostHistory(query: QueryParams): Promise<Response> {
-    const url = new URL(`${proxy}/influxdb?`),
-      params: any = {
-        metricType: query.metricType,
-        hostId: query.hostId,
-        start: query.start,
-        end: query.end,
-      };
-    Object.keys(params).forEach((key) =>
-      url.searchParams.append(key, params[key])
-    );
-    return fetch(url.toString());
-  }
 
   const handleQuery = async () => {
     setError("");
     const query: QueryParams = {
-      metricType: metricType,
+      metricType: props.activeMetric + metricType,
       hostId: hostId,
       start: (dateRange[0] != null ? dateRange[0] : yesterday).toISOString(),
       end: dateRange[1]?.toISOString(),
     };
-    const response = await fetchHostHistory(query);
+    const response = await fetch(`${proxy}/influxdb?` + paramsToString(query));
     const result: StandardApiResponse<InfluxBody[]> = await response.json();
     if (response.ok) {
       setHostHistory(result.body);
@@ -83,7 +70,7 @@ const InfluxHistory: React.FC<{ hostId: number }> = (props) => {
     new Date(),
   ]);
   const [metricType, setMetricType] = React.useState<string>(
-    allMetricQueries.CPU[0]
+    allMetricQueries.Metric[0]
   );
 
   const daysSpan = (date1: Date | null, date2: Date | null) => {
@@ -93,6 +80,8 @@ const InfluxHistory: React.FC<{ hostId: number }> = (props) => {
     const diff = Math.abs(date1.getTime() - date2.getTime());
     return Math.ceil(diff / (1000 * 3600 * 24));
   };
+
+  useEffect(() => {handleQuery()}, [props.activeMetric]);
 
   return (
     <LocalizationProvider dateAdapter={AdapterDateFns} locale={plLocale}>
