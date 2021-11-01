@@ -1,4 +1,5 @@
 import { CssBaseline, ThemeProvider } from "@material-ui/core";
+import { ThemeProvider as ThemeProviderMui } from "@mui/material";
 import React from "react";
 import { BrowserRouter } from "react-router-dom";
 import theme from "./common/theme";
@@ -13,22 +14,24 @@ const App: React.FC = () => {
   return (
     <BrowserRouter>
       <ThemeProvider theme={theme}>
-        <Provider store={store}>
-          <SnackbarProvider
-            maxSnack={4}
-            anchorOrigin={{
-              vertical: "bottom",
-              horizontal: "right",
-            }}
-          >
-            <WebSocketProvider>
-              <CssBaseline />
-              <Layout>
-                <Navigation />
-              </Layout>
-            </WebSocketProvider>
-          </SnackbarProvider>
-        </Provider>
+        <ThemeProviderMui theme={theme}>
+          <Provider store={store}>
+            <SnackbarProvider
+              maxSnack={4}
+              anchorOrigin={{
+                vertical: "bottom",
+                horizontal: "right",
+              }}
+            >
+              <WebSocketProvider>
+                <CssBaseline />
+                <Layout>
+                  <Navigation />
+                </Layout>
+              </WebSocketProvider>
+            </SnackbarProvider>
+          </Provider>
+        </ThemeProviderMui>
       </ThemeProvider>
     </BrowserRouter>
   );

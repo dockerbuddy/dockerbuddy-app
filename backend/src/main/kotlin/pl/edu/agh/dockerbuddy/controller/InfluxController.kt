@@ -69,7 +69,7 @@ class InfluxController (
     @GetMapping("/alerts")
     fun getAlerts(
             @RequestParam(required = false) hostId: Long?,
-            @RequestParam @Pattern(regexp = DATETIME_REGEX) start: String,
+            @RequestParam /*@Pattern(regexp = DATETIME_REGEX)*/ start: String,
             @RequestParam(required = false) end: String? // FIXME default value that violates pattern
     ): ResponseEntity<DefaultResponse<List<AlertRecord>>> {
         logger.info("GET /api/v2/influxdb/alerts")

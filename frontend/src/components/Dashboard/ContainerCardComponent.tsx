@@ -42,19 +42,30 @@ const ContainerCardComponent: React.FC<{ container: Container }> = ({
       className={classes.mainContainer}
       spacing={3}
     >
-      <Grid item xs={12} justify="center" alignItems="center">
-        <AllOutOutlined
-          fontSize="large"
-          className={classes.dockerIcon}
-          style={{ color: imgColor }}
-        />
-        <Typography
-          variant="h5"
-          align="center"
-          style={{ marginTop: -10, color: imgColor }}
-        >
-          {container.name}
-        </Typography>
+      <Grid
+        item
+        container
+        direction="column"
+        xs={12}
+        justify="center"
+        alignItems="center"
+      >
+        <Grid item>
+          <AllOutOutlined
+            fontSize="large"
+            className={classes.dockerIcon}
+            style={{ color: imgColor }}
+          />
+        </Grid>
+        <Grid item>
+          <Typography
+            variant="h5"
+            align="center"
+            style={{ marginTop: -10, color: imgColor }}
+          >
+            {container.name}
+          </Typography>
+        </Grid>
       </Grid>
 
       <Divider
