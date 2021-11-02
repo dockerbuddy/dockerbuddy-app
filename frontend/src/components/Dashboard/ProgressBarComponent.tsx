@@ -53,8 +53,10 @@ const ProgressBarComponent: React.FC<{
   name: string;
   metric: BasicMetric;
 }> = ({ name, metric }) => {
-  const used = humanFileSize(metric.value);
-  const total = humanFileSize(metric.total);
+  const used =
+    name === "CPU" ? `${metric.value}%` : humanFileSize(metric.value);
+  const total =
+    name === "CPU" ? `${metric.total}%` : humanFileSize(metric.total);
 
   //eslint-disable-next-line @typescript-eslint/ban-ts-comment
   //@ts-ignore
