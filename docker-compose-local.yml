@@ -1,0 +1,33 @@
+version: '3'
+services: 
+    influxdb:
+        image: influxdb:latest
+        ports: 
+            - '8086:8086'
+        volumes: 
+            - influxdb-storage:/var/lib/influxdb
+        environment: 
+            - DOCKER_INFLUXDB_INIT_MODE=setup
+            - DOCKER_INFLUXDB_INIT_USERNAME=admin
+            - DOCKER_INFLUXDB_INIT_PASSWORD=YmM3ZTgzNG
+            - DOCKER_INFLUXDB_INIT_ORG=agh-utc
+            - DOCKER_INFLUXDB_INIT_BUCKET=metrics
+            - DOCKER_INFLUXDB_INIT_ADMIN_TOKEN=YmM3ZTgzNGMyYTE2OTc2OWJjZmU4Y2FjMmI1YWM1Y2U3NDg2MGFjOTJlMDA2MWQz
+
+
+    webapp:
+        image: kraleppa/dockerbuddy:v1.2.0-beta
+        ports:
+            - '8080:8080'
+        depends_on:
+            - influxdb
+        environment:
+            - INFLUXDB_USERNAME=admin
+            - INFLUXDB_PASSWORD=YmM3ZTgzNG
+            - INFLUXDB_ORGANIZATION=agh-utc
+            - INFLUXDB_ADMIN_TOKEN=YmM3ZTgzNGMyYTE2OTc2OWJjZmU4Y2FjMmI1YWM1Y2U3NDg2MGFjOTJlMDA2MWQz
+            - INFLUXDB_BUCKET=metrics
+            - INFLUXDB_URL=http://influxdb:8086
+
+volumes:
+    influxdb-storage:
