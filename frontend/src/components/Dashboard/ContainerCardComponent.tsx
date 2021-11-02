@@ -59,7 +59,7 @@ const ContainerCardComponent: React.FC<{ container: Container }> = ({
         </Grid>
         <Grid item>
           <Typography
-            variant="h5"
+            variant="subtitle1"
             align="center"
             style={{ marginTop: -10, color: imgColor }}
           >
@@ -78,7 +78,11 @@ const ContainerCardComponent: React.FC<{ container: Container }> = ({
       <Grid item container justify="space-around">
         {/* or space-between */}
         <Grid item xs={5}>
-          <Typography variant="h6" align="center" style={{ color: cpuColor }}>
+          <Typography
+            variant="subtitle1"
+            align="center"
+            style={{ color: cpuColor }}
+          >
             CPU: {cpu?.percent.toFixed(2)}%
           </Typography>
         </Grid>
@@ -89,7 +93,11 @@ const ContainerCardComponent: React.FC<{ container: Container }> = ({
           style={{ width: 3 }}
         />
         <Grid item xs={5}>
-          <Typography variant="h6" align="center" style={{ color: memColor }}>
+          <Typography
+            variant="subtitle1"
+            align="center"
+            style={{ color: memColor }}
+          >
             MEM: {mem?.percent.toFixed(2)}%
           </Typography>
         </Grid>
