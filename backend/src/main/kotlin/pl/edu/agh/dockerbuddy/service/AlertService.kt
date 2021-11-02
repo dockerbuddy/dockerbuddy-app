@@ -48,7 +48,7 @@ class AlertService(val template: SimpMessagingTemplate, val influxDbProxy: Influ
         if (basicMetric.alertType == null) return
         logger.debug("Checking basic metric: ${basicMetric.metricType}")
         if (basicMetric.alertType != prevBasicMetric.alertType) {
-            val alertMessage = "Host ${hostSummary.id}: ${basicMetric.metricType} is ${basicMetric.percent}%"
+            val alertMessage = "Host ${hostSummary.id}: ${basicMetric.metricType.humanReadable()} is ${basicMetric.percent}%"
             logger.info(alertMessage)
             logger.debug("$basicMetric")
             sendAlert(Alert(hostSummary.id, basicMetric.alertType!!, alertMessage))
@@ -74,7 +74,7 @@ class AlertService(val template: SimpMessagingTemplate, val influxDbProxy: Influ
             val container = cont.value
             if (container.alertType != prevContainers[container.id]!!.alertType){
                 val alertMessage = "Host ${hostSummary.id}: something wrong with container ${container.name}. " +
-                        "State: ${container.status}"
+                        "State: ${container.status.humaneReadable()}"
                 sendAlert(Alert(hostSummary.id, container.alertType!!, alertMessage))
             }
         }
@@ -124,10 +124,10 @@ class AlertService(val template: SimpMessagingTemplate, val influxDbProxy: Influ
             if (rule.containerName !in containerMap.keys) {
                 sendAlert(
                     Alert(
-                    hostSummary.id,
-                    AlertType.CRITICAL,
-                    "Host ${hostSummary.id}: missing container ${rule.containerName}"
-                )
+                        hostSummary.id,
+                        AlertType.CRITICAL,
+                        "Host ${hostSummary.id}: missing container ${rule.containerName}"
+                    )
                 )
             }
             addAlertTypeToContainer(containerMap[rule.containerName]!!, rule)
