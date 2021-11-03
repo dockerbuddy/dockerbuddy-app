@@ -1,5 +1,5 @@
 # Docker Buddy
-
+Hi I'm your Docker Buddy - Buddy for everybody
 ## Running app with docker
 Image of Docker Buddy is available on [DockerHub](https://hub.docker.com/repository/docker/kraleppa/dockerbuddy)
 ```
