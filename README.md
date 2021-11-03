@@ -22,6 +22,7 @@ See [Environment variables](#environment-variables).
 
 ## Running with docker-compose
 Since Docker Buddy requires InflxuDB to work properly, we prepared docker-compose with example configuration [Link](https://github.com/agh-docker-monitoring/dockiera-app/blob/main/docker-compose-local.yml). 
+Docker Buddy will be available on port 8080
 ```
 docker-compose -f docker-compose-local.yml up
 ```
