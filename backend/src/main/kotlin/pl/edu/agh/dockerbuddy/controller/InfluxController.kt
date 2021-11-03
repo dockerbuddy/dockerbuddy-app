@@ -13,6 +13,7 @@ import pl.edu.agh.dockerbuddy.controller.response.ResponseType
 import pl.edu.agh.dockerbuddy.influxdb.AlertRecord
 import pl.edu.agh.dockerbuddy.influxdb.CustomFluxRecord
 import pl.edu.agh.dockerbuddy.influxdb.InfluxDbProxy
+import java.util.*
 import javax.validation.constraints.Pattern
 
 @Api(tags = ["Influx"])
@@ -32,14 +33,14 @@ class InfluxController (
     @ApiOperation(value = "Get host's metrics form a range of time")
     @ApiImplicitParams(value = [
         ApiImplicitParam(name = "metricType", value = "Type of a metric", dataTypeClass = String::class),
-        ApiImplicitParam(name = "hostId", value = "Id of a host", dataTypeClass = Long::class, example = "1"),
+        ApiImplicitParam(name = "hostId", value = "Id of a host", dataTypeClass = UUID::class, example = "123e4567-e89b-12d3-a456-426614174000"),
         ApiImplicitParam(name = "start", value = "Start time, eg -1d, -10m, etc.", dataTypeClass = String::class),
         ApiImplicitParam(name = "end", value = "End time, must be greater than start time", dataTypeClass = String::class),
     ])
     @GetMapping(produces = ["application/json"])
     fun getHostMetricFromRange(
         @RequestParam metricType: String,
-        @RequestParam hostId: Long,
+        @RequestParam hostId: UUID,
         @RequestParam /*@Pattern(regexp = DATETIME_REGEX)*/ start: String,
         @RequestParam(required = false, defaultValue = "now()") end: String // FIXME default value that violates pattern
     ): ResponseEntity<DefaultResponse<List<CustomFluxRecord>>> {
@@ -62,13 +63,13 @@ class InfluxController (
 
     @ApiOperation(value = "Get host's alerts form a range of time")
     @ApiImplicitParams(value = [
-        ApiImplicitParam(name = "hostId", value = "Id of a host", dataTypeClass = Long::class, example = "1"),
+        ApiImplicitParam(name = "hostId", value = "Id of a host", dataTypeClass = UUID::class, example = "123e4567-e89b-12d3-a456-426614174000"),
         ApiImplicitParam(name = "start", value = "Start time, eg -1d, -10m, etc.", dataTypeClass = String::class),
         ApiImplicitParam(name = "end", value = "End time, must be greater than start time", dataTypeClass = String::class),
     ])
     @GetMapping("/alerts")
     fun getAlerts(
-            @RequestParam(required = false) hostId: Long?,
+            @RequestParam(required = false) hostId: UUID?,
             @RequestParam /*@Pattern(regexp = DATETIME_REGEX)*/ start: String,
             @RequestParam(required = false) end: String? // FIXME default value that violates pattern
     ): ResponseEntity<DefaultResponse<List<AlertRecord>>> {

@@ -6,6 +6,7 @@ import pl.edu.agh.dockerbuddy.inmemory.InMemory
 import pl.edu.agh.dockerbuddy.model.HostWithSummary
 import pl.edu.agh.dockerbuddy.model.entity.Host
 import pl.edu.agh.dockerbuddy.repository.HostRepository
+import java.util.*
 import javax.persistence.EntityNotFoundException
 
 @Service
@@ -20,21 +21,21 @@ class HostService (
         return hostRepository.save(host)
     }
 
-    fun deleteHost(id: Long) {
+    fun deleteHost(id: UUID) {
         logger.info("Deleting host $id")
         if (!hostRepository.existsById(id)) throw EntityNotFoundException("Host $id does not exist")
         inMemory.deleteHost(id)
         return hostRepository.deleteById(id)
     }
 
-    fun updateHost(id: Long, host: Host): Host {
+    fun updateHost(id: UUID, host: Host): Host {
         if (!hostRepository.existsById(id)) throw EntityNotFoundException("Host $id does not exist")
         logger.info("Host $id update: $host")
         host.id = id
         return hostRepository.save(host)
     }
 
-    fun getHostWithSummary(id: Long): HostWithSummary {
+    fun getHostWithSummary(id: UUID): HostWithSummary {
         logger.info("Fetching host $id")
         val foundHost = hostRepository.findById(id)
         if (foundHost.isEmpty) throw EntityNotFoundException("Host $id does not exist")
@@ -52,7 +53,7 @@ class HostService (
         )
     }
 
-    fun getHostWithSettings(id: Long): Host {
+    fun getHostWithSettings(id: UUID): Host {
         logger.info("Fetching host $id")
         val foundHost = hostRepository.findById(id)
         if (foundHost.isEmpty) throw EntityNotFoundException("Host $id does not exist")

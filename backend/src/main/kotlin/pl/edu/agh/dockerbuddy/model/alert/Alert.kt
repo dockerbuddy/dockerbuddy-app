@@ -1,3 +1,5 @@
 package pl.edu.agh.dockerbuddy.model.alert
 
-data class Alert (val hostId: Long, val alertType: AlertType, val alertMessage: String)
+import java.util.*
+
+data class Alert (val hostId: UUID, val alertType: AlertType, val alertMessage: String)

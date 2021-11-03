@@ -13,6 +13,7 @@ import pl.edu.agh.dockerbuddy.model.metric.HostSummary
 import pl.edu.agh.dockerbuddy.model.metric.MetricType
 import java.lang.IllegalArgumentException
 import java.time.*
+import java.util.*
 
 @Service
 class InfluxDbProxy {
@@ -44,7 +45,7 @@ class InfluxDbProxy {
         println(checklist)
     }
 
-    suspend fun saveMetric(hostId: Long, hostSummary: HostSummary) {
+    suspend fun saveMetric(hostId: UUID, hostSummary: HostSummary) {
         logger.info("Saving metric for host $hostId")
         logger.debug("$hostSummary")
         val influxDBClient = InfluxDBClientKotlinFactory.create(url, token.toCharArray(), organization, bucket)
@@ -88,7 +89,7 @@ class InfluxDbProxy {
         }
     }
 
-    suspend fun queryInfluxDb(metricTypeVariation: String, hostId: Long, start: String, end: String): List<CustomFluxRecord> {
+    suspend fun queryInfluxDb(metricTypeVariation: String, hostId: UUID, start: String, end: String): List<CustomFluxRecord> {
 
         val metricTypeVariationLowercase = metricTypeVariation.lowercase()
         if (metricTypeVariationLowercase !in checklist)
@@ -99,7 +100,7 @@ class InfluxDbProxy {
                 + " |> range(start: $start, stop: $end)"
                 + " |> filter(fn: (r) => (" +
                     "r._measurement == \"host_stats\" and " +
-                    "r.host_id == \"$hostId\" and " +
+                    "r.host_id == \"$hostId.\" and " +
                     "r._field == \"$metricTypeVariationLowercase\"))"
                 )
 
@@ -129,7 +130,7 @@ class InfluxDbProxy {
         writeApi.writePoint(alertPoint)
     }
 
-    suspend fun queryAlerts(hostId: Long?, start: String, end: String?): List<AlertRecord> {
+    suspend fun queryAlerts(hostId: UUID?, start: String, end: String?): List<AlertRecord> {
 
         val influxDBClient = InfluxDBClientKotlinFactory.create(url, token.toCharArray(), organization, bucket)
         val fluxQuery = ("from(bucket: \"$bucket\")\n"
@@ -143,7 +144,7 @@ class InfluxDbProxy {
         val result = influxDBClient.getQueryKotlinApi().query(fluxQuery).toList().map {
             logger.info(it.value.toString())
             AlertRecord(
-                    it.values["host_id"].toString().toLong(),
+                    UUID.fromString(it.values["host_id"].toString()),
                     AlertType.valueOf(it.values["alert_type"].toString()),
                     it.value as String,
                     it.time.toString()

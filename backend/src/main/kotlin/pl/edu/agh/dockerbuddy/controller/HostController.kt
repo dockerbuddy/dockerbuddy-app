@@ -9,6 +9,7 @@ import pl.edu.agh.dockerbuddy.controller.response.ResponseType
 import pl.edu.agh.dockerbuddy.model.HostWithSummary
 import pl.edu.agh.dockerbuddy.model.entity.Host
 import pl.edu.agh.dockerbuddy.service.HostService
+import java.util.*
 import javax.validation.Valid
 
 @Api(tags = ["Hosts"])
@@ -42,7 +43,7 @@ class HostController (
         ApiImplicitParam(name = "id", value = "Id of a host", dataTypeClass = Long::class, example = "1")
     ])
     @GetMapping(value =["/{id}"], produces = ["application/json"])
-    fun getHostWithSummary(@PathVariable id: Long): ResponseEntity<DefaultResponse<HostWithSummary>> {
+    fun getHostWithSummary(@PathVariable id: UUID): ResponseEntity<DefaultResponse<HostWithSummary>> {
         val hostsWithSummary = hostService.getHostWithSummary(id)
         return ResponseEntity.status(HttpStatus.OK)
             .body(DefaultResponse(ResponseType.SUCCESS, "Hosts fetched", hostsWithSummary))
@@ -53,7 +54,7 @@ class HostController (
            ApiImplicitParam(name = "id", value = "Id of a host", dataTypeClass = Long::class, example = "1")
     ])
     @DeleteMapping(value =["/{id}"], produces = ["application/json"])
-    fun deleteHost(@PathVariable id: Long): ResponseEntity<DefaultResponse<Any?>> {
+    fun deleteHost(@PathVariable id: UUID): ResponseEntity<DefaultResponse<Any?>> {
         hostService.deleteHost(id)
         return ResponseEntity.status(HttpStatus.OK)
             .body(DefaultResponse(ResponseType.SUCCESS, "Host deleted", null))
@@ -64,7 +65,7 @@ class HostController (
         ApiImplicitParam(name = "id", value = "Id of a host", dataTypeClass = Long::class, example = "1")
     ])
     @PutMapping(value = ["/{id}"], produces = ["application/json"])
-    fun updateHost(@PathVariable id: Long, @RequestBody @Valid host: Host): ResponseEntity<DefaultResponse<Host>> {
+    fun updateHost(@PathVariable id: UUID, @RequestBody @Valid host: Host): ResponseEntity<DefaultResponse<Host>> {
         val updatedHost = hostService.updateHost(id, host)
         return ResponseEntity.status(HttpStatus.OK)
             .body(DefaultResponse(ResponseType.SUCCESS, "Host updated", updatedHost))

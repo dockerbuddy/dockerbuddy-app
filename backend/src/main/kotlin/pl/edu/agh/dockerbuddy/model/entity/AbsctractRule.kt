@@ -15,4 +15,4 @@ abstract class AbstractRule(
     @Column(name = "type", nullable = false)
     @JsonAlias("ruleType")
     var type: RuleType
-): BaseLongIdEntity()
+): BaseIdEntity()
