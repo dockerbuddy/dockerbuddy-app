@@ -20,6 +20,13 @@ See [Environment variables](#environment-variables).
 - java 11
 - ???  
 
+## Running with docker-compose
+Since Docker Buddy requires InflxuDB to work properly, we prepared docker-compose with example configuration [Link](https://github.com/agh-docker-monitoring/dockiera-app/blob/main/docker-compose-local.yml). 
+```
+docker-compose -f docker-compose-local up
+```
+Webapp may throw an exception associated with connection to influxdb - in this case you should run above command again (sometimes it doesn't work properly we are working on it)
+
 ## Environment variables
 We are using some environment variables - mostly for connection with influx
 - `INFLUXDB_URL` - influx URL
