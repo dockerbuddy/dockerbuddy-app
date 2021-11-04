@@ -3,10 +3,11 @@ import { RootState } from "./store";
 import { fetchHosts } from "../common/api";
 import { Host, HostSummary } from "../common/types";
 
+//We need @Patryk Skupień here
 export interface HostState {
   status: "LOADING" | "ERROR" | "LOADED";
   hosts: {
-    [id: number]: Host;
+    [id: string]: Host;
   };
 }
 

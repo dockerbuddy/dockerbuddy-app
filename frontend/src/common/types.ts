@@ -7,21 +7,21 @@ export type StandardApiResponse<T> = {
 };
 
 export interface HostRule {
-  id?: number;
+  id?: string;
   type: RuleType;
   warnLevel: number;
   criticalLevel: number;
 }
 
 export interface HostSummary {
-  id: number;
+  id: string;
   timestamp: string;
   metrics: BasicMetric[];
   containers: Container[];
 }
 
 export interface Host {
-  id: number;
+  id: string;
   hostName: string;
   ip: string;
   hostSummary: HostSummary;
@@ -30,7 +30,7 @@ export interface Host {
 }
 
 export interface ContainerRule {
-  id: number;
+  id: string;
   alertType: AlertType;
   containerName: string;
   type: RuleType; //todo MEM, CPU, DISK Usage right now isnt used
@@ -55,13 +55,13 @@ export interface BasicMetric {
 
 export interface AlertsResponseElement {
   alertType: AlertType;
-  hostId: number;
+  hostId: string;
   alertMessage: string;
   time: Date;
 }
 
 export interface Alert {
-  hostId: number;
+  hostId: string;
   alertType: AlertType;
   alertMessage: string;
 }

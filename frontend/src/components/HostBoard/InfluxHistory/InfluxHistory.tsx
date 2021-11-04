@@ -36,7 +36,7 @@ type AllMetricQueries = {
   Metric: string[];
 };
 
-const InfluxHistory: React.FC<{ hostId: number, activeMetric: string}> = (props) => {
+const InfluxHistory: React.FC<{ hostId: string, activeMetric: string}> = (props) => {
   const hostId: string = props.hostId.toString();
 
   const allMetricQueries: AllMetricQueries = {
