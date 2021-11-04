@@ -73,16 +73,21 @@ class AlertService(val template: SimpMessagingTemplate, val influxDbProxy: Influ
             if (cont.key !in prevContainers.keys) {
                 sendAlert(
                     Alert(
-                    hostSummary.id,
-                    AlertType.WARN,
-                    "Host $hostName: new container: ${cont.value.name}"
-                )
+                        hostSummary.id,
+                        AlertType.WARN,
+                        "Host $hostName: new container: ${cont.value.name}"
+                    )
                 )
             }
             val container = cont.value
             if (container.alertType != prevContainers[container.id]!!.alertType){
-                val alertMessage = "Host $hostName: something wrong with container ${container.name}. " +
-                        "State: ${container.status.humaneReadable()}"
+                val alertMessage: String = if (container.alertType != AlertType.OK) {
+                    "Host $hostName: something wrong with container ${container.name}. " +
+                            "State: ${container.status.humaneReadable()}"
+                } else {
+                    "Host $hostName: container ${container.name} is back. " +
+                            "State: ${container.status.humaneReadable()}"
+                }
                 sendAlert(Alert(hostSummary.id, container.alertType!!, alertMessage))
             }
         }
