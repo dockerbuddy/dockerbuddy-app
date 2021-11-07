@@ -71,7 +71,9 @@ class InfluxController (
     fun getAlerts(
             @RequestParam(required = false) hostId: UUID?,
             @RequestParam /*@Pattern(regexp = DATETIME_REGEX)*/ start: String,
-            @RequestParam(required = false) end: String? // FIXME default value that violates pattern
+            @RequestParam(required = false) end: String?, // FIXME default value that violates pattern
+            @RequestParam(required = true) fetchAll: Boolean,
+            @RequestParam(required = false) read: Boolean?
     ): ResponseEntity<DefaultResponse<List<AlertRecord>>> {
         logger.info("GET /api/v2/influxdb/alerts")
         logger.debug("getAlerts: " +
@@ -82,7 +84,7 @@ class InfluxController (
 
         var response: ResponseEntity<DefaultResponse<List<AlertRecord>>>
         runBlocking {
-            val result = influxDbProxy.queryAlerts(hostId, start, end)
+            val result = influxDbProxy.queryAlerts(hostId, start, end, fetchAll, read)
             response =  ResponseEntity.status(HttpStatus.OK)
                     .body(DefaultResponse(ResponseType.SUCCESS, "Influx records fetched", result))
         }

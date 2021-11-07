@@ -90,7 +90,6 @@ class InfluxDbProxy {
     }
 
     suspend fun queryInfluxDb(metricTypeVariation: String, hostId: UUID, start: String, end: String): List<CustomFluxRecord> {
-
         val metricTypeVariationLowercase = metricTypeVariation.lowercase()
         if (metricTypeVariationLowercase !in checklist)
             throw IllegalArgumentException("Unknown metric type: $metricTypeVariationLowercase")
@@ -124,22 +123,31 @@ class InfluxDbProxy {
         val alertPoint = Point.measurement("alerts")
                 .addTag("host_id", alert.hostId.toString())
                 .addTag("alert_type", alert.alertType.toString())
+                .addTag("read", alert.read.toString())
                 .addField("message", alert.alertMessage)
                 .time(Instant.now().toEpochMilli(), WritePrecision.MS)
 
         writeApi.writePoint(alertPoint)
     }
 
-    suspend fun queryAlerts(hostId: UUID?, start: String, end: String?): List<AlertRecord> {
+    suspend fun queryAlerts(hostId: UUID?, start: String, end: String?, fetchAll: Boolean, read: Boolean?): List<AlertRecord> {
+        return when {
+            fetchAll -> queryAlerts(hostId, start, end, null)
+            read != null -> queryAlerts(hostId, start, end, read)
+            else -> throw IllegalArgumentException("If not fetching all hosts 'read' param must be specified")
+        }
+    }
 
+    private suspend fun queryAlerts(hostId: UUID?, start: String, end: String?, read: Boolean?): List<AlertRecord> {
         val influxDBClient = InfluxDBClientKotlinFactory.create(url, token.toCharArray(), organization, bucket)
         val fluxQuery = ("from(bucket: \"$bucket\")\n"
                 + " |> range(start: $start, stop: ${end ?: "now()"})"
                 + " |> filter(fn: (r) => (" +
                 "r._measurement == \"alerts\" and " +
                 "r._field == \"message\" " +
-                if (hostId != null) " and r.host_id == \"$hostId\"))" else "))"
-                )
+                if (read != null) "and r.read == \"$read\" " else " " +
+                if (hostId != null) "and r.host_id == \"$hostId\"))" else "))"
+            )
 
         val result = influxDBClient.getQueryKotlinApi().query(fluxQuery).toList().map {
             logger.info(it.value.toString())
