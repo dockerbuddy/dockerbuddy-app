@@ -114,7 +114,14 @@ class InfluxDbProxy {
         return result
     }
 
-    suspend fun saveAlert(alert: Alert){
+    suspend fun saveAlerts(alertList: List<Alert>): List<Alert> {
+        for (alert in alertList) {
+            saveAlert(alert)
+        }
+        return alertList
+    }
+
+    suspend fun saveAlert(alert: Alert) {
         logger.info("Saving alert for hostId ${alert.hostId}")
         logger.debug("$alert")
         val influxDBClient = InfluxDBClientKotlinFactory.create(url, token.toCharArray(), organization, bucket)

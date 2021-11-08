@@ -13,6 +13,7 @@ import pl.edu.agh.dockerbuddy.controller.response.ResponseType
 import pl.edu.agh.dockerbuddy.influxdb.AlertRecord
 import pl.edu.agh.dockerbuddy.influxdb.CustomFluxRecord
 import pl.edu.agh.dockerbuddy.influxdb.InfluxDbProxy
+import pl.edu.agh.dockerbuddy.model.alert.Alert
 import java.util.*
 import javax.validation.constraints.Pattern
 
@@ -66,20 +67,24 @@ class InfluxController (
         ApiImplicitParam(name = "hostId", value = "Id of a host", dataTypeClass = UUID::class, example = "123e4567-e89b-12d3-a456-426614174000"),
         ApiImplicitParam(name = "start", value = "Start time, eg -1d, -10m, etc.", dataTypeClass = String::class),
         ApiImplicitParam(name = "end", value = "End time, must be greater than start time", dataTypeClass = String::class),
+        ApiImplicitParam(name = "fetchAll", value = "Fetch all alerts. If false, 'read' must be specified", dataTypeClass = Boolean::class),
+        ApiImplicitParam(name = "read", value = "Fetch specific alerts: true for read only, false for unread only", dataTypeClass = String::class)
     ])
     @GetMapping("/alerts")
     fun getAlerts(
-            @RequestParam(required = false) hostId: UUID?,
-            @RequestParam /*@Pattern(regexp = DATETIME_REGEX)*/ start: String,
-            @RequestParam(required = false) end: String?, // FIXME default value that violates pattern
-            @RequestParam(required = true) fetchAll: Boolean,
-            @RequestParam(required = false) read: Boolean?
+        @RequestParam(required = false) hostId: UUID?,
+        @RequestParam /*@Pattern(regexp = DATETIME_REGEX)*/ start: String,
+        @RequestParam(required = false) end: String?, // FIXME default value that violates pattern
+        @RequestParam(required = true) fetchAll: Boolean,
+        @RequestParam(required = false) read: Boolean?
     ): ResponseEntity<DefaultResponse<List<AlertRecord>>> {
         logger.info("GET /api/v2/influxdb/alerts")
         logger.debug("getAlerts: " +
                 "hostId: $hostId, " +
                 "start: $start, " +
-                "end: $end, "
+                "end: $end, " +
+                "fetchAll: $fetchAll, " +
+                "read: $read "
         )
 
         var response: ResponseEntity<DefaultResponse<List<AlertRecord>>>
@@ -87,6 +92,19 @@ class InfluxController (
             val result = influxDbProxy.queryAlerts(hostId, start, end, fetchAll, read)
             response =  ResponseEntity.status(HttpStatus.OK)
                     .body(DefaultResponse(ResponseType.SUCCESS, "Influx records fetched", result))
+        }
+        return response
+    }
+
+    @ApiOperation(value = "Mark alerts as read")
+    @PutMapping("/alerts")
+    fun readAlerts(@RequestBody alertList: List<Alert>): ResponseEntity<DefaultResponse<List<Alert>>> {
+        logger.info("PUT /api/v2/influxdb/alerts")
+        var response: ResponseEntity<DefaultResponse<List<Alert>>>
+        runBlocking {
+            val result = influxDbProxy.saveAlerts(alertList)
+            response =  ResponseEntity.status(HttpStatus.OK)
+                .body(DefaultResponse(ResponseType.SUCCESS, "Alerts marked as read", result))
         }
         return response
     }
