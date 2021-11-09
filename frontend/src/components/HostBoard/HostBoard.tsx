@@ -39,7 +39,7 @@ type HParam = { id: string };
 
 const HostBoard: React.FC<RouteComponentProps<HParam>> = ({ match }) => {
   const classes = useStyles();
-  const hostId = parseInt(match.params.id);
+  const hostId = match.params.id;
   const hostData = useAppSelector(selectHost).hosts[hostId];
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
