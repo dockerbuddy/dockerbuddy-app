@@ -3,7 +3,6 @@ import { RootState } from "./store";
 import { fetchHosts } from "../common/api";
 import { Host, HostSummary } from "../common/types";
 
-//We need @Patryk Skupień here
 export interface HostState {
   status: "LOADING" | "ERROR" | "LOADED";
   hosts: {
@@ -43,15 +42,15 @@ export const hostsSlice = createSlice({
         const hosts = action.payload.body;
         if (hosts == null) {
           state.status = "ERROR";
-          state.hosts = [];
+          state.hosts = {};
         } else if (hosts.length > 0) {
-          state.hosts = [];
+          state.hosts = {};
           hosts.forEach((e: Host) => {
             state.hosts[e.id] = e;
           });
           state.status = "LOADED";
         } else {
-          state.hosts = [];
+          state.hosts = {};
           state.status = "LOADED";
         }
       });
