@@ -8,7 +8,7 @@ interface HostMenuProps {
   anchorEl: null | HTMLElement;
   open: boolean;
   handleClose: () => void;
-  hostId: number;
+  hostId: string;
 }
 
 const HostMenu: React.FC<HostMenuProps> = ({

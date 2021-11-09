@@ -11,6 +11,7 @@ import pl.edu.agh.dockerbuddy.inmemory.InMemory
 import pl.edu.agh.dockerbuddy.model.entity.Host
 import pl.edu.agh.dockerbuddy.model.metric.HostSummary
 import pl.edu.agh.dockerbuddy.repository.HostRepository
+import java.util.*
 import javax.persistence.EntityNotFoundException
 
 @Service
@@ -24,23 +25,23 @@ class MetricService(
 
     private val logger = LoggerFactory.getLogger(MetricService::class.java)
 
-    fun postMetric(hostSummary: HostSummary, hostId: Long){
+    fun postMetric(hostSummary: HostSummary, hostId: UUID){
         logger.info("Processing new metrics for host $hostId")
         logger.debug("$hostSummary")
         val host: Host = hostRepository.findByIdOrNull(hostId) ?:
             throw EntityNotFoundException("Host $hostId not found. Cannot add metric")
         alertService.appendAlertTypeToMetrics(hostSummary, host.hostRules)
-        alertService.appendAlertTypeToContainers(hostSummary, host.containersRules.toList())
+        alertService.appendAlertTypeToContainers(hostSummary, host.containersRules.toList(), host.hostName!!)
 
         val prevHostSummary: HostSummary? = inMemory.getHostSummary(hostId)
         if (prevHostSummary != null){
             logger.info("Host found in cache. Checking for alerts...")
-            alertService.checkForAlertSummary(hostSummary, prevHostSummary)
+            alertService.checkForAlertSummary(hostSummary, prevHostSummary, host.hostName!!)
             logger.info("Metrics updated")
             logger.debug("$hostSummary")
         } else {
             logger.info("No data for host $hostId in cache. Checking for alerts...")
-            alertService.initialCheckForAlertSummary(hostSummary)
+            alertService.initialCheckForAlertSummary(hostSummary, host.hostName!!)
         }
 
         inMemory.saveHostSummary(hostId, hostSummary)

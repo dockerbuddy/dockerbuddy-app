@@ -25,4 +25,4 @@ class Host(
 
     @OneToMany(cascade = [CascadeType.ALL], orphanRemoval = true, fetch = FetchType.EAGER)
     var containersRules: MutableSet<ContainerRule> = mutableSetOf()
-): BaseLongIdEntity()
+): BaseIdEntity()

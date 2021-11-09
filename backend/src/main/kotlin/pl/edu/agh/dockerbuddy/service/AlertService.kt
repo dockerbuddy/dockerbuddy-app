@@ -17,6 +17,7 @@ import pl.edu.agh.dockerbuddy.model.metric.BasicMetric
 import pl.edu.agh.dockerbuddy.model.metric.ContainerSummary
 import pl.edu.agh.dockerbuddy.model.metric.HostSummary
 import pl.edu.agh.dockerbuddy.model.metric.MetricType
+import java.util.*
 
 @Service
 class AlertService(val template: SimpMessagingTemplate, val influxDbProxy: InfluxDbProxy) {
@@ -30,25 +31,30 @@ class AlertService(val template: SimpMessagingTemplate, val influxDbProxy: Influ
         }
     }
 
-    fun checkForAlertSummary(hostSummary: HostSummary, prevHostSummary: HostSummary){
+    fun checkForAlertSummary(hostSummary: HostSummary, prevHostSummary: HostSummary, hostName: String){
         val hostMetrics = hostSummary.metrics.associateBy { it.metricType }
         val prevHostMetrics = prevHostSummary.metrics.associateBy { it.metricType }
         for (mt in MetricType.values()) {
             if (hostMetrics.containsKey(mt) && prevHostMetrics.containsKey(mt)) {
-                checkForAlert(hostMetrics[mt]!!, prevHostMetrics[mt]!!, hostSummary)
+                checkForAlert(hostMetrics[mt]!!, prevHostMetrics[mt]!!, hostSummary, hostName)
             }
             else {
-                logger.warn("Missing metric $mt for host ${hostSummary.id}")
+                logger.warn("Missing metric $mt for host $hostName")
             }
         }
-        checkForAlerts(hostSummary.containers, prevHostSummary.containers, hostSummary)
+        checkForAlerts(hostSummary.containers, prevHostSummary.containers, hostSummary, hostName)
     }
 
-    fun checkForAlert(basicMetric: BasicMetric, prevBasicMetric: BasicMetric, hostSummary: HostSummary){
+    fun checkForAlert(
+        basicMetric: BasicMetric,
+        prevBasicMetric: BasicMetric,
+        hostSummary: HostSummary,
+        hostName: String
+    ) {
         if (basicMetric.alertType == null) return
         logger.debug("Checking basic metric: ${basicMetric.metricType}")
         if (basicMetric.alertType != prevBasicMetric.alertType) {
-            val alertMessage = "Host ${hostSummary.id}: ${basicMetric.metricType.humanReadable()} is ${basicMetric.percent}%"
+            val alertMessage = "Host $hostName: ${basicMetric.metricType.humanReadable()} is ${basicMetric.percent}%"
             logger.info(alertMessage)
             logger.debug("$basicMetric")
             sendAlert(Alert(hostSummary.id, basicMetric.alertType!!, alertMessage))
@@ -57,7 +63,9 @@ class AlertService(val template: SimpMessagingTemplate, val influxDbProxy: Influ
 
     fun checkForAlerts(
         containersSummaries: List<ContainerSummary>,
-        prevContainersSummaries: List<ContainerSummary>, hostSummary: HostSummary
+        prevContainersSummaries: List<ContainerSummary>,
+        hostSummary: HostSummary,
+        hostName: String
     ) {
         val containers = containersSummaries.associateBy { it.id }
         val prevContainers = prevContainersSummaries.associateBy { it.id }
@@ -65,25 +73,30 @@ class AlertService(val template: SimpMessagingTemplate, val influxDbProxy: Influ
             if (cont.key !in prevContainers.keys) {
                 sendAlert(
                     Alert(
-                    hostSummary.id,
-                    AlertType.WARN,
-                    "Host ${hostSummary.id}: new container: ${cont.value.name}"
-                )
+                        hostSummary.id,
+                        AlertType.WARN,
+                        "Host $hostName: new container: ${cont.value.name}"
+                    )
                 )
             }
             val container = cont.value
             if (container.alertType != prevContainers[container.id]!!.alertType){
-                val alertMessage = "Host ${hostSummary.id}: something wrong with container ${container.name}. " +
-                        "State: ${container.status.humaneReadable()}"
+                val alertMessage: String = if (container.alertType != AlertType.OK) {
+                    "Host $hostName: something wrong with container ${container.name}. " +
+                            "State: ${container.status.humaneReadable()}"
+                } else {
+                    "Host $hostName: container ${container.name} is back. " +
+                            "State: ${container.status.humaneReadable()}"
+                }
                 sendAlert(Alert(hostSummary.id, container.alertType!!, alertMessage))
             }
         }
     }
 
-    fun initialCheckForAlertSummary(hostSummary: HostSummary) {
+    fun initialCheckForAlertSummary(hostSummary: HostSummary, hostName: String) {
         logger.debug("Initial check for alerts")
         val mockPrevHostSummary = HostSummary(
-            -1,
+            UUID.randomUUID(),
             "123",
             listOf(
                 BasicMetric(MetricType.CPU_USAGE, 0.0, 0.0, 0.0, AlertType.OK),
@@ -94,7 +107,7 @@ class AlertService(val template: SimpMessagingTemplate, val influxDbProxy: Influ
         )
         mockPrevHostSummary.containers.map { it.copy() }.forEach { it.alertType = AlertType.OK }
 
-        checkForAlertSummary(hostSummary, mockPrevHostSummary)
+        checkForAlertSummary(hostSummary, mockPrevHostSummary, hostName)
     }
 
     fun appendAlertTypeToMetrics(hostSummary: HostSummary, rules: MutableSet<MetricRule>){
@@ -117,7 +130,7 @@ class AlertService(val template: SimpMessagingTemplate, val influxDbProxy: Influ
         else -> basicMetric.alertType = AlertType.WARN
     }
 
-    fun appendAlertTypeToContainers(hostSummary: HostSummary, rules: List<ContainerRule>) {
+    fun appendAlertTypeToContainers(hostSummary: HostSummary, rules: List<ContainerRule>, hostName: String) {
         val containers = hostSummary.containers
         val containerMap = containers.associateBy { it.name }
         for (rule in rules) {
@@ -126,7 +139,7 @@ class AlertService(val template: SimpMessagingTemplate, val influxDbProxy: Influ
                     Alert(
                         hostSummary.id,
                         AlertType.CRITICAL,
-                        "Host ${hostSummary.id}: missing container ${rule.containerName}"
+                        "Host $hostName: missing container ${rule.containerName}"
                     )
                 )
             }

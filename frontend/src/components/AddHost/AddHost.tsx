@@ -46,7 +46,7 @@ interface AddHostProps {
 }
 
 export interface PostHostResponse {
-  id: number;
+  id: string;
   hostName: string;
   ip: string;
   hostRules: HostRule[];

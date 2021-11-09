@@ -37,12 +37,12 @@ export const openRoutes: Route[] = [
     component: AlertsDashboard,
   },
   {
-    path: "/host/:id(\\d+)",
+    path: "/host/:id",
     exact: true,
     component: HostBoard,
   },
   {
-    path: "/host/:id(\\d+)/edit",
+    path: "/host/:id/edit",
     exact: true,
     component: EditHost,
   },

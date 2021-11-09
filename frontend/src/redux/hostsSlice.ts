@@ -6,7 +6,7 @@ import { Host, HostSummary } from "../common/types";
 export interface HostState {
   status: "LOADING" | "ERROR" | "LOADED";
   hosts: {
-    [id: number]: Host;
+    [id: string]: Host;
   };
 }
 
@@ -42,15 +42,15 @@ export const hostsSlice = createSlice({
         const hosts = action.payload.body;
         if (hosts == null) {
           state.status = "ERROR";
-          state.hosts = [];
+          state.hosts = {};
         } else if (hosts.length > 0) {
-          state.hosts = [];
+          state.hosts = {};
           hosts.forEach((e: Host) => {
             state.hosts[e.id] = e;
           });
           state.status = "LOADED";
         } else {
-          state.hosts = [];
+          state.hosts = {};
           state.status = "LOADED";
         }
       });
