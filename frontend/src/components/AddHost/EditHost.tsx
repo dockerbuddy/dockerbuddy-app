@@ -9,7 +9,7 @@ import AddHost, { AddHostFormData, PostHostResponse } from "./AddHost";
 type HParam = { id: string };
 
 const EditHost: React.FC<RouteComponentProps<HParam>> = ({ match }) => {
-  const hostId = parseInt(match.params.id);
+  const hostId = match.params.id;
   const [formData, setFormData] = useState<AddHostFormData | null>(null);
 
   const getHostSettings = async () => {

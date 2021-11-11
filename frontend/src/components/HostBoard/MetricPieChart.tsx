@@ -59,7 +59,7 @@ const MetricPieChart: React.FC<{
   const dataColors = [
     //@ts-ignore
     alertTypeToColor(AlertType[metric.alertType]),
-    "transparent",
+    "#333333",
   ];
 
   const state = {
