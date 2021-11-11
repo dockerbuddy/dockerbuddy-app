@@ -2,9 +2,7 @@ package pl.edu.agh.dockerbuddy.controller
 
 import io.swagger.annotations.*
 import kotlinx.coroutines.*
-import okhttp3.Response
 import org.slf4j.LoggerFactory
-import org.springframework.beans.factory.annotation.Value
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.validation.annotation.Validated
@@ -14,9 +12,7 @@ import pl.edu.agh.dockerbuddy.controller.response.ResponseType
 import pl.edu.agh.dockerbuddy.influxdb.AlertRecord
 import pl.edu.agh.dockerbuddy.influxdb.CustomFluxRecord
 import pl.edu.agh.dockerbuddy.influxdb.InfluxDbProxy
-import pl.edu.agh.dockerbuddy.model.alert.Alert
 import java.util.*
-import javax.validation.constraints.Pattern
 
 @Api(tags = ["Influx"])
 @RestController
@@ -54,7 +50,7 @@ class InfluxController (
             name = "end",
             value = "End time, must be greater than start time",
             dataTypeClass = String::class
-        ),
+        )
     ])
     @GetMapping(produces = ["application/json"])
     fun getHostMetricFromRange(
