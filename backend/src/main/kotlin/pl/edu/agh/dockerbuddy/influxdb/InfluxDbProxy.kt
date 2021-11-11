@@ -133,8 +133,8 @@ class InfluxDbProxy {
         val alertPoint = Point.measurement("alerts")
                 .addTag("host_id", alert.hostId.toString())
                 .addTag("alert_type", alert.alertType.toString())
-                .addTag("read", alert.read.toString())
-                .addField("message", alert.alertMessage)
+                .addTag("message", alert.alertMessage)
+                .addField("read", alert.read.toString())
                 .time(time, WritePrecision.MS)
 
         writeApi.writePoint(alertPoint)
@@ -150,23 +150,24 @@ class InfluxDbProxy {
 
     private suspend fun queryAlerts(hostId: UUID?, start: String, end: String?, read: Boolean?): List<AlertRecord> {
         val influxDBClient = InfluxDBClientKotlinFactory.create(url, token.toCharArray(), organization, bucket)
-        val fluxQuery = ("from(bucket: \"$bucket\")\n"
-                + " |> range(start: $start, stop: ${end ?: "now()"})"
-                + " |> filter(fn: (r) => (" +
-                "r._measurement == \"alerts\" and " +
-                "r._field == \"message\" " +
-                if (read != null) "and r.read == \"$read\" " else " " +
-                if (hostId != null) "and r.host_id == \"$hostId\"))" else "))"
+        val fluxQuery = ("from(bucket: \"$bucket\")\n " +
+                "|> range(start: $start, stop: ${end ?: "now()"}) " +
+                "|> filter(fn: (r) => (" +
+                "r._measurement == \"alerts\" " +
+                (if (read != null) "and r._value == \"$read\" " else "") +
+                (if (hostId != null) "and r.host_id == \"$hostId\"))" else "))")
             )
 
+        logger.info(fluxQuery)
+
         val result = influxDBClient.getQueryKotlinApi().query(fluxQuery).toList().map {
-            logger.info(it.value.toString())
+            logger.info(it.toString())
             AlertRecord(
                 UUID.fromString(it.values["host_id"].toString()),
                 AlertType.valueOf(it.values["alert_type"].toString()),
-                it.value as String,
+                it.values["message"].toString(),
                 it.time.toString(),
-                it.values["read"].toString().toBoolean()
+                it.value.toString().toBoolean()
             ) }.sortedByDescending { it.time }
 
         logger.info("${result.size} records fetched form InfluxDB")
