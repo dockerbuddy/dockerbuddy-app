@@ -31,6 +31,8 @@ class InfluxDbProxy {
 
     private val logger = LoggerFactory.getLogger(InfluxDbProxy::class.java)
 
+    @Volatile var alertCounter = 0
+
     var checklist = mutableListOf<String>()
 
     init {
@@ -114,14 +116,15 @@ class InfluxDbProxy {
         return result
     }
 
-    suspend fun saveAlerts(alertList: List<Alert>): List<Alert> {
-        for (alert in alertList) {
-            saveAlert(alert)
+    suspend fun saveAlerts(alertList: List<AlertRecord>): List<AlertRecord> {
+        for (alertRecord in alertList) {
+            alertCounter = if (alertCounter > 0) --alertCounter else alertCounter
+            saveAlert(Alert(alertRecord.hostId, alertRecord.alertType, alertRecord.alertMessage, true), Instant.parse(alertRecord.time).toEpochMilli())
         }
         return alertList
     }
 
-    suspend fun saveAlert(alert: Alert) {
+    suspend fun saveAlert(alert: Alert, time: Long = Instant.now().toEpochMilli()) {
         logger.info("Saving alert for hostId ${alert.hostId}")
         logger.debug("$alert")
         val influxDBClient = InfluxDBClientKotlinFactory.create(url, token.toCharArray(), organization, bucket)
@@ -132,7 +135,7 @@ class InfluxDbProxy {
                 .addTag("alert_type", alert.alertType.toString())
                 .addTag("read", alert.read.toString())
                 .addField("message", alert.alertMessage)
-                .time(Instant.now().toEpochMilli(), WritePrecision.MS)
+                .time(time, WritePrecision.MS)
 
         writeApi.writePoint(alertPoint)
     }
@@ -141,7 +144,7 @@ class InfluxDbProxy {
         return when {
             fetchAll -> queryAlerts(hostId, start, end, null)
             read != null -> queryAlerts(hostId, start, end, read)
-            else -> throw IllegalArgumentException("If not fetching all hosts 'read' param must be specified")
+            else -> throw IllegalArgumentException("If not fetching all hosts, 'read' param must be specified")
         }
     }
 
@@ -159,10 +162,11 @@ class InfluxDbProxy {
         val result = influxDBClient.getQueryKotlinApi().query(fluxQuery).toList().map {
             logger.info(it.value.toString())
             AlertRecord(
-                    UUID.fromString(it.values["host_id"].toString()),
-                    AlertType.valueOf(it.values["alert_type"].toString()),
-                    it.value as String,
-                    it.time.toString()
+                UUID.fromString(it.values["host_id"].toString()),
+                AlertType.valueOf(it.values["alert_type"].toString()),
+                it.value as String,
+                it.time.toString(),
+                it.values["read"].toString().toBoolean()
             ) }.sortedByDescending { it.time }
 
         logger.info("${result.size} records fetched form InfluxDB")

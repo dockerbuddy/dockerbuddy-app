@@ -12,5 +12,5 @@ data class ContainerSummary(
     val image: String,
     @JsonAlias("state") val status: ContainerState,
     val metrics: List<BasicMetric>,
-    var alertType: AlertType?,
+    var alertType: AlertType?, // TODO change to container watched state
 )

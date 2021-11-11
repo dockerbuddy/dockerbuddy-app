@@ -5,7 +5,6 @@ import java.util.*
 data class Alert (
     val hostId: UUID,
     val alertType: AlertType,
-    val alertMessage: String
-) {
+    val alertMessage: String,
     var read: Boolean = false
-}
+)

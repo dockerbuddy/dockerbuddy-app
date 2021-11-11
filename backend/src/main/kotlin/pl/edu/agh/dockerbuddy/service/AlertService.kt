@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service
 import pl.edu.agh.dockerbuddy.influxdb.InfluxDbProxy
 import pl.edu.agh.dockerbuddy.model.alert.Alert
 import pl.edu.agh.dockerbuddy.model.alert.AlertType
+import pl.edu.agh.dockerbuddy.model.alert.AlertWithCounter
 import pl.edu.agh.dockerbuddy.model.enums.ContainerState
 import pl.edu.agh.dockerbuddy.model.enums.RuleType
 import pl.edu.agh.dockerbuddy.model.entity.ContainerRule
@@ -25,7 +26,8 @@ class AlertService(val template: SimpMessagingTemplate, val influxDbProxy: Influ
 
     fun sendAlert(alert: Alert) {
         logger.info("Sending alert...")
-        template.convertAndSend("/alerts", alert)
+        influxDbProxy.alertCounter += 1
+        template.convertAndSend("/alerts", AlertWithCounter(alert, influxDbProxy.alertCounter))
         CoroutineScope(Dispatchers.IO).launch {
             influxDbProxy.saveAlert(alert)
         }
