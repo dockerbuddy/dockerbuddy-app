@@ -158,8 +158,6 @@ class InfluxDbProxy {
                 (if (hostId != null) "and r.host_id == \"$hostId\"))" else "))")
             )
 
-        logger.info(fluxQuery)
-
         val result = influxDBClient.getQueryKotlinApi().query(fluxQuery).toList().map {
             logger.info(it.toString())
             AlertRecord(
