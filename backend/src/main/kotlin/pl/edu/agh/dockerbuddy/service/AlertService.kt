@@ -163,7 +163,7 @@ class AlertService(val template: SimpMessagingTemplate, val influxDbProxy: Influ
 
     fun addAlertTypeToContainer(containerSummary: ContainerSummary, rule: ContainerRule) = when {
         ContainerState.RUNNING != containerSummary.status ->
-            containerSummary.alertType = rule.alertType
+            containerSummary.alertType = AlertType.CRITICAL
         else -> containerSummary.alertType = AlertType.OK
     }
 }

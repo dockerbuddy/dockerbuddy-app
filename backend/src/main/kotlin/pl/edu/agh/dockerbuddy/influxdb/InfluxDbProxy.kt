@@ -119,7 +119,12 @@ class InfluxDbProxy {
     suspend fun saveAlerts(alertList: List<AlertRecord>): List<AlertRecord> {
         for (alertRecord in alertList) {
             alertCounter = if (alertCounter > 0) --alertCounter else alertCounter
-            saveAlert(Alert(alertRecord.hostId, alertRecord.alertType, alertRecord.alertMessage, true), Instant.parse(alertRecord.time).toEpochMilli())
+            saveAlert(
+                Alert(alertRecord.hostId,
+                    alertRecord.alertType,
+                    alertRecord.alertMessage,
+                    true),
+                Instant.parse(alertRecord.time).toEpochMilli())
         }
         return alertList
     }
