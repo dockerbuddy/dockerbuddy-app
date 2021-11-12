@@ -40,7 +40,7 @@ const Dashboard: React.FC = () => {
           <Alert severity="error"> BRAK POLACZENIA Z SERWEREM </Alert>
         </Grid>
       )}
-      {(hostsData.status === "LOADED" || hostsData.status === "LOADING") &&
+      {hostsData.status === "LOADED" &&
         (Object.values(hostsData.hosts).length == 0 ? (
           <Grid
             container
