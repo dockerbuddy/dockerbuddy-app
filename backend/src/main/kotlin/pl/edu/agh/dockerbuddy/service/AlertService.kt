@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service
 import pl.edu.agh.dockerbuddy.influxdb.InfluxDbProxy
 import pl.edu.agh.dockerbuddy.model.alert.Alert
 import pl.edu.agh.dockerbuddy.model.alert.AlertType
+import pl.edu.agh.dockerbuddy.model.alert.AlertWithCounter
 import pl.edu.agh.dockerbuddy.model.enums.ContainerState
 import pl.edu.agh.dockerbuddy.model.enums.RuleType
 import pl.edu.agh.dockerbuddy.model.entity.ContainerRule
@@ -25,7 +26,8 @@ class AlertService(val template: SimpMessagingTemplate, val influxDbProxy: Influ
 
     fun sendAlert(alert: Alert) {
         logger.info("Sending alert...")
-        template.convertAndSend("/alerts", alert)
+        influxDbProxy.alertCounter += 1
+        template.convertAndSend("/alerts", AlertWithCounter(alert, influxDbProxy.alertCounter))
         CoroutineScope(Dispatchers.IO).launch {
             influxDbProxy.saveAlert(alert)
         }
@@ -80,14 +82,20 @@ class AlertService(val template: SimpMessagingTemplate, val influxDbProxy: Influ
                 )
             }
             val container = cont.value
-            if (container.alertType != prevContainers[container.id]!!.alertType){
-                val alertMessage: String = if (container.alertType != AlertType.OK) {
-                    "Host $hostName: something wrong with container ${container.name}. " +
-                            "State: ${container.status.humaneReadable()}"
-                } else {
-                    "Host $hostName: container ${container.name} is back. " +
-                            "State: ${container.status.humaneReadable()}"
+            if(prevContainers[container.id] != null) {
+                if (container.alertType != prevContainers[container.id]!!.alertType) {
+                    val alertMessage: String = if (container.alertType != AlertType.OK) {
+                        "Host $hostName: something wrong with container ${container.name}. " +
+                                "State: ${container.status.humaneReadable()}"
+                    } else {
+                        "Host $hostName: container ${container.name} is back. " +
+                                "State: ${container.status.humaneReadable()}"
+                    }
+                    sendAlert(Alert(hostSummary.id, container.alertType!!, alertMessage))
                 }
+            } else if (container.alertType != AlertType.OK){
+                val alertMessage: String = "Host $hostName: something wrong with container ${container.name}. " +
+                                           "State: ${container.status.humaneReadable()}"
                 sendAlert(Alert(hostSummary.id, container.alertType!!, alertMessage))
             }
         }

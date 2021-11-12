@@ -24,5 +24,5 @@ class Host(
     var hostRules: MutableSet<MetricRule> = mutableSetOf(),
 
     @OneToMany(cascade = [CascadeType.ALL], orphanRemoval = true, fetch = FetchType.EAGER)
-    var containersRules: MutableSet<ContainerRule> = mutableSetOf()
+    var containersRules: MutableSet<ContainerRule> = mutableSetOf() // TODO persist container names + their watched states
 ): BaseIdEntity()
