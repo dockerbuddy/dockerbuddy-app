@@ -1,6 +1,7 @@
 package pl.edu.agh.dockerbuddy.service
 
 import org.slf4j.LoggerFactory
+import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 import pl.edu.agh.dockerbuddy.inmemory.InMemory
 import pl.edu.agh.dockerbuddy.model.HostWithSummary
@@ -80,6 +81,13 @@ class HostService (
         }
 
         return hostsWithSummary.toList()
+    }
+
+    fun updateHostContainerReport(id: UUID, updatedContainerReport: ContainerReport): Host {
+        val host = hostRepository.findByIdOrNull(id) ?: throw EntityNotFoundException("Host $id does not exist")
+        val containerName = updatedContainerReport.containerName
+        host.containers.find { it.containerName == containerName }?.reportStatus = updatedContainerReport.reportStatus
+        return hostRepository.save(host)
     }
 
     fun addContainersToHost(host: Host, containersSummaries: List<ContainerSummary>) {

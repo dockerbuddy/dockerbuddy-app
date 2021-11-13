@@ -17,7 +17,6 @@ import javax.persistence.EntityNotFoundException
 @Service
 class MetricService(
     val hostRepository: HostRepository,
-    val hostService: HostService,
     val alertService: AlertService,
     @Qualifier("InMemoryStorage") val inMemory: InMemory,
     val influxDbProxy: InfluxDbProxy,
