@@ -4,7 +4,10 @@ import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import pl.edu.agh.dockerbuddy.inmemory.InMemory
 import pl.edu.agh.dockerbuddy.model.HostWithSummary
+import pl.edu.agh.dockerbuddy.model.entity.ContainerReport
 import pl.edu.agh.dockerbuddy.model.entity.Host
+import pl.edu.agh.dockerbuddy.model.enums.ReportStatus
+import pl.edu.agh.dockerbuddy.model.metric.ContainerSummary
 import pl.edu.agh.dockerbuddy.repository.HostRepository
 import java.util.*
 import javax.persistence.EntityNotFoundException
@@ -48,19 +51,9 @@ class HostService (
             host.hostName!!,
             host.ip!!,
             host.hostRules.toList().sortedBy { it.id },
-            host.containersRules.toList().sortedBy { it.id },
+            host.containers.toList().sortedBy { it.id },
             hostSummary
         )
-    }
-
-    fun getHostWithSettings(id: UUID): Host {
-        logger.info("Fetching host $id")
-        val foundHost = hostRepository.findById(id)
-        if (foundHost.isEmpty) throw EntityNotFoundException("Host $id does not exist")
-        val host = foundHost.get()
-        host.containersRules.sortedBy { it.id }
-        host.hostRules.sortedBy { it.id }
-        return host
     }
 
     fun getAllHostsWithSummaries(): List<HostWithSummary> {
@@ -80,12 +73,24 @@ class HostService (
                     host.hostName!!,
                     host.ip!!,
                     host.hostRules.toList().sortedBy { it.id },
-                    host.containersRules.toList().sortedBy { it.id },
+                    host.containers.toList().sortedBy { it.id },
                     hostSummary
                 )
             )
         }
 
         return hostsWithSummary.toList()
+    }
+
+    fun addContainersToHost(host: Host, containersSummaries: List<ContainerSummary>) {
+        for (containerSummary in containersSummaries) {
+            addContainerToHost(host, containerSummary)
+        }
+        hostRepository.save(host)
+    }
+
+    private fun addContainerToHost(host: Host, containerSummary: ContainerSummary) {
+        val containerReport = ContainerReport(containerSummary.name, ReportStatus.NEW)
+        host.containers.add(containerReport)
     }
 }
