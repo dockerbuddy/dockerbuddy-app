@@ -101,7 +101,7 @@ class InfluxDbProxy {
                 + " |> range(start: $start, stop: $end)"
                 + " |> filter(fn: (r) => (" +
                     "r._measurement == \"host_stats\" and " +
-                    "r.host_id == \"$hostId.\" and " +
+                    "r.host_id == \"$hostId\" and " +
                     "r._field == \"$metricTypeVariationLowercase\"))"
                 )
 
