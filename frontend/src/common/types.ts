@@ -60,6 +60,11 @@ export interface AlertsResponseElement {
   time: Date;
 }
 
+export interface AlertsSummary {
+  alert: AlertsResponseElement;
+  alertsCounter: number;
+}
+
 export interface Alert {
   hostId: string;
   alertType: AlertType;

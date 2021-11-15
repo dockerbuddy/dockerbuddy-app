@@ -1,4 +1,3 @@
-/* eslint-disable */
 import {
   ButtonBase,
   Card,
@@ -20,7 +19,7 @@ import MetricPieChart from "./MetricPieChart";
 import { extractHostRule, extractMetric } from "../../util/util";
 import { MetricType, RuleType } from "../../common/enums";
 
-const useStyles = makeStyles((theme) => ({
+const useStyles = makeStyles(() => ({
   pieChartButton: {
     paddingTop: "40px",
   },
@@ -97,9 +96,20 @@ const HostBoard: React.FC<RouteComponentProps<HParam>> = ({ match }) => {
               </Grid>
               <Grid item container spacing={5}>
                 <Grid item xs={4}>
-                  <ButtonBase 
-                    className={[activeMetric == MetricType.CPU_USAGE ? classes.activeColor : classes.inactiveColor, classes.pieChartButton].filter(e => !!e).join(' ')}
-                    style={{ width:"100%", height:"100%"}} onClick={() => {setActiveMetric(MetricType.CPU_USAGE)}}>
+                  <ButtonBase
+                    className={[
+                      activeMetric == MetricType.CPU_USAGE
+                        ? classes.activeColor
+                        : classes.inactiveColor,
+                      classes.pieChartButton,
+                    ]
+                      .filter((e) => !!e)
+                      .join(" ")}
+                    style={{ width: "100%", height: "100%" }}
+                    onClick={() => {
+                      setActiveMetric(MetricType.CPU_USAGE);
+                    }}
+                  >
                     {mem == undefined ? (
                       <Alert severity="error"> No CPU data to show </Alert>
                     ) : (
@@ -108,30 +118,61 @@ const HostBoard: React.FC<RouteComponentProps<HParam>> = ({ match }) => {
                   </ButtonBase>
                 </Grid>
                 <Grid item xs={4}>
-                  <ButtonBase 
-                    className={[activeMetric == MetricType.MEMORY_USAGE ? classes.activeColor : classes.inactiveColor, classes.pieChartButton].filter(e => !!e).join(' ')} 
-                    style={{ width:"100%", height:"100%"}} onClick={() => {setActiveMetric(MetricType.MEMORY_USAGE)}}>
+                  <ButtonBase
+                    className={[
+                      activeMetric == MetricType.MEMORY_USAGE
+                        ? classes.activeColor
+                        : classes.inactiveColor,
+                      classes.pieChartButton,
+                    ]
+                      .filter((e) => !!e)
+                      .join(" ")}
+                    style={{ width: "100%", height: "100%" }}
+                    onClick={() => {
+                      setActiveMetric(MetricType.MEMORY_USAGE);
+                    }}
+                  >
                     {mem == undefined ? (
                       <Alert severity="error"> No memory data to show </Alert>
                     ) : (
-                      <MetricPieChart metric={mem} name="MEMORY" rule={memRule} />
+                      <MetricPieChart metric={mem} name="MEM" rule={memRule} />
                     )}
                   </ButtonBase>
                 </Grid>
                 <Grid item xs={4}>
                   <ButtonBase
-                    className={[activeMetric == MetricType.DISK_USAGE ? classes.activeColor : classes.inactiveColor, classes.pieChartButton].filter(e => !!e).join(' ')}
-                    style={{ width:"100%", height:"100%"}} onClick={() => {setActiveMetric(MetricType.DISK_USAGE)}}>
+                    className={[
+                      activeMetric == MetricType.DISK_USAGE
+                        ? classes.activeColor
+                        : classes.inactiveColor,
+                      classes.pieChartButton,
+                    ]
+                      .filter((e) => !!e)
+                      .join(" ")}
+                    style={{ width: "100%", height: "100%" }}
+                    onClick={() => {
+                      setActiveMetric(MetricType.DISK_USAGE);
+                    }}
+                  >
                     {mem == undefined ? (
                       <Alert severity="error"> No disk data to show </Alert>
                     ) : (
-                      <MetricPieChart metric={disk} name="DISK" rule={diskRule} />
+                      <MetricPieChart
+                        metric={disk}
+                        name="DISK"
+                        rule={diskRule}
+                      />
                     )}
                   </ButtonBase>
                 </Grid>
               </Grid>
-              <Grid item className={[classes.activeColor, classes.shortenTopMargin].filter(e => !!e).join(' ')}>
-                <InfluxHistory hostId={hostId} activeMetric={activeMetric}/>
+              <Grid
+                item
+                className={[classes.activeColor, classes.shortenTopMargin]
+                  .filter((e) => !!e)
+                  .join(" ")}
+              >
+                <InfluxHistory hostId={hostId} activeMetric={activeMetric} />
               </Grid>
             </Grid>
           </CardContent>
