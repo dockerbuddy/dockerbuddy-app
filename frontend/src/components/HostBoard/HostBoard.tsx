@@ -1,6 +1,7 @@
 import {
   Card,
   CardContent,
+  Container,
   Grid,
   IconButton,
   Typography,
@@ -31,7 +32,7 @@ const HostBoard: React.FC<RouteComponentProps<HParam>> = ({ match }) => {
   };
 
   return (
-    <>
+    <Container maxWidth="xl">
       {hostData !== undefined ? (
         <Card>
           <CardContent>
@@ -74,7 +75,7 @@ const HostBoard: React.FC<RouteComponentProps<HParam>> = ({ match }) => {
       ) : (
         <Alert severity="error"> Host not found </Alert>
       )}
-    </>
+    </Container>
   );
 };
 
