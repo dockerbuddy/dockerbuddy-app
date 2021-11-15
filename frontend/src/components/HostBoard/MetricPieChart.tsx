@@ -87,7 +87,7 @@ const MetricPieChart: React.FC<{
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     //@ts-ignore
     alertTypeToColor(AlertType[metric.alertType]),
-    "transparent",
+    "#333333",
   ];
 
   const state = {

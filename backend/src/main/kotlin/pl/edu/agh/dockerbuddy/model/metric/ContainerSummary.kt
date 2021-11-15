@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonAlias
 import lombok.ToString
 import pl.edu.agh.dockerbuddy.model.alert.AlertType
 import pl.edu.agh.dockerbuddy.model.enums.ContainerState
+import pl.edu.agh.dockerbuddy.model.enums.ReportStatus
 
 @ToString
 data class ContainerSummary(
@@ -12,5 +13,6 @@ data class ContainerSummary(
     val image: String,
     @JsonAlias("state") val status: ContainerState,
     val metrics: List<BasicMetric>,
-    var alertType: AlertType?, // TODO change to container watched state
+    var alertType: AlertType?,
+    var reportStatus: ReportStatus?
 )

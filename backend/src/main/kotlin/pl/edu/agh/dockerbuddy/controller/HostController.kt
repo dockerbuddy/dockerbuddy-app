@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.*
 import pl.edu.agh.dockerbuddy.controller.response.DefaultResponse
 import pl.edu.agh.dockerbuddy.controller.response.ResponseType
 import pl.edu.agh.dockerbuddy.model.HostWithSummary
+import pl.edu.agh.dockerbuddy.model.entity.ContainerReport
 import pl.edu.agh.dockerbuddy.model.entity.Host
 import pl.edu.agh.dockerbuddy.service.HostService
 import java.util.*
@@ -84,5 +85,22 @@ class HostController (
         val updatedHost = hostService.updateHost(id, host)
         return ResponseEntity.status(HttpStatus.OK)
             .body(DefaultResponse(ResponseType.SUCCESS, "Host updated", updatedHost))
+    }
+
+    @ApiOperation(value = "Update container report status (marked as watched or not)")
+    @ApiImplicitParams(value = [
+        ApiImplicitParam(
+            name = "id",
+            value = "Id of a host",
+            dataTypeClass = UUID::class,
+            example = "1e85551a-d9bd-4a9c-bc62-81207553c9fd"
+        )
+    ])
+    @PutMapping(value = ["/{id}/container"], produces = ["application/json"])
+    fun updateContainer(@PathVariable id: UUID, @RequestBody @Valid containerReport: ContainerReport):
+            ResponseEntity<DefaultResponse<Host>> {
+        val updatedHost = hostService.updateHostContainerReport(id, containerReport)
+        return ResponseEntity.status(HttpStatus.OK)
+            .body(DefaultResponse(ResponseType.SUCCESS, "Container report updated", updatedHost))
     }
 }
