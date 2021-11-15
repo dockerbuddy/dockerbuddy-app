@@ -1,10 +1,10 @@
 /* eslint-disable @typescript-eslint/ban-ts-comment */
 import React from "react";
 import { Cell, Pie, PieChart, ResponsiveContainer, Sector } from "recharts";
-import { AlertType } from "../../common/enums";
-import { BasicMetric, HostRule } from "../../common/types";
-import { alertColors } from "../../util/alertStyle";
-import { alertTypeToColor } from "../../util/util";
+import { AlertType } from "../../../common/enums";
+import { BasicMetric, HostRule } from "../../../common/types";
+import { alertColors } from "../../../util/alertStyle";
+import { alertTypeToColor } from "../../../util/util";
 
 const renderActiveShape = (props: any) => {
   const {
