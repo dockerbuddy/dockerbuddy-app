@@ -11,16 +11,18 @@ interface HostInfoProps {
 }
 
 const HostInfo: React.FC<HostInfoProps> = ({ hostData }) => {
-  //   const metric = extractMetric(
-  //     hostData.hostSummary.metrics,
-  //     MetricType.CPU_USAGE
-  //   );
+  const metric = extractMetric(
+    hostData?.hostSummary?.metrics,
+    MetricType.CPU_USAGE
+  );
 
-  //   console.log(metric);
+  console.log(metric);
   return (
-    <Grid container>
+    <Grid container direction="column">
       <Grid item>{hostData.id}</Grid>
-      <Grid item>asdasd</Grid>
+      <Grid item>
+        <ProgressBarComponent name={"CPU"} metric={metric} />
+      </Grid>
       <Grid item>Sth else</Grid>
     </Grid>
   );
