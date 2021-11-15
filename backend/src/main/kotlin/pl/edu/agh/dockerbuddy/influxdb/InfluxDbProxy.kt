@@ -3,7 +3,10 @@ package pl.edu.agh.dockerbuddy.influxdb
 import com.influxdb.client.kotlin.InfluxDBClientKotlinFactory
 import com.influxdb.client.domain.WritePrecision
 import com.influxdb.client.write.Point
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.toList
+import kotlinx.coroutines.launch
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Service
@@ -44,7 +47,12 @@ class InfluxDbProxy {
                 checklist.add(metric.lowercase() + "_" + variation)
             }
         }
-        println(checklist)
+
+        var unreadAlerts: List<AlertRecord>
+        CoroutineScope(Dispatchers.IO).launch {
+            unreadAlerts = queryAlerts(null, "1970-01-01T00:00:00Z", null,false)
+            alertCounter = unreadAlerts.size
+        }
     }
 
     suspend fun saveMetric(hostId: UUID, hostSummary: HostSummary) {
