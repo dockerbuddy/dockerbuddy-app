@@ -1,6 +1,4 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 import {
-  Box,
   Card,
   CardContent,
   Container,
@@ -11,7 +9,7 @@ import {
   Typography,
 } from "@material-ui/core";
 import SettingsIcon from "@material-ui/icons/Settings";
-import { Alert, TabContext, TabList, TabPanel } from "@material-ui/lab";
+import { Alert } from "@material-ui/lab";
 import React from "react";
 import { RouteComponentProps } from "react-router-dom";
 import { selectHost } from "../../redux/hostsSlice";
@@ -36,10 +34,21 @@ const HostBoard: React.FC<RouteComponentProps<HParam>> = ({ match }) => {
     setAnchorEl(null);
   };
 
-  const [value, setValue] = React.useState("1");
+  const components = {
+    "1": <HostInfo hostData={hostData} />,
+    "2": <HostInfo hostData={hostData} />,
+    "3": <HostStats hostData={hostData} />,
+  };
+
+  const [value, setValue] = React.useState<string>("1");
+  const [displayedComponent, setDisplayedComponent] =
+    React.useState<JSX.Element>(components["1"]);
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const handleChange = (event: any, newValue: string) => {
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    //@ts-ignore
+    setDisplayedComponent(components[newValue]);
     setValue(newValue);
   };
 
@@ -75,9 +84,11 @@ const HostBoard: React.FC<RouteComponentProps<HParam>> = ({ match }) => {
                 </Grid>
               </Grid>
               <Tabs value={value} onChange={handleChange}>
-                <Tab label="Item One" />
-                <Tab label="Item Two" />
+                <Tab label="Details" value={"1"} />
+                <Tab label="Alerts" value={"2"} />
+                <Tab label="Charts" value={"3"} />
               </Tabs>
+              <Grid item>{displayedComponent}</Grid>
             </Grid>
           </CardContent>
           <HostMenu

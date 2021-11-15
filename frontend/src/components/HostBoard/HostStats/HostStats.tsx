@@ -43,7 +43,7 @@ const HostStats: React.FC<HostStatsProps> = ({ hostData }) => {
   );
   return (
     <>
-      <Grid item container spacing={5}>
+      <Grid container spacing={5}>
         <Grid item xs={4}>
           <ButtonBase
             className={[
