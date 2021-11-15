@@ -4,6 +4,7 @@ import React, { useEffect, useState } from "react";
 import { proxy } from "../../common/api";
 import { AlertsResponseElement, StandardApiResponse } from "../../common/types";
 import { paramsToString } from "../../util/util";
+import AlertElement from "../AlertsDashboard/AlertElement";
 
 interface AlertsListProps {
   anchorEl: null | HTMLElement;
@@ -17,7 +18,9 @@ const AlertsListComponent: React.FC<AlertsListProps> = ({
   handleClose,
 }) => {
   const [alerts, setAlerts] = useState<AlertsResponseElement[]>([]);
-  const alertsToDelete: AlertsResponseElement[] = [];
+  const [alertsToDelete, setAlertsToDelete] = useState<AlertsResponseElement[]>(
+    []
+  );
 
   useEffect(() => {
     if (open) {
@@ -46,15 +49,25 @@ const AlertsListComponent: React.FC<AlertsListProps> = ({
   const onClose = async () => {
     if (alertsToDelete.length > 0) {
       const response = await fetch(`${proxy}/influxdb/alerts`, {
-        method: "POST",
+        method: "PUT",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify(alertsToDelete),
       });
-      if (!response.ok) {
+      if (response.ok) {
+        setAlertsToDelete([]);
+      } else {
         console.log("COULDN'T DELETE");
       }
+    }
+  };
+
+  const handleAlertClick = (alert: AlertsResponseElement) => {
+    if (alertsToDelete.includes(alert)) {
+      setAlertsToDelete((arr) => arr.filter((a) => a === alert));
+    } else {
+      setAlertsToDelete((arr) => [...arr, alert]);
     }
   };
 
@@ -70,11 +83,17 @@ const AlertsListComponent: React.FC<AlertsListProps> = ({
     >
       {Object.values(alerts).map((alert: AlertsResponseElement) => {
         return (
-          <MenuItem key={alert.alertMessage}>
+          <MenuItem
+            key={
+              alert.alertMessage + alert.hostId + alert.alertType + alert.time
+            }
+            onClick={() => handleAlertClick(alert)}
+          >
             <ListItemIcon>
               <Edit />
             </ListItemIcon>
-            <ListItemText>{alert.alertMessage}</ListItemText>
+            <AlertElement alert={alert} showDate={true} />
+            {/* <ListItemText>{alert.alertMessage}</ListItemText> */}
           </MenuItem>
         );
       })}
