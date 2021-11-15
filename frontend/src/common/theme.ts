@@ -28,8 +28,11 @@ const theme = createMuiTheme({
       "@global": {
         body: {
           background:
-            "linear-gradient(40deg, rgba(26,19,59,1) 0%, rgba(8,1,9,1) 20%, rgba(8,1,9,1) 80%, rgba(62,45,9,1) 100%);",
-          // "linear-gradient(40deg, #fe6b8b 30%, #ff8e53 90%)",
+            // "linear-gradient(40deg, rgba(26,19,59,1) 0%, rgba(8,1,9,1) 20%, rgba(8,1,9,1) 80%, rgba(62,45,9,1) 100%);",
+            // "linear-gradient(40deg, #050609 0%, #FA8334 30%, #D65780 90%, #050609 100%)",
+            "linear-gradient(40deg, #200122, #6f0000)",
+          // "linear-gradient(40deg, #403a3e, #be5869)",
+          // "repeating-radial-gradient(#FA8334, #D65780, #FA8334 2000px)",
           // "linear-gradient(40deg, #a64258 30%, #a35a34 90%)",
           backgroundRepeat: "no-repeat",
           backgroundAttachment: "fixed",

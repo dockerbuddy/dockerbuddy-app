@@ -25,3 +25,9 @@ export enum ContainerState {
   EXITED,
   DEAD,
 }
+
+export enum ReportStatus {
+  NEW,
+  NOT_WATCHED,
+  WATCHED,
+}

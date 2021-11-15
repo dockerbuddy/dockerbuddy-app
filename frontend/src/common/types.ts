@@ -1,4 +1,10 @@
-import { RuleType, AlertType, ContainerState, MetricType } from "./enums";
+import {
+  RuleType,
+  AlertType,
+  ContainerState,
+  MetricType,
+  ReportStatus,
+} from "./enums";
 
 export type StandardApiResponse<T> = {
   type: string;
@@ -25,16 +31,16 @@ export interface Host {
   hostName: string;
   ip: string;
   hostSummary: HostSummary;
-  containersRules: ContainerRule[];
+  // containersRules: ContainerRule[];
   hostRules: HostRule[];
 }
 
-export interface ContainerRule {
-  id: string;
-  alertType: AlertType;
-  containerName: string;
-  type: RuleType; //todo MEM, CPU, DISK Usage right now isnt used
-}
+// export interface ContainerRule {
+//   id: string;
+//   alertType: AlertType;
+//   containerName: string;
+//   type: RuleType; //todo MEM, CPU, DISK Usage right now isnt used
+// }
 
 export interface Container {
   id: string;
@@ -43,6 +49,7 @@ export interface Container {
   status: ContainerState;
   metrics: BasicMetric[];
   alertType: AlertType;
+  reportStatus: ReportStatus;
 }
 
 export interface BasicMetric {
