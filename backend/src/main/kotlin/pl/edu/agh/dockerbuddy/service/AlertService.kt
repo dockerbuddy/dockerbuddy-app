@@ -174,6 +174,7 @@ class AlertService(
                             "Host ${host.hostName}: missing container ${report.containerName}"
                         )
                     )
+                    continue
                 }
                 addAlertTypeToContainer(containerMap[report.containerName]!!)
             }

@@ -81,7 +81,6 @@ class HostService (
                 )
             )
         }
-
         return hostsWithSummary.toList()
     }
 
