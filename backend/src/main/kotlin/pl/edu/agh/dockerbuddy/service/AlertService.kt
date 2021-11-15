@@ -12,7 +12,6 @@ import pl.edu.agh.dockerbuddy.model.alert.AlertType
 import pl.edu.agh.dockerbuddy.model.alert.AlertWithCounter
 import pl.edu.agh.dockerbuddy.model.enums.ContainerState
 import pl.edu.agh.dockerbuddy.model.enums.RuleType
-import pl.edu.agh.dockerbuddy.model.entity.ContainerReport
 import pl.edu.agh.dockerbuddy.model.entity.Host
 import pl.edu.agh.dockerbuddy.model.entity.MetricRule
 import pl.edu.agh.dockerbuddy.model.enums.ReportStatus
@@ -39,6 +38,17 @@ class AlertService(
         }
     }
 
+    fun appendAlertTypeToMetrics(hostSummary: HostSummary, rules: MutableSet<MetricRule>){
+        val hostMetrics = hostSummary.metrics.associateBy { it.metricType }
+        for (rule in rules) {
+            when (rule.type) {
+                RuleType.CPU_USAGE -> addAlertType(hostMetrics[MetricType.CPU_USAGE]!!, rule)
+                RuleType.MEMORY_USAGE -> addAlertType(hostMetrics[MetricType.MEMORY_USAGE]!!, rule)
+                RuleType.DISK_USAGE -> addAlertType(hostMetrics[MetricType.DISK_USAGE]!!, rule)
+            }
+        }
+    }
+
     fun checkForAlertSummary(hostSummary: HostSummary, prevHostSummary: HostSummary, host: Host){
         val hostMetrics = hostSummary.metrics.associateBy { it.metricType }
         val prevHostMetrics = prevHostSummary.metrics.associateBy { it.metricType }
@@ -50,7 +60,7 @@ class AlertService(
                 logger.warn("Missing metric $mt for host ${host.hostName}")
             }
         }
-        checkForAlerts(hostSummary.containers, prevHostSummary.containers, hostSummary, host)
+        checkForContainerAlerts(hostSummary, prevHostSummary.containers, host)
     }
 
     fun checkForAlert(
@@ -69,49 +79,60 @@ class AlertService(
         }
     }
 
-    fun checkForAlerts(
-        containersSummaries: List<ContainerSummary>,
-        prevContainersSummaries: List<ContainerSummary>,
+    fun checkForContainerAlerts(
         hostSummary: HostSummary,
+        prevContainersSummaryList: List<ContainerSummary>,
         host: Host
     ) {
-        val containers = containersSummaries.associateBy { it.id }
-        val prevContainers = prevContainersSummaries.associateBy { it.id }
-        val newContainers = mutableListOf<ContainerSummary>()
-        for (cont in containers) {
-            if (cont.key !in prevContainers.keys) {
-                sendAlert(
-                    Alert(
-                        hostSummary.id,
-                        AlertType.WARN,
-                        "Host ${host.hostName}: new container: ${cont.value.name}"
+        val containerReportMap = host.containers.associateBy { it.containerName }
+        val containerMap = hostSummary.containers.associateBy { it.id }
+        val prevContainerMap = prevContainersSummaryList.associateBy { it.id }
+        val newContainerList = mutableListOf<ContainerSummary>()
+        for (cont in containerMap) {
+            val containerSummary = cont.value
+            if (containerReportMap[containerSummary.name]?.reportStatus == null) {
+                if (containerSummary.id !in prevContainerMap.keys) {
+                    sendAlert(
+                        Alert(
+                            hostSummary.id,
+                            AlertType.WARN,
+                            "Host ${host.hostName}: new container: ${containerSummary.name}"
+                        )
                     )
-                )
-                newContainers.add(cont.value)
-            }
-            hostService.addContainersToHost(host, newContainers)
-            val container = cont.value
-            if(prevContainers[container.id] != null) {
-                if (container.alertType != prevContainers[container.id]!!.alertType) {
-                    val alertMessage: String = if (container.alertType != AlertType.OK) {
-                        "Host ${host.hostName}: something wrong with container ${container.name}. " +
-                                "State: ${container.status.humaneReadable()}"
-                    } else {
-                        "Host ${host.hostName}: container ${container.name} is back. " +
-                                "State: ${container.status.humaneReadable()}"
-                    }
-                    sendAlert(Alert(hostSummary.id, container.alertType!!, alertMessage))
+                    containerSummary.reportStatus = ReportStatus.NEW
+                    newContainerList.add(containerSummary)
                 }
-            } else if (container.alertType != AlertType.OK){
-                val alertMessage: String = "Host ${host.hostName}: something wrong with container ${container.name}. " +
-                                           "State: ${container.status.humaneReadable()}"
-                sendAlert(Alert(hostSummary.id, container.alertType!!, alertMessage))
+            } else {
+                containerSummary.reportStatus = containerReportMap[containerSummary.name]?.reportStatus
+            }
+
+            if(prevContainerMap[containerSummary.id] != null) {
+                if (containerReportMap[containerSummary.name]?.reportStatus == ReportStatus.WATCHED &&
+                    containerSummary.alertType != prevContainerMap[containerSummary.id]?.alertType
+                ) {
+                    val alertMessage = if (containerSummary.alertType != AlertType.OK) {
+                            "Host ${host.hostName}: something wrong with container ${containerSummary.name}. " +
+                                    "State: ${containerSummary.status.humaneReadable()}"
+                        } else {
+                            "Host ${host.hostName}: container ${containerSummary.name} is back. " +
+                                    "State: ${containerSummary.status.humaneReadable()}"
+                        }
+                    sendAlert(Alert(hostSummary.id, containerSummary.alertType!!, alertMessage))
+                }
+            } else if (containerSummary.alertType != AlertType.OK){
+                val alertMessage: String = "Host ${host.hostName}: something wrong with container ${containerSummary.name}. " +
+                                           "State: ${containerSummary.status.humaneReadable()}"
+                sendAlert(Alert(hostSummary.id, containerSummary.alertType!!, alertMessage))
             }
         }
+        hostService.addContainersToHost(host, newContainerList)
     }
 
     fun initialCheckForAlertSummary(hostSummary: HostSummary, host: Host) {
         logger.debug("Initial check for alerts")
+        val reportsMap = host.containers.associateBy { it.containerName }
+        val containerSummaryList = hostSummary.containers
+        val newContainers = mutableListOf<ContainerSummary>()
         val mockPrevHostSummary = HostSummary(
             UUID.randomUUID(),
             "123",
@@ -124,20 +145,13 @@ class AlertService(
         )
         mockPrevHostSummary.containers.map { it.copy() }.forEach { it.alertType = AlertType.OK }
 
-        checkForAlertSummary(hostSummary, mockPrevHostSummary, host)
-    }
-
-    fun appendAlertTypeToMetrics(hostSummary: HostSummary, rules: MutableSet<MetricRule>){
-        val hostMetrics = hostSummary.metrics.associateBy { it.metricType }
-        for (rule in rules) {
-            when (rule.type) {
-                RuleType.CPU_USAGE -> addAlertType(hostMetrics[MetricType.CPU_USAGE]!!, rule)
-                RuleType.MEMORY_USAGE -> addAlertType(hostMetrics[MetricType.MEMORY_USAGE]!!, rule)
-                RuleType.DISK_USAGE -> addAlertType(hostMetrics[MetricType.DISK_USAGE]!!, rule)
+        for (containerSummary in containerSummaryList) {
+            if (containerSummary.name !in reportsMap.keys) {
+                containerSummary.reportStatus = ReportStatus.NEW
+                newContainers.add(containerSummary)
             }
         }
-
-        hostSummary.containers.map { if (it.alertType == null) it.alertType = AlertType.OK }
+        checkForAlertSummary(hostSummary, mockPrevHostSummary, hostService.addContainersToHost(host, newContainers))
     }
 
     fun addAlertType(basicMetric: BasicMetric, rule: MetricRule) = when {
@@ -146,21 +160,22 @@ class AlertService(
         else -> basicMetric.alertType = AlertType.WARN
     }
 
-    fun appendAlertTypeToContainers(hostSummary: HostSummary, rules: List<ContainerReport>, hostName: String) {
+    fun appendAlertTypeToContainers(hostSummary: HostSummary, host: Host) {
+        val reports = host.containers.toList()
         val containers = hostSummary.containers
         val containerMap = containers.associateBy { it.name }
-        for (rule in rules) {
-            if (rule.reportStatus == ReportStatus.WATCHED) {
-                if (rule.containerName !in containerMap.keys) {
+        for (report in reports) {
+            if (report.reportStatus == ReportStatus.WATCHED) {
+                if (report.containerName !in containerMap.keys) {
                     sendAlert(
                         Alert(
                             hostSummary.id,
                             AlertType.CRITICAL,
-                            "Host $hostName: missing container ${rule.containerName}"
+                            "Host ${host.hostName}: missing container ${report.containerName}"
                         )
                     )
                 }
-                addAlertTypeToContainer(containerMap[rule.containerName]!!, rule)
+                addAlertTypeToContainer(containerMap[report.containerName]!!)
             }
         }
         containers.forEach {
@@ -168,7 +183,7 @@ class AlertService(
         }
     }
 
-    fun addAlertTypeToContainer(containerSummary: ContainerSummary, rule: ContainerReport) = when {
+    fun addAlertTypeToContainer(containerSummary: ContainerSummary) = when {
         ContainerState.RUNNING != containerSummary.status ->
             containerSummary.alertType = AlertType.CRITICAL
         else -> containerSummary.alertType = AlertType.OK

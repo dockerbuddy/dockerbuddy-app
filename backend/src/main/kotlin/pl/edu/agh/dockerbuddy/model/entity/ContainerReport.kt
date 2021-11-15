@@ -1,10 +1,12 @@
 package pl.edu.agh.dockerbuddy.model.entity
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import lombok.ToString
 import pl.edu.agh.dockerbuddy.model.enums.ReportStatus
 import javax.persistence.*
 
 @ToString
+@JsonIgnoreProperties("id")
 @Table(name = "container_report")
 @Entity
 class ContainerReport(

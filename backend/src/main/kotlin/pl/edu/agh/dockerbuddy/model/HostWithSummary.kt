@@ -12,6 +12,6 @@ data class HostWithSummary(
     val hostName: String,
     val ip: String,
     val hostRules: List<MetricRule>,
-    val containersRules: List<ContainerReport>,
+    val containersReports: List<ContainerReport>,
     val hostSummary: HostSummary?
 )

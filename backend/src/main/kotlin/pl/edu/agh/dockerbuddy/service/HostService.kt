@@ -1,6 +1,7 @@
 package pl.edu.agh.dockerbuddy.service
 
 import org.slf4j.LoggerFactory
+import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 import pl.edu.agh.dockerbuddy.inmemory.InMemory
@@ -9,6 +10,7 @@ import pl.edu.agh.dockerbuddy.model.entity.ContainerReport
 import pl.edu.agh.dockerbuddy.model.entity.Host
 import pl.edu.agh.dockerbuddy.model.enums.ReportStatus
 import pl.edu.agh.dockerbuddy.model.metric.ContainerSummary
+import pl.edu.agh.dockerbuddy.model.metric.HostSummary
 import pl.edu.agh.dockerbuddy.repository.HostRepository
 import java.util.*
 import javax.persistence.EntityNotFoundException
@@ -16,7 +18,7 @@ import javax.persistence.EntityNotFoundException
 @Service
 class HostService (
     private val hostRepository: HostRepository,
-    private val inMemory: InMemory,
+    @Qualifier("InMemoryStorage") val inMemory: InMemory,
 ){
     private val logger = LoggerFactory.getLogger(HostService::class.java)
 
@@ -87,14 +89,19 @@ class HostService (
         val host = hostRepository.findByIdOrNull(id) ?: throw EntityNotFoundException("Host $id does not exist")
         val containerName = updatedContainerReport.containerName
         host.containers.find { it.containerName == containerName }?.reportStatus = updatedContainerReport.reportStatus
+        val hostSummary: HostSummary? = inMemory.getHostSummary(id)
+        if (hostSummary != null) {
+            hostSummary.containers.first { it.name == containerName }.reportStatus = updatedContainerReport.reportStatus
+            inMemory.saveHostSummary(id, hostSummary)
+        }
         return hostRepository.save(host)
     }
 
-    fun addContainersToHost(host: Host, containersSummaries: List<ContainerSummary>) {
+    fun addContainersToHost(host: Host, containersSummaries: List<ContainerSummary>): Host {
         for (containerSummary in containersSummaries) {
             addContainerToHost(host, containerSummary)
         }
-        hostRepository.save(host)
+        return hostRepository.save(host)
     }
 
     private fun addContainerToHost(host: Host, containerSummary: ContainerSummary) {
