@@ -11,6 +11,7 @@ import {
 import { BasicMetric } from "../../common/types";
 import { alertTypeToColor, humanFileSize } from "../../util/util";
 import { AlertType } from "../../common/enums";
+import { Alert } from "@mui/material";
 
 function LinearProgressWithLabel(
   props: LinearProgressProps & { value: number; alertColor: string }
@@ -51,30 +52,38 @@ function LinearProgressWithLabel(
 
 const ProgressBarComponent: React.FC<{
   name: string;
-  metric: BasicMetric;
+  metric: BasicMetric | undefined;
 }> = ({ name, metric }) => {
   const used =
-    name === "CPU" ? `${metric.value}%` : humanFileSize(metric.value);
+    name === "CPU" ? `${metric?.value}%` : humanFileSize(metric?.value);
   const total =
-    name === "CPU" ? `${metric.total}%` : humanFileSize(metric.total);
+    name === "CPU" ? `${metric?.total}%` : humanFileSize(metric?.total);
 
   //eslint-disable-next-line @typescript-eslint/ban-ts-comment
   //@ts-ignore
-  const color = alertTypeToColor(AlertType[metric.alertType]);
+  const color = alertTypeToColor(AlertType[metric?.alertType]);
 
   return (
-    <Grid container justify="flex-start" alignItems="center" spacing={2}>
-      <Grid item md={12} style={{ minWidth: "250px" }}>
-        <Typography variant="subtitle1" display="inline">
-          {name + ":\t" + used + (!!total ? ` / ${total}` : "")}
-          <LinearProgressWithLabel
-            variant="determinate"
-            value={metric.percent}
-            alertColor={color}
-          />
-        </Typography>
-      </Grid>
-    </Grid>
+    <>
+      {metric !== undefined ? (
+        <Grid container justify="flex-start" alignItems="center" spacing={2}>
+          <Grid item md={12} style={{ minWidth: "250px" }}>
+            <Typography variant="subtitle1" display="inline">
+              {name + ":\t" + used + (!!total ? ` / ${total}` : "")}
+              <LinearProgressWithLabel
+                variant="determinate"
+                value={metric.percent}
+                alertColor={color}
+              />
+            </Typography>
+          </Grid>
+        </Grid>
+      ) : (
+        <Grid item>
+          <Alert severity="error"> NO DISC INFO </Alert>
+        </Grid>
+      )}
+    </>
   );
 };
 

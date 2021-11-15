@@ -1,19 +1,24 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import {
+  Box,
   Card,
   CardContent,
   Container,
   Grid,
   IconButton,
+  Tab,
+  Tabs,
   Typography,
 } from "@material-ui/core";
 import SettingsIcon from "@material-ui/icons/Settings";
-import { Alert } from "@material-ui/lab";
+import { Alert, TabContext, TabList, TabPanel } from "@material-ui/lab";
 import React from "react";
 import { RouteComponentProps } from "react-router-dom";
 import { selectHost } from "../../redux/hostsSlice";
 import { useAppSelector } from "../../redux/hooks";
 import HostMenu from "./HostMenu";
 import HostStats from "./HostStats/HostStats";
+import HostInfo from "./HostInfo/HostInfo";
 
 type HParam = { id: string };
 
@@ -29,6 +34,13 @@ const HostBoard: React.FC<RouteComponentProps<HParam>> = ({ match }) => {
 
   const handleClose = () => {
     setAnchorEl(null);
+  };
+
+  const [value, setValue] = React.useState("1");
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const handleChange = (event: any, newValue: string) => {
+    setValue(newValue);
   };
 
   return (
@@ -62,7 +74,10 @@ const HostBoard: React.FC<RouteComponentProps<HParam>> = ({ match }) => {
                   </Typography>
                 </Grid>
               </Grid>
-              <HostStats hostData={hostData} />
+              <Tabs value={value} onChange={handleChange}>
+                <Tab label="Item One" />
+                <Tab label="Item Two" />
+              </Tabs>
             </Grid>
           </CardContent>
           <HostMenu
