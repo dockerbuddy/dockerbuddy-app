@@ -8,18 +8,19 @@ import {
   IconButton,
   Tooltip,
 } from "@material-ui/core";
-import { alertTypeToColor, extractMetric } from "../../util/util";
+import { extractMetric, statusTypeToColor } from "../../util/util";
 import { Container } from "../../common/types";
 import { AlertType, MetricType, ReportStatus } from "../../common/enums";
 import { AllOutOutlined, VisibilityOff, Visibility } from "@material-ui/icons";
 import { Link } from "react-router-dom";
 import { proxy } from "../../common/api";
+import { alertColors } from "../../util/alertStyle";
 
 const useStyles = makeStyles(() => ({
   newContainer: {
     backgroundColor: "transparent",
     border: "3px solid",
-    borderColor: "rgb(47, 40, 49)",
+    borderColor: "#3ED7C2",
     boxShadow: "inset 0px 0px 5px 5px #3ED7C2",
   },
   watchedContainer: {
@@ -40,7 +41,7 @@ const useStyles = makeStyles(() => ({
     color: "#ababab",
   },
   disabled: {
-    color: "#3d3d3d",
+    color: alertColors.disabled,
   },
 }));
 
@@ -55,8 +56,10 @@ const ContainerCardComponent: React.FC<{
   const cpu = extractMetric(container.metrics, MetricType.CPU_USAGE);
 
   const [reportStatus, setReportStatus] = useState<ReportStatus>(
-    ReportStatus.NEW //container.reportStatus
+    //@ts-ignore
+    ReportStatus[container.reportStatus]
   );
+  console.log(ReportStatus.NEW);
   const isNew = () => {
     return reportStatus == ReportStatus.NEW;
   };
@@ -64,12 +67,15 @@ const ContainerCardComponent: React.FC<{
     return reportStatus == ReportStatus.WATCHED;
   };
 
-  //@ts-ignore
-  const imgColor = alertTypeToColor(AlertType[container.alertType]);
-  //@ts-ignore
-  const memColor = alertTypeToColor(AlertType[mem?.alertType]);
-  //@ts-ignore
-  const cpuColor = alertTypeToColor(AlertType[cpu?.alertType]);
+  const imgColor = statusTypeToColor(
+    //@ts-ignore
+    AlertType[container.alertType],
+    //@ts-ignore
+    ReportStatus[container.reportStatus],
+    container.status
+  );
+  const textColor =
+    imgColor === alertColors.red ? alertColors.disabled : imgColor;
 
   const changeWatchedStatus = (e: React.MouseEvent<HTMLButtonElement>) => {
     const newStatus = isWatched()
@@ -181,7 +187,7 @@ const ContainerCardComponent: React.FC<{
               <Typography
                 variant="subtitle1"
                 align="center"
-                style={{ color: cpuColor }}
+                style={{ color: textColor }}
               >
                 CPU: {cpu?.percent.toFixed(2)}%
               </Typography>
@@ -198,7 +204,7 @@ const ContainerCardComponent: React.FC<{
               <Typography
                 variant="subtitle1"
                 align="center"
-                style={{ color: memColor }}
+                style={{ color: textColor }}
               >
                 MEM: {mem?.percent.toFixed(2)}%
               </Typography>
