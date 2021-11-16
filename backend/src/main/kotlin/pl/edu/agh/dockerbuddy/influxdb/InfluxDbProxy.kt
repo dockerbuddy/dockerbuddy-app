@@ -6,6 +6,7 @@ import com.influxdb.client.write.Point
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.toList
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Value
@@ -50,6 +51,9 @@ class InfluxDbProxy {
 
         var unreadAlerts: List<AlertRecord>
         CoroutineScope(Dispatchers.IO).launch {
+            while (!::url.isInitialized) {
+                delay(1)
+            }
             unreadAlerts = queryAlerts(null, "1970-01-01T00:00:00Z", null,false)
             alertCounter = unreadAlerts.size
         }
