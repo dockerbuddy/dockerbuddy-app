@@ -1,10 +1,13 @@
-import { Menu, MenuItem, ListItemIcon, ListItemText } from "@material-ui/core";
-import { Edit } from "@material-ui/icons";
+/* eslint-disable */
+import { Menu, MenuItem, ListItemText, Divider } from "@material-ui/core";
 import React, { useEffect, useState } from "react";
 import { proxy } from "../../common/api";
 import { AlertsResponseElement, StandardApiResponse } from "../../common/types";
-import { paramsToString } from "../../util/util";
+import { reduceBy } from "../../redux/alertCounterSlice";
+import { useAppDispatch } from "../../redux/hooks";
+import { paramsToString, parseDateToDDMMYYYY } from "../../util/util";
 import AlertElement from "../AlertsDashboard/AlertElement";
+// import AlertElement from "../AlertsDashboard/AlertElement";
 
 interface AlertsListProps {
   anchorEl: null | HTMLElement;
@@ -17,10 +20,13 @@ const AlertsListComponent: React.FC<AlertsListProps> = ({
   open,
   handleClose,
 }) => {
+  const dispatch = useAppDispatch();
+
   const [alerts, setAlerts] = useState<AlertsResponseElement[]>([]);
   const [alertsToDelete, setAlertsToDelete] = useState<AlertsResponseElement[]>(
     []
   );
+  const [isAll, setIsAll] = useState<boolean>(false);
 
   useEffect(() => {
     if (open) {
@@ -42,7 +48,11 @@ const AlertsListComponent: React.FC<AlertsListProps> = ({
     const result: StandardApiResponse<AlertsResponseElement[]> =
       await response.json();
     if (response.ok) {
-      setAlerts(result.body);
+      const alertsParsed: AlertsResponseElement[] = result.body.map((alert) => ({
+        ...alert,
+        time: new Date(alert.time),
+      }));
+      setAlerts(alertsParsed);
     }
   };
 
@@ -56,20 +66,35 @@ const AlertsListComponent: React.FC<AlertsListProps> = ({
         body: JSON.stringify(alertsToDelete),
       });
       if (response.ok) {
+        dispatch(reduceBy(alertsToDelete.length));
         setAlertsToDelete([]);
       } else {
-        console.log("COULDN'T DELETE");
+        //todo do something
       }
     }
   };
 
   const handleAlertClick = (alert: AlertsResponseElement) => {
     if (alertsToDelete.includes(alert)) {
-      setAlertsToDelete((arr) => arr.filter((a) => a === alert));
+      setAlertsToDelete((arr) => arr.filter((a) => a != alert));
     } else {
       setAlertsToDelete((arr) => [...arr, alert]);
     }
   };
+
+  const handleAll = () => {
+    if(isAll) {
+      setAlertsToDelete([]);
+    } else {
+      setAlertsToDelete(alerts);
+    }
+    setIsAll((isAll) => !isAll)
+  }
+
+
+  let prev = "";
+
+  console.log(alertsToDelete);
 
   return (
     <Menu
@@ -82,28 +107,34 @@ const AlertsListComponent: React.FC<AlertsListProps> = ({
       }}
     >
       {Object.values(alerts).map((alert: AlertsResponseElement) => {
+        let showDate = false;
+        if (parseDateToDDMMYYYY(alert.time) != prev) {
+        prev = parseDateToDDMMYYYY(alert.time);
+        showDate = true;
+        }
         return (
           <MenuItem
+            selected={alertsToDelete.includes(alert)}
             key={
               alert.alertMessage + alert.hostId + alert.alertType + alert.time
             }
             onClick={() => handleAlertClick(alert)}
           >
-            <ListItemIcon>
+            <AlertElement
+              alert={alert}
+              key={alert.time.getTime()}
+              showDate={showDate}
+            />
+            {/* <ListItemIcon>
               <Edit />
-            </ListItemIcon>
-            <AlertElement alert={alert} showDate={true} />
-            {/* <ListItemText>{alert.alertMessage}</ListItemText> */}
+            </ListItemIcon> */}
           </MenuItem>
         );
       })}
-
-      {/* <MenuItem>
-        <ListItemIcon>
-          <HighlightOff fontSize="small" />
-        </ListItemIcon> */}
-      <ListItemText>Delete all</ListItemText>
-      {/* </MenuItem> */}
+      <Divider />
+      <MenuItem onClick={handleAll}>
+        <ListItemText>{isAll ? "Unselect all" : "Select all"}</ListItemText>
+      </MenuItem>
     </Menu>
   );
 };

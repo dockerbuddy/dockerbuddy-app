@@ -30,6 +30,9 @@ export const alertCounterSlice = createSlice({
     setCounter: (state, action: PayloadAction<number>) => {
       state.value = action.payload;
     },
+    reduceBy: (state, action: PayloadAction<number>) => {
+      state.value -= action.payload;
+    },
   },
   extraReducers: (builder) => {
     builder
@@ -42,7 +45,7 @@ export const alertCounterSlice = createSlice({
   },
 });
 
-export const { setCounter } = alertCounterSlice.actions;
+export const { setCounter, reduceBy } = alertCounterSlice.actions;
 // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
 export const selectCounter = (state: RootState) => state.alertCounter;
 
