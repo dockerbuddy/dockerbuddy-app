@@ -19,7 +19,7 @@ const HostInfo: React.FC<HostInfoProps> = ({ hostData }) => {
   console.log(metric);
   return (
     <Grid container direction="column">
-      <Grid item>{hostData.id}</Grid>
+      <Grid item>{hostData?.id}</Grid>
       <Grid item>
         <ProgressBarComponent name={"CPU"} metric={metric} />
       </Grid>

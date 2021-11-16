@@ -14,15 +14,20 @@ import { AlertsResponseElement, StandardApiResponse } from "../../common/types";
 import AlertsList from "./AlertsList";
 import { Sync } from "@material-ui/icons";
 
-const AlertsDashboard: React.FC = () => {
+interface AlertsDashboardProps {
+  hostId?: string;
+}
+
+const AlertsDashboard: React.FC<AlertsDashboardProps> = ({ hostId = "" }) => {
   const [alerts, setAlerts] = useState<AlertsResponseElement[]>([]);
   const [days, setDays] = useState<string>("1");
   const [isFetching, setIsFetching] = useState<boolean>(false);
 
   const fetchAlerts = async () => {
     setIsFetching(true);
+    const hostIdParam = hostId ? `&hostId=${hostId}` : "";
     const response = await fetch(
-      `${proxy}/influxdb/alerts?start=-${parseInt(days)}d`,
+      `${proxy}/influxdb/alerts?start=-${parseInt(days)}d` + hostIdParam,
       {
         headers: {
           "Content-Type": "application/json",
@@ -57,11 +62,13 @@ const AlertsDashboard: React.FC = () => {
   };
 
   return (
-    <Container maxWidth="md">
+    <Container maxWidth={hostId ? "lg" : "md"}>
       <Grid container direction="column" spacing={2}>
-        <Grid item>
-          <Typography variant="h4">Alerts</Typography>
-        </Grid>
+        {!hostId && (
+          <Grid item>
+            <Typography variant="h4">Alerts</Typography>
+          </Grid>
+        )}
         <Grid item container spacing={2} alignItems="center">
           <Grid item>
             <Typography variant="subtitle1">Show alerts from last </Typography>

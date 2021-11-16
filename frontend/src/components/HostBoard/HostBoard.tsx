@@ -17,6 +17,7 @@ import { useAppSelector } from "../../redux/hooks";
 import HostMenu from "./HostMenu";
 import HostStats from "./HostStats/HostStats";
 import HostInfo from "./HostInfo/HostInfo";
+import AlertsDashboard from "../AlertsDashboard/AlertsDashboard";
 
 type HParam = { id: string };
 
@@ -36,7 +37,7 @@ const HostBoard: React.FC<RouteComponentProps<HParam>> = ({ match }) => {
 
   const components = {
     "1": <HostInfo hostData={hostData} />,
-    "2": <HostInfo hostData={hostData} />,
+    "2": <AlertsDashboard hostId={hostId} />,
     "3": <HostStats hostData={hostData} />,
   };
 
