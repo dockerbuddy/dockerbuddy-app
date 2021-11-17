@@ -9,7 +9,7 @@ import {
 
 import React from "react";
 import { Link } from "react-router-dom";
-import DropdownAlertsComponent from "./DropdownAlertsComponent";
+import UnreadAlertsBellComponent from "./UnreadAlertsBellComponent";
 
 const useStyles = makeStyles((theme) => ({
   appBar: {
@@ -36,7 +36,7 @@ const Header: React.FC = () => {
               DockerBuddy
             </Typography>
           </Link>
-          <DropdownAlertsComponent />
+          <UnreadAlertsBellComponent />
           <Link
             to="/alerts"
             style={{ textDecoration: "none", marginRight: "10px" }}

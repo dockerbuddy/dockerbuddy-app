@@ -14,7 +14,7 @@ interface AlertsListProps {
   handleClose: () => void;
 }
 
-const AlertsListComponent: React.FC<AlertsListProps> = ({
+const UnreadAlertsListComponent: React.FC<AlertsListProps> = ({
   anchorEl,
   open,
   handleClose,
@@ -94,7 +94,7 @@ const AlertsListComponent: React.FC<AlertsListProps> = ({
 
   let prev = "";
 
-  //todo display info when there are no alerts whatsoever, make alerts max length, improve select/deselect all button
+  //todo display info when there are no alerts whatsoever, make alerts max length, improve select/deselect all button, make alert not link to their hosts -> make separate button for it
   return (
     <Menu
       id="basic-menu"
@@ -143,4 +143,4 @@ const AlertsListComponent: React.FC<AlertsListProps> = ({
   );
 };
 
-export default AlertsListComponent;
+export default UnreadAlertsListComponent;

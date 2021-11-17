@@ -1,7 +1,7 @@
 import * as React from "react";
 import IconButton from "@mui/material/IconButton";
 import { Notifications } from "@material-ui/icons";
-import AlertsListComponent from "./AlertsListComponent";
+import AlertsListComponent from "./UnreadAlertsListComponent";
 import {
   selectCounter,
   updateAlertCounter,
@@ -16,7 +16,7 @@ const useStyles = makeStyles(() => ({
   },
 }));
 
-const DropdownAlertsComponent: React.FC = () => {
+const UnreadAlertsBellComponent: React.FC = () => {
   const classes = useStyles();
   const counterData = useAppSelector(selectCounter);
 
@@ -62,4 +62,4 @@ const DropdownAlertsComponent: React.FC = () => {
   );
 };
 
-export default DropdownAlertsComponent;
+export default UnreadAlertsBellComponent;
