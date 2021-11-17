@@ -14,6 +14,7 @@ import pl.edu.agh.dockerbuddy.model.metric.HostSummary
 import pl.edu.agh.dockerbuddy.repository.HostRepository
 import java.util.*
 import javax.persistence.EntityNotFoundException
+import kotlin.math.log
 
 @Service
 class HostService (
@@ -36,7 +37,7 @@ class HostService (
 
     fun updateHost(id: UUID, host: Host): Host {
         if (!hostRepository.existsById(id)) throw EntityNotFoundException("Host $id does not exist")
-        logger.info("Host $id update: $host")
+        logger.info("Host $id update to: $host")
         host.id = id
         return hostRepository.save(host)
     }
@@ -60,7 +61,7 @@ class HostService (
     }
 
     fun getAllHostsWithSummaries(): List<HostWithSummary> {
-        logger.info("Fetching all hosts with summary")
+        logger.info("Fetching all hosts with summaries")
         val hostsWithSummary = mutableListOf<HostWithSummary>()
         val hosts = hostRepository.findAll()
         if (hosts.isEmpty()) return emptyList()
@@ -69,7 +70,7 @@ class HostService (
         for (host in hosts) {
             logger.debug("> $host")
             val hostSummary = inMemory.getHostSummary(host.id!!)
-            logger.debug("Found newest host summary: $hostSummary")
+            logger.debug("Found most recent host summary: $hostSummary")
             hostsWithSummary.add(
                 HostWithSummary(
                     host.id!!,
@@ -85,10 +86,13 @@ class HostService (
     }
 
     fun updateHostContainerReport(id: UUID, updatedContainerReport: ContainerReport): Host {
+        logger.info("Updating container report for host $id")
+        logger.debug("Container report: $updatedContainerReport")
         val host = hostRepository.findByIdOrNull(id) ?: throw EntityNotFoundException("Host $id does not exist")
         val containerName = updatedContainerReport.containerName
         host.containers.find { it.containerName == containerName }?.reportStatus = updatedContainerReport.reportStatus
         val hostSummary: HostSummary? = inMemory.getHostSummary(id)
+        logger.debug("Host summary found in memory: $hostSummary")
         if (hostSummary != null) {
             hostSummary.containers.first { it.name == containerName }.reportStatus = updatedContainerReport.reportStatus
             inMemory.saveHostSummary(id, hostSummary)
@@ -97,6 +101,7 @@ class HostService (
     }
 
     fun addContainersToHost(host: Host, containersSummaries: List<ContainerSummary>): Host {
+        logger.info("Host ${host.id}: add ${containersSummaries.size} new containers to container reports")
         for (containerSummary in containersSummaries) {
             addContainerToHost(host, containerSummary)
         }
