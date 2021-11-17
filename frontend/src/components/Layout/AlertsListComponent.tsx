@@ -1,4 +1,5 @@
-import { Menu, MenuItem, ListItemText, Divider } from "@material-ui/core";
+import { MenuItem, ListItemText, Divider } from "@material-ui/core";
+import { Menu } from "@mui/material";
 import React, { useEffect, useState } from "react";
 import { proxy } from "../../common/api";
 import { AlertsResponseElement, StandardApiResponse } from "../../common/types";
@@ -93,7 +94,7 @@ const AlertsListComponent: React.FC<AlertsListProps> = ({
 
   let prev = "";
 
-  //todo display info when there are no alerts whatsoever
+  //todo display info when there are no alerts whatsoever, make alerts max length, improve select/deselect all button
   return (
     <Menu
       id="basic-menu"
@@ -109,7 +110,7 @@ const AlertsListComponent: React.FC<AlertsListProps> = ({
     >
       <>
         <MenuItem onClick={handleAll}>
-          <ListItemText>{isAll ? "Unselect all" : "Select all"}</ListItemText>
+          <ListItemText>{isAll ? "Deselect all" : "Select all"}</ListItemText>
         </MenuItem>
         <Divider />
         {Object.values(alerts).map((alert: AlertsResponseElement) => {
