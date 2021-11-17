@@ -21,7 +21,7 @@ class HostTest {
     }
 
     @Test
-    fun hostName_NotBlank_Test() {
+    fun notBlankName_Test() {
         val host = Host("")
         val violations = validator.validate(host)
         Assertions.assertFalse(violations.isEmpty())
@@ -29,7 +29,7 @@ class HostTest {
 
     @ParameterizedTest
     @ValueSource(strings = ["192.168.1.1", "1.1.1.1", "255.255.255.255", "5.5.5.5"])
-    fun hostIP_Valid_Test(ip: String) {
+    fun ValidIp_Test(ip: String) {
         val host = Host("host", ip)
         val violations = validator.validate(host)
         Assertions.assertTrue(violations.isEmpty())
@@ -38,7 +38,7 @@ class HostTest {
 
     @ParameterizedTest
     @ValueSource(strings = ["", "999.999.999.999", "256.1.0.0", "x.y.z.q", "ip"])
-    fun hostIP_Invalid_Test(ip: String) {
+    fun InvalidIp_Test(ip: String) {
         val host = Host("host", ip)
         val violations = validator.validate(host)
         Assertions.assertFalse(violations.isEmpty())

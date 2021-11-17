@@ -19,14 +19,14 @@ class PersistenceTest (
     @Autowired val hostRepository: HostRepository
 ) {
     @Test
-    fun saveHostToDB_Test() {
+    fun saveHost_Test() {
         val host = Host("host", "192.168.1.55")
         hostRepository.save(host)
         assertEquals(host, hostRepository.findAll().first())
     }
 
     @Test
-    fun saveMetricRuleToDB_Test() {
+    fun saveMetricRule_Test() {
         val host = Host("host", "192.168.1.55")
         val metricRule = MetricRule(RuleType.DISK_USAGE, 50, 90)
         host.hostRules.add(metricRule)

@@ -1,5 +1,5 @@
 package pl.edu.agh.dockerbuddy
 
-class AlertServiceTests {
+class AlertServiceTest {
     // TODO
 }

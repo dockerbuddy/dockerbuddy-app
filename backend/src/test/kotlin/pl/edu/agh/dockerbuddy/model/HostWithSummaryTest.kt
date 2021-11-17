@@ -19,7 +19,7 @@ class HostWithSummaryTest {
 
     @ParameterizedTest
     @ValueSource(strings = ["192.168.1.1", "1.1.1.1", "255.255.255.255", "5.5.5.5"])
-    fun hostWithSummaryIP_Valid_Test(ip: String) {
+    fun valid_Test(ip: String) {
         val host = HostWithSummary(UUID.randomUUID(), "host", ip, mutableListOf(), mutableListOf(), null)
         val violations = validator.validate(host)
         Assertions.assertTrue(violations.isEmpty())
@@ -27,7 +27,7 @@ class HostWithSummaryTest {
 
     @ParameterizedTest
     @ValueSource(strings = ["", "999.999.999.999", "256.1.0.0", "x.y.z.q", "ip"])
-    fun hostWithSummaryIP_Invalid_Test(ip: String) {
+    fun invalidIp_Test(ip: String) {
         val host = HostWithSummary(UUID.randomUUID(), "host", ip, mutableListOf(), mutableListOf(), null)
         val violations = validator.validate(host)
         Assertions.assertFalse(violations.isEmpty())
