@@ -1,4 +1,3 @@
-/* eslint-disable */
 import { Menu, MenuItem, ListItemText, Divider } from "@material-ui/core";
 import React, { useEffect, useState } from "react";
 import { proxy } from "../../common/api";
@@ -7,7 +6,6 @@ import { reduceBy } from "../../redux/alertCounterSlice";
 import { useAppDispatch } from "../../redux/hooks";
 import { paramsToString, parseDateToDDMMYYYY } from "../../util/util";
 import AlertElement from "../AlertsDashboard/AlertElement";
-// import AlertElement from "../AlertsDashboard/AlertElement";
 
 interface AlertsListProps {
   anchorEl: null | HTMLElement;
@@ -48,10 +46,12 @@ const AlertsListComponent: React.FC<AlertsListProps> = ({
     const result: StandardApiResponse<AlertsResponseElement[]> =
       await response.json();
     if (response.ok) {
-      const alertsParsed: AlertsResponseElement[] = result.body.map((alert) => ({
-        ...alert,
-        time: new Date(alert.time),
-      }));
+      const alertsParsed: AlertsResponseElement[] = result.body.map(
+        (alert) => ({
+          ...alert,
+          time: new Date(alert.time),
+        })
+      );
       setAlerts(alertsParsed);
     }
   };
@@ -83,58 +83,61 @@ const AlertsListComponent: React.FC<AlertsListProps> = ({
   };
 
   const handleAll = () => {
-    if(isAll) {
+    if (isAll) {
       setAlertsToDelete([]);
     } else {
       setAlertsToDelete(alerts);
     }
-    setIsAll((isAll) => !isAll)
-  }
-
+    setIsAll((isAll) => !isAll);
+  };
 
   let prev = "";
 
-  console.log(alertsToDelete);
-
+  //todo display info when there are no alerts whatsoever
   return (
     <Menu
       id="basic-menu"
       anchorEl={anchorEl}
       open={open}
       onClose={handleClose}
-      MenuListProps={{
-        "aria-labelledby": "basic-button",
+      PaperProps={{
+        style: {
+          maxHeight: "80vh",
+          width: "40vw",
+        },
       }}
     >
-      {Object.values(alerts).map((alert: AlertsResponseElement) => {
-        let showDate = false;
-        if (parseDateToDDMMYYYY(alert.time) != prev) {
-        prev = parseDateToDDMMYYYY(alert.time);
-        showDate = true;
-        }
-        return (
-          <MenuItem
-            selected={alertsToDelete.includes(alert)}
-            key={
-              alert.alertMessage + alert.hostId + alert.alertType + alert.time
-            }
-            onClick={() => handleAlertClick(alert)}
-          >
-            <AlertElement
-              alert={alert}
-              key={alert.time.getTime()}
-              showDate={showDate}
-            />
-            {/* <ListItemIcon>
+      <>
+        <MenuItem onClick={handleAll}>
+          <ListItemText>{isAll ? "Unselect all" : "Select all"}</ListItemText>
+        </MenuItem>
+        <Divider />
+        {Object.values(alerts).map((alert: AlertsResponseElement) => {
+          let showDate = false;
+          if (parseDateToDDMMYYYY(alert.time) != prev) {
+            prev = parseDateToDDMMYYYY(alert.time);
+            showDate = true;
+          }
+          return (
+            <MenuItem
+              selected={alertsToDelete.includes(alert)}
+              key={
+                alert.alertMessage + alert.hostId + alert.alertType + alert.time
+              }
+              onClick={() => handleAlertClick(alert)}
+            >
+              <AlertElement
+                alert={alert}
+                key={alert.time.getTime()}
+                showDate={showDate}
+              />
+              {/* <ListItemIcon>
               <Edit />
             </ListItemIcon> */}
-          </MenuItem>
-        );
-      })}
-      <Divider />
-      <MenuItem onClick={handleAll}>
-        <ListItemText>{isAll ? "Unselect all" : "Select all"}</ListItemText>
-      </MenuItem>
+            </MenuItem>
+          );
+        })}
+      </>
     </Menu>
   );
 };
