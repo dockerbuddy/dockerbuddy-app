@@ -33,7 +33,7 @@ function LinearProgressWithLabel(
 
   return (
     <Box display="flex" alignItems="center">
-      <Box minWidth={40}>
+      <Box minWidth={40} mr={1}>
         <Typography
           variant="body1"
           style={{ color: props.alertColor }}

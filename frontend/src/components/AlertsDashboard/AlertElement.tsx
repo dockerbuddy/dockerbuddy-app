@@ -19,7 +19,7 @@ const AlertElement: React.FC<AlertElementProps> = ({ alert, showDate }) => {
     <Grid item>
       {showDate && (
         <Box mb={1}>
-          <Typography variant="h5">
+          <Typography variant="h6">
             {parseDateToDDMMYYYY(alert.time)}
           </Typography>
           <Divider light />

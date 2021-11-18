@@ -16,9 +16,13 @@ import { Sync } from "@material-ui/icons";
 
 interface AlertsDashboardProps {
   hostId?: string;
+  onlyList?: boolean;
 }
 
-const AlertsDashboard: React.FC<AlertsDashboardProps> = ({ hostId = "" }) => {
+const AlertsDashboard: React.FC<AlertsDashboardProps> = ({
+  hostId = "",
+  onlyList = false,
+}) => {
   const [alerts, setAlerts] = useState<AlertsResponseElement[]>([]);
   const [days, setDays] = useState<string>("1");
   const [isFetching, setIsFetching] = useState<boolean>(false);
@@ -47,7 +51,8 @@ const AlertsDashboard: React.FC<AlertsDashboardProps> = ({ hostId = "" }) => {
       ...alert,
       time: new Date(alert.time),
     }));
-    setAlerts(alertsParsed);
+    if (onlyList) setAlerts(alertsParsed.slice(0, 6));
+    else setAlerts(alertsParsed);
     setIsFetching(false);
   };
 
@@ -64,38 +69,45 @@ const AlertsDashboard: React.FC<AlertsDashboardProps> = ({ hostId = "" }) => {
   return (
     <Container maxWidth={hostId ? "lg" : "md"}>
       <Grid container direction="column" spacing={2}>
-        {!hostId && (
-          <Grid item>
-            <Typography variant="h4">Alerts</Typography>
-          </Grid>
+        {!onlyList && (
+          <>
+            {!onlyList && !hostId && (
+              <Grid item>
+                <Typography variant="h4">Alerts</Typography>
+              </Grid>
+            )}
+
+            <Grid item container spacing={2} alignItems="center">
+              <Grid item>
+                <Typography variant="subtitle1">
+                  Show alerts from last{" "}
+                </Typography>
+              </Grid>
+              <Grid item>
+                <TextField
+                  id="start-day"
+                  variant="outlined"
+                  type="number"
+                  size="small"
+                  style={{ width: "60%" }}
+                  InputProps={{
+                    endAdornment: (
+                      <InputAdornment position="end">days</InputAdornment>
+                    ),
+                    inputProps: { min: 0 },
+                  }}
+                  value={days}
+                  onChange={(event) => setDays(event.target.value)}
+                />
+              </Grid>
+              <Grid item>
+                <IconButton onClick={refresh}>
+                  <Sync color="primary" />
+                </IconButton>
+              </Grid>
+            </Grid>
+          </>
         )}
-        <Grid item container spacing={2} alignItems="center">
-          <Grid item>
-            <Typography variant="subtitle1">Show alerts from last </Typography>
-          </Grid>
-          <Grid item>
-            <TextField
-              id="start-day"
-              variant="outlined"
-              type="number"
-              size="small"
-              style={{ width: "60%" }}
-              InputProps={{
-                endAdornment: (
-                  <InputAdornment position="end">days</InputAdornment>
-                ),
-                inputProps: { min: 0 },
-              }}
-              value={days}
-              onChange={(event) => setDays(event.target.value)}
-            />
-          </Grid>
-          <Grid item>
-            <IconButton onClick={refresh}>
-              <Sync color="primary" />
-            </IconButton>
-          </Grid>
-        </Grid>
         <Grid item>
           {isFetching ? (
             <Box justifyContent="center" display="flex" mt={5}>

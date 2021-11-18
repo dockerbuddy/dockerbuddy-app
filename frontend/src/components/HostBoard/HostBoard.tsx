@@ -85,8 +85,8 @@ const HostBoard: React.FC<RouteComponentProps<HParam>> = ({ match }) => {
                 </Grid>
               </Grid>
               <Tabs value={value} onChange={handleChange}>
-                <Tab label="Details" value={"1"} />
-                <Tab label="Alerts" value={"2"} />
+                <Tab label="Host Details" value={"1"} />
+                <Tab label="Host Alerts" value={"2"} />
                 <Tab label="Charts" value={"3"} />
               </Tabs>
               <Grid item>{displayedComponent}</Grid>

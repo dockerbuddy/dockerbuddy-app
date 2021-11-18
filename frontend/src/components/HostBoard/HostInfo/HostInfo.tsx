@@ -1,29 +1,39 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
-import { Grid } from "@material-ui/core";
+import { Grid, Typography } from "@material-ui/core";
 import React from "react";
-import { MetricType } from "../../../common/enums";
 import { Host } from "../../../common/types";
-import { extractMetric } from "../../../util/util";
-import ProgressBarComponent from "../../Dashboard/ProgressBarComponent";
+import AlertsDashboard from "../../AlertsDashboard/AlertsDashboard";
+import StatPanel from "./StatPanel";
 
 interface HostInfoProps {
   hostData: Host;
 }
 
 const HostInfo: React.FC<HostInfoProps> = ({ hostData }) => {
-  const metric = extractMetric(
-    hostData?.hostSummary?.metrics,
-    MetricType.CPU_USAGE
-  );
-
-  console.log(metric);
   return (
-    <Grid container direction="column">
-      <Grid item>{hostData?.id}</Grid>
-      <Grid item>
-        <ProgressBarComponent name={"CPU"} metric={metric} />
+    <Grid container direction="column" style={{ padding: "15px" }} spacing={4}>
+      <Grid
+        container
+        item
+        direction="row"
+        justify="space-between"
+        alignItems="stretch"
+        spacing={5}
+      >
+        <Grid item xs={6}>
+          <StatPanel hostData={hostData} />
+        </Grid>
+        <Grid item container xs={6} direction="column" spacing={2}>
+          <Grid item>
+            <Typography variant="h5">Recent alerts</Typography>
+          </Grid>
+          <Grid item>
+            <AlertsDashboard hostId={hostData.id} onlyList={true} />
+          </Grid>
+        </Grid>
       </Grid>
-      <Grid item>Sth else</Grid>
+      <Grid item>
+        <Typography variant="h5">Containers</Typography>
+      </Grid>
     </Grid>
   );
 };
