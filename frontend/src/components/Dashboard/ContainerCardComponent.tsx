@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/ban-ts-comment */
 import React, { useState } from "react";
 import {
@@ -133,7 +134,7 @@ const ContainerCardComponent: React.FC<{
         direction="column"
         alignItems="center"
         className={getContainerClass(reportStatus)}
-        spacing={3}
+        style={{ paddingTop: "15px", paddingBottom: "15px" }}
       >
         <Grid item container xs={12}>
           <Grid item xs={2}></Grid>

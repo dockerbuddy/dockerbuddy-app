@@ -63,28 +63,10 @@ const HostCardComponent: React.FC<{ host: Host }> = (props) => {
         style={{ color: "inherit", textDecoration: "none" }}
       >
         <CardContent>
-          {diskUsage !== undefined ? (
-            <ProgressBarComponent name="Disk" metric={diskUsage} />
-          ) : (
-            <Grid item>
-              <Alert severity="error"> NO DISC INFO </Alert>
-            </Grid>
-          )}
-          {memoryUsage !== undefined ? (
-            <ProgressBarComponent name="Memory" metric={memoryUsage} />
-          ) : (
-            <Grid item>
-              <Alert severity="error"> NO VMEM INFO </Alert>
-            </Grid>
-          )}
-          {cpuUsage !== undefined ? (
-            <ProgressBarComponent name="CPU" metric={cpuUsage} />
-          ) : (
-            <Grid item>
-              <Alert severity="error"> NO CPU INFO </Alert>
-            </Grid>
-          )}
-          <Grid container spacing={4}>
+          <ProgressBarComponent name="Disk" metric={diskUsage} />
+          <ProgressBarComponent name="Memory" metric={memoryUsage} />
+          <ProgressBarComponent name="CPU" metric={cpuUsage} />
+          <Grid container spacing={2}>
             <Grid item xs={12}>
               <Typography variant="h6" style={{ display: "inline-block" }}>
                 Containers:

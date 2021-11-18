@@ -1,5 +1,5 @@
 import React, { useEffect } from "react";
-import { makeStyles, Grid } from "@material-ui/core";
+import { makeStyles, Grid, Container } from "@material-ui/core";
 import { Alert } from "@material-ui/lab";
 import HostCardComponent from "./HostCardComponent";
 import { selectHost, updateHostsAsync } from "../../redux/hostsSlice";
@@ -34,7 +34,7 @@ const Dashboard: React.FC = () => {
   }, []);
 
   return (
-    <div className={classes.root}>
+    <Container maxWidth="xl" className={classes.root}>
       {hostsData.status === "ERROR" && (
         <Grid item>
           <Alert severity="error"> BRAK POLACZENIA Z SERWEREM </Alert>
@@ -65,7 +65,7 @@ const Dashboard: React.FC = () => {
         ))}
       {hostsData.status === "LOADING" &&
         Object.keys(hostsData.hosts).length == 0 && <p>LOADING</p>}
-    </div>
+    </Container>
   );
 };
 
