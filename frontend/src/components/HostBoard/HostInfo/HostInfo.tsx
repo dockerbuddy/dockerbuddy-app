@@ -1,7 +1,8 @@
 import { Grid, Typography } from "@material-ui/core";
 import React from "react";
-import { Host } from "../../../common/types";
+import { Container, Host } from "../../../common/types";
 import AlertsDashboard from "../../AlertsDashboard/AlertsDashboard";
+import ContainerCardComponent from "../../Dashboard/ContainerCardComponent";
 import StatPanel from "./StatPanel";
 
 interface HostInfoProps {
@@ -9,6 +10,7 @@ interface HostInfoProps {
 }
 
 const HostInfo: React.FC<HostInfoProps> = ({ hostData }) => {
+  console.log("Info " + hostData);
   return (
     <Grid container direction="column" style={{ padding: "15px" }} spacing={4}>
       <Grid
@@ -31,8 +33,22 @@ const HostInfo: React.FC<HostInfoProps> = ({ hostData }) => {
           </Grid>
         </Grid>
       </Grid>
-      <Grid item>
-        <Typography variant="h5">Containers</Typography>
+      <Grid item container direction="column" spacing={4}>
+        <Grid item>
+          <Typography variant="h5">Containers</Typography>
+        </Grid>
+        <Grid container item>
+          {hostData?.hostSummary?.containers.map((cont: Container) => {
+            return (
+              <Grid item xs={2} key={cont.id}>
+                <ContainerCardComponent
+                  container={cont}
+                  hostId={hostData?.id}
+                />
+              </Grid>
+            );
+          })}
+        </Grid>
       </Grid>
     </Grid>
   );

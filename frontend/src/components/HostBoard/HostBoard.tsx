@@ -35,23 +35,14 @@ const HostBoard: React.FC<RouteComponentProps<HParam>> = ({ match }) => {
     setAnchorEl(null);
   };
 
-  const components = {
-    "1": <HostInfo hostData={hostData} />,
-    "2": <AlertsDashboard hostId={hostId} />,
-    "3": <HostStats hostData={hostData} />,
-  };
-
   const [value, setValue] = React.useState<string>("1");
-  const [displayedComponent, setDisplayedComponent] =
-    React.useState<JSX.Element>(components["1"]);
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const handleChange = (event: any, newValue: string) => {
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    //@ts-ignore
-    setDisplayedComponent(components[newValue]);
     setValue(newValue);
   };
+
+  console.log(hostData);
 
   return (
     <Container maxWidth="xl">
@@ -89,7 +80,11 @@ const HostBoard: React.FC<RouteComponentProps<HParam>> = ({ match }) => {
                 <Tab label="Host Alerts" value={"2"} />
                 <Tab label="Charts" value={"3"} />
               </Tabs>
-              <Grid item>{displayedComponent}</Grid>
+              <Grid item>
+                {value === "1" && <HostInfo hostData={hostData} />}
+                {value === "2" && <AlertsDashboard hostId={hostId} />}
+                {value === "3" && <HostStats hostData={hostData} />}
+              </Grid>
             </Grid>
           </CardContent>
           <HostMenu
