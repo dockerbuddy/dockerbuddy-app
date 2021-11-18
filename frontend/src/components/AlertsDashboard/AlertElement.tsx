@@ -16,7 +16,7 @@ const AlertElement: React.FC<AlertElementProps> = ({ alert, showDate }) => {
   // @ts-ignore
   const severity = AlertType[alert.alertType];
   return (
-    <Grid item>
+    <Grid item style={{ width: "100%" }}>
       {showDate && (
         <Box mb={1}>
           <Typography variant="h5">

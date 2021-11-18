@@ -133,13 +133,13 @@ class InfluxController (
 
     @ApiOperation(value = "Mark alerts as read")
     @PutMapping("/alerts")
-    fun readAlerts(@RequestBody alertList: List<AlertRecord>): ResponseEntity<DefaultResponse<List<AlertRecord>>> {
+    fun readAlerts(@RequestBody alertList: List<AlertRecord>): ResponseEntity<DefaultResponse<Int>> {
         logger.info("PUT /api/v2/influxdb/alerts")
-        var response: ResponseEntity<DefaultResponse<List<AlertRecord>>>
+        var response: ResponseEntity<DefaultResponse<Int>>
         runBlocking {
             val result = influxDbProxy.saveAlerts(alertList)
             response =  ResponseEntity.status(HttpStatus.OK)
-                .body(DefaultResponse(ResponseType.SUCCESS, "Alerts marked as read", result))
+                .body(DefaultResponse(ResponseType.SUCCESS, "Alerts marked as read", influxDbProxy.alertCounter))
         }
         return response
     }

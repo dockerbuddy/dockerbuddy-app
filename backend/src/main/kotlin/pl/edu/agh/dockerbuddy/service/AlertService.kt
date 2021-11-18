@@ -105,7 +105,6 @@ class AlertService(
             } else {
                 containerSummary.reportStatus = containerReportMap[containerSummary.name]?.reportStatus
             }
-
             if(prevContainerMap[containerSummary.id] != null) {
                 if (containerReportMap[containerSummary.name]?.reportStatus == ReportStatus.WATCHED &&
                     containerSummary.alertType != prevContainerMap[containerSummary.id]?.alertType

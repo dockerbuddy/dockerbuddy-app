@@ -59,7 +59,7 @@ const ContainerCardComponent: React.FC<{
     //@ts-ignore
     ReportStatus[container.reportStatus]
   );
-  console.log(ReportStatus.NEW);
+
   const isNew = () => {
     return reportStatus == ReportStatus.NEW;
   };

@@ -4,7 +4,8 @@ import React, { useEffect } from "react";
 import SockJS from "sockjs-client";
 import { socketProxy } from "../common/api";
 import { AlertType } from "../common/enums";
-import { Alert, HostSummary } from "../common/types";
+import { AlertsSummary, HostSummary } from "../common/types";
+import { setCounter } from "../redux/alertCounterSlice";
 import { useAppDispatch } from "../redux/hooks";
 import { updateHostsAsync, updateSingleHost } from "../redux/hostsSlice";
 
@@ -23,11 +24,12 @@ const WebSocketProvider: React.FC = ({ children }) => {
           dispatch(updateSingleHost(summaryParsed));
         });
         stompClient.subscribe("/alerts", (alert) => {
-          const alertParsed: Alert = JSON.parse(alert.body);
-          enqueueSnackbar(alertParsed.alertMessage, {
+          const alertParsed: AlertsSummary = JSON.parse(alert.body);
+          dispatch(setCounter(alertParsed.alertsCounter));
+          enqueueSnackbar(alertParsed.alert.alertMessage, {
             // eslint-disable-next-line @typescript-eslint/ban-ts-comment
             //@ts-ignore
-            variant: AlertType[alertParsed.alertType],
+            variant: AlertType[alertParsed.alert.alertType],
           });
         });
       });

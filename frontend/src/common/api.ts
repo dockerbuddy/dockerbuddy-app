@@ -20,3 +20,11 @@ export function getHostSummary(id: string): Promise<Response> {
     },
   });
 }
+
+export function fetchCounter(): Promise<Response> {
+  return fetch(`${proxy}/influxdb/alertsCounter`, {
+    headers: {
+      "Content-Type": "application/json",
+    },
+  });
+}
