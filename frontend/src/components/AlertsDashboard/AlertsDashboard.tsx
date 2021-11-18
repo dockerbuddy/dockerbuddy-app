@@ -13,19 +13,28 @@ import { proxy } from "../../common/api";
 import { AlertsResponseElement, StandardApiResponse } from "../../common/types";
 import AlertsList from "./AlertsList";
 import { Sync } from "@material-ui/icons";
+import { useAppSelector } from "../../redux/hooks";
+import { selectCounter } from "../../redux/alertCounterSlice";
 
 interface AlertsDashboardProps {
   hostId?: string;
   onlyList?: boolean;
+  autoRefresh?: boolean;
 }
 
 const AlertsDashboard: React.FC<AlertsDashboardProps> = ({
   hostId = "",
   onlyList = false,
+  autoRefresh = false,
 }) => {
   const [alerts, setAlerts] = useState<AlertsResponseElement[]>([]);
   const [days, setDays] = useState<string>("1");
   const [isFetching, setIsFetching] = useState<boolean>(false);
+  let counterData;
+  if (autoRefresh) {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    counterData = useAppSelector(selectCounter);
+  }
 
   const fetchAlerts = async () => {
     setIsFetching(true);
@@ -60,7 +69,7 @@ const AlertsDashboard: React.FC<AlertsDashboardProps> = ({
 
   useEffect(() => {
     fetchAlerts();
-  }, []);
+  }, [counterData?.value]);
 
   const refresh = async () => {
     const value = parseInt(days);
@@ -111,7 +120,7 @@ const AlertsDashboard: React.FC<AlertsDashboardProps> = ({
           </>
         )}
         <Grid item>
-          {isFetching ? (
+          {isFetching && !autoRefresh ? (
             <Box justifyContent="center" display="flex" mt={5}>
               <CircularProgress />
             </Box>
