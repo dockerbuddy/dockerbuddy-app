@@ -22,13 +22,16 @@ class ExceptionHandler {
     @ExceptionHandler(value = [ EntityNotFoundException::class ])
     fun handleEntityNotFound(ex: EntityNotFoundException): ResponseEntity<DefaultResponse<Any?>> {
         logger.warn(ex.message)
+        logger.debug(ex.stackTrace.toString())
         return ResponseEntity.status(HttpStatus.NOT_FOUND)
             .body(DefaultResponse(ResponseType.ERROR, ex.message ?: "No message provided", null))
     }
 
     @ExceptionHandler(value = [ IllegalArgumentException::class ])
-    fun handleIllegalArgumentException(ex: IllegalArgumentException):ResponseEntity<DefaultResponse<Any?>> {
+    fun handleIllegalArgumentException(ex: IllegalArgumentException)
+    :ResponseEntity<DefaultResponse<Any?>> {
         logger.error("IllegalArgumentException: " + ex.message)
+        logger.debug(ex.stackTrace.toString())
         return ResponseEntity.status(HttpStatus.BAD_REQUEST)
             .body(DefaultResponse(ResponseType.ERROR, ex.message ?: "No message provided", null))
     }
@@ -36,6 +39,7 @@ class ExceptionHandler {
     @ExceptionHandler(value = [ ConstraintViolationException::class, org.hibernate.exception.ConstraintViolationException::class ])
     fun handleIllegalArgumentException(ex: Exception):ResponseEntity<DefaultResponse<Any?>> {
         logger.error("ConstraintViolationException: " + ex.message)
+        logger.debug(ex.stackTrace.toString())
         return ResponseEntity.status(HttpStatus.BAD_REQUEST)
             .body(DefaultResponse(ResponseType.ERROR, ex.message ?: "No message provided", null))
     }
@@ -49,6 +53,7 @@ class ExceptionHandler {
             errors[fieldName] = errorMessage.toString()
         }
         logger.error("MethodArgumentNotValidException: $errors")
+        logger.debug(ex.stackTrace.toString())
         return ResponseEntity.status(HttpStatus.BAD_REQUEST)
             .body(DefaultResponse(ResponseType.ERROR, "Validation failed for some arguments", errors))
     }
@@ -57,6 +62,7 @@ class ExceptionHandler {
     @ExceptionHandler(value = [ Exception::class ])
     fun handleOtherException(ex: Exception): ResponseEntity<DefaultResponse<Any?>> {
         logger.error("An unhandled exception occurred: " + ex.message)
+        logger.debug(ex.stackTrace.toString())
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
             .body(DefaultResponse(ResponseType.ERROR, ex.message ?: "No message provided", null))
     }

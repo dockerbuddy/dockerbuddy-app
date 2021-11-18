@@ -1,9 +1,11 @@
 import { configureStore, ThunkAction, Action } from "@reduxjs/toolkit";
 import hostReducer from "./hostsSlice";
+import alertCounterReducer from "./alertCounterSlice";
 
 export const store = configureStore({
   reducer: {
     host: hostReducer,
+    alertCounter: alertCounterReducer,
   },
 });
 

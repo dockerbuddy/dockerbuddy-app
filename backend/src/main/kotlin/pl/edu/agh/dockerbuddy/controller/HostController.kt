@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.*
 import pl.edu.agh.dockerbuddy.controller.response.DefaultResponse
 import pl.edu.agh.dockerbuddy.controller.response.ResponseType
 import pl.edu.agh.dockerbuddy.model.HostWithSummary
+import pl.edu.agh.dockerbuddy.model.entity.ContainerReport
 import pl.edu.agh.dockerbuddy.model.entity.Host
 import pl.edu.agh.dockerbuddy.service.HostService
 import java.util.*
@@ -40,7 +41,12 @@ class HostController (
 
     @ApiOperation(value = "Get specific host with summary")
     @ApiImplicitParams(value = [
-        ApiImplicitParam(name = "id", value = "Id of a host", dataTypeClass = Long::class, example = "1")
+        ApiImplicitParam(
+            name = "id",
+            value = "Id of a host",
+            dataTypeClass = UUID::class,
+            example = "1e85551a-d9bd-4a9c-bc62-81207553c9fd"
+        )
     ])
     @GetMapping(value =["/{id}"], produces = ["application/json"])
     fun getHostWithSummary(@PathVariable id: UUID): ResponseEntity<DefaultResponse<HostWithSummary>> {
@@ -51,7 +57,12 @@ class HostController (
 
     @ApiOperation(value = "Delete host")
     @ApiImplicitParams(value = [
-           ApiImplicitParam(name = "id", value = "Id of a host", dataTypeClass = Long::class, example = "1")
+       ApiImplicitParam(
+           name = "id",
+           value = "Id of a host",
+           dataTypeClass = UUID::class,
+           example = "1e85551a-d9bd-4a9c-bc62-81207553c9fd"
+       )
     ])
     @DeleteMapping(value =["/{id}"], produces = ["application/json"])
     fun deleteHost(@PathVariable id: UUID): ResponseEntity<DefaultResponse<Any?>> {
@@ -62,12 +73,34 @@ class HostController (
 
     @ApiOperation(value = "Update host")
     @ApiImplicitParams(value = [
-        ApiImplicitParam(name = "id", value = "Id of a host", dataTypeClass = Long::class, example = "1")
+        ApiImplicitParam(
+            name = "id",
+            value = "Id of a host",
+            dataTypeClass = UUID::class,
+            example = "1e85551a-d9bd-4a9c-bc62-81207553c9fd"
+        )
     ])
     @PutMapping(value = ["/{id}"], produces = ["application/json"])
     fun updateHost(@PathVariable id: UUID, @RequestBody @Valid host: Host): ResponseEntity<DefaultResponse<Host>> {
         val updatedHost = hostService.updateHost(id, host)
         return ResponseEntity.status(HttpStatus.OK)
             .body(DefaultResponse(ResponseType.SUCCESS, "Host updated", updatedHost))
+    }
+
+    @ApiOperation(value = "Update container report status (marked as watched or not)")
+    @ApiImplicitParams(value = [
+        ApiImplicitParam(
+            name = "id",
+            value = "Id of a host",
+            dataTypeClass = UUID::class,
+            example = "1e85551a-d9bd-4a9c-bc62-81207553c9fd"
+        )
+    ])
+    @PutMapping(value = ["/{id}/container"], produces = ["application/json"])
+    fun updateContainer(@PathVariable id: UUID, @RequestBody @Valid containerReport: ContainerReport):
+            ResponseEntity<DefaultResponse<Host>> {
+        val updatedHost = hostService.updateHostContainerReport(id, containerReport)
+        return ResponseEntity.status(HttpStatus.OK)
+            .body(DefaultResponse(ResponseType.SUCCESS, "Container report updated", updatedHost))
     }
 }

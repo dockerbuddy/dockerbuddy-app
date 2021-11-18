@@ -7,5 +7,6 @@ data class AlertRecord (
     val hostId: UUID,
     val alertType: AlertType,
     val alertMessage: String,
-    val time: String
+    val time: String,
+    val read: Boolean
 )

@@ -18,7 +18,7 @@ import { MetricType } from "../../common/enums";
 const useStyles = makeStyles((theme) => ({
   card: {
     borderColor: "#1A1C19",
-    backgroundColor: "transparent",
+    backgroundColor: "#1D1F22",
   },
   settingsColor: {
     color: theme.palette.primary.main,
@@ -76,7 +76,7 @@ const HostCardComponent: React.FC<{ host: Host }> = (props) => {
               host.hostSummary.containers.map((cont: Container) => {
                 return (
                   <Grid item xs={4} key={cont.id}>
-                    <ContainerCardComponent container={cont} />
+                    <ContainerCardComponent container={cont} hostId={host.id} />
                   </Grid>
                 );
               })

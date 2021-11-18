@@ -12,8 +12,10 @@ import javax.validation.constraints.Min
 @Table(name = "metric_rule")
 @Entity
 class MetricRule (
+    @Enumerated(EnumType.STRING)
+    @Column(name = "type", nullable = false)
     @JsonAlias("ruleType")
-    type: RuleType,
+    var type: RuleType,
 
     @field:Min(0)
     @field:Max(100)
@@ -24,7 +26,7 @@ class MetricRule (
     @field:Max(100)
     @Column(name = "critical_level", nullable = false)
     var criticalLevel: Int
-): AbstractRule(type)  {
+): BaseIdEntity()  {
 
     init {
         if (warnLevel >= criticalLevel) {

@@ -1,4 +1,4 @@
-import { MetricType, AlertType, RuleType } from "../common/enums";
+import { MetricType, AlertType, RuleType, ReportStatus } from "../common/enums";
 import { BasicMetric, HostRule } from "../common/types";
 import { alertColors } from "./alertStyle";
 
@@ -64,6 +64,23 @@ export function alertTypeToColor(type: AlertType): string {
       return alertColors.yellow;
   }
   return alertColors.default;
+}
+
+export function statusTypeToColor(
+  type: AlertType,
+  reportStatus: ReportStatus,
+  status: string
+): string {
+  switch (reportStatus) {
+    case ReportStatus.WATCHED:
+      return alertTypeToColor(type);
+    default:
+      if (status !== "RUNNING") {
+        return alertColors.disabled;
+      } else {
+        return alertColors.default;
+      }
+  }
 }
 
 export function paramsToString(params: any): string {
