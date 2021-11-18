@@ -1,12 +1,34 @@
-import { MenuItem, ListItemText, Divider } from "@material-ui/core";
+import {
+  MenuItem,
+  ListItemText,
+  Divider,
+  Grid,
+  IconButton,
+  Typography,
+} from "@material-ui/core";
+import { Link } from "@material-ui/icons";
+import { makeStyles } from "@material-ui/styles";
 import { Menu } from "@mui/material";
 import React, { useEffect, useState } from "react";
+import { useHistory } from "react-router-dom";
 import { proxy } from "../../common/api";
 import { AlertsResponseElement, StandardApiResponse } from "../../common/types";
-import { reduceBy } from "../../redux/alertCounterSlice";
+import { setCounter } from "../../redux/alertCounterSlice";
 import { useAppDispatch } from "../../redux/hooks";
 import { paramsToString, parseDateToDDMMYYYY } from "../../util/util";
 import AlertElement from "../AlertsDashboard/AlertElement";
+
+const useStyles = makeStyles(() => ({
+  disableHover: {
+    "&:hover": {
+      backgroundColor: "transparent",
+    },
+  },
+  noAlerts: {
+    padding: "20px",
+    color: "rgb(229, 209, 208)",
+  },
+}));
 
 interface AlertsListProps {
   anchorEl: null | HTMLElement;
@@ -19,13 +41,14 @@ const UnreadAlertsListComponent: React.FC<AlertsListProps> = ({
   open,
   handleClose,
 }) => {
+  const classes = useStyles();
   const dispatch = useAppDispatch();
 
   const [alerts, setAlerts] = useState<AlertsResponseElement[]>([]);
   const [alertsToDelete, setAlertsToDelete] = useState<AlertsResponseElement[]>(
     []
   );
-  const [isAll, setIsAll] = useState<boolean>(false);
+  const [highlight, setHighlight] = useState<boolean>(true);
 
   useEffect(() => {
     if (open) {
@@ -66,8 +89,9 @@ const UnreadAlertsListComponent: React.FC<AlertsListProps> = ({
         },
         body: JSON.stringify(alertsToDelete),
       });
+      const result = await response.json();
       if (response.ok) {
-        dispatch(reduceBy(alertsToDelete.length));
+        dispatch(setCounter(result.body));
         setAlertsToDelete([]);
       } else {
         //todo do something
@@ -84,17 +108,24 @@ const UnreadAlertsListComponent: React.FC<AlertsListProps> = ({
   };
 
   const handleAll = () => {
-    if (isAll) {
+    if (alerts.length == alertsToDelete.length) {
       setAlertsToDelete([]);
     } else {
       setAlertsToDelete(alerts);
     }
-    setIsAll((isAll) => !isAll);
+  };
+
+  const history = useHistory();
+  const clickLink = (
+    e: React.MouseEvent<HTMLButtonElement>,
+    hostId: string
+  ) => {
+    e.stopPropagation();
+    history.push(`/host/${hostId}`);
   };
 
   let prev = "";
 
-  //todo display info when there are no alerts whatsoever, make alerts max length, improve select/deselect all button, make alert not link to their hosts -> make separate button for it
   return (
     <Menu
       id="basic-menu"
@@ -108,37 +139,70 @@ const UnreadAlertsListComponent: React.FC<AlertsListProps> = ({
         },
       }}
     >
-      <>
-        <MenuItem onClick={handleAll}>
-          <ListItemText>{isAll ? "Deselect all" : "Select all"}</ListItemText>
-        </MenuItem>
-        <Divider />
-        {Object.values(alerts).map((alert: AlertsResponseElement) => {
-          let showDate = false;
-          if (parseDateToDDMMYYYY(alert.time) != prev) {
-            prev = parseDateToDDMMYYYY(alert.time);
-            showDate = true;
-          }
-          return (
-            <MenuItem
-              selected={alertsToDelete.includes(alert)}
-              key={
-                alert.alertMessage + alert.hostId + alert.alertType + alert.time
-              }
-              onClick={() => handleAlertClick(alert)}
-            >
-              <AlertElement
-                alert={alert}
-                key={alert.time.getTime()}
-                showDate={showDate}
-              />
-              {/* <ListItemIcon>
-              <Edit />
-            </ListItemIcon> */}
-            </MenuItem>
-          );
-        })}
-      </>
+      {alerts.length == 0 ? (
+        <Typography align="center" className={classes.noAlerts} variant="h6">
+          There are no unread alerts!
+        </Typography>
+      ) : (
+        <>
+          <MenuItem onClick={handleAll}>
+            <ListItemText>
+              <Typography variant="h6" color="textPrimary">
+                <strong>
+                  {alerts.length == alertsToDelete.length
+                    ? "Deselect all"
+                    : "Select all"}
+                </strong>
+              </Typography>
+            </ListItemText>
+          </MenuItem>
+          <Divider />
+          {Object.values(alerts).map((alert: AlertsResponseElement) => {
+            let showDate = false;
+            if (parseDateToDDMMYYYY(alert.time) != prev) {
+              prev = parseDateToDDMMYYYY(alert.time);
+              showDate = true;
+            }
+            return (
+              <MenuItem
+                selected={alertsToDelete.includes(alert)}
+                onClick={() => handleAlertClick(alert)}
+                key={
+                  alert.alertMessage +
+                  alert.hostId +
+                  alert.alertType +
+                  alert.time
+                }
+                className={highlight ? undefined : classes.disableHover}
+              >
+                <Grid container alignItems="flex-end">
+                  <Grid item xs={1}>
+                    <IconButton
+                      onClick={(e) => clickLink(e, alert.hostId)}
+                      onMouseEnter={() => setHighlight(false)}
+                      onMouseLeave={() => setHighlight(true)}
+                    >
+                      <Link color="primary" />
+                    </IconButton>
+                  </Grid>
+                  <Grid
+                    item
+                    container
+                    xs={11}
+                    style={{ pointerEvents: "none" }}
+                  >
+                    <AlertElement
+                      alert={alert}
+                      key={alert.time.getTime()}
+                      showDate={showDate}
+                    />
+                  </Grid>
+                </Grid>
+              </MenuItem>
+            );
+          })}
+        </>
+      )}
     </Menu>
   );
 };
