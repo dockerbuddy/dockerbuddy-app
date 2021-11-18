@@ -23,13 +23,13 @@ import java.util.*
 class HostServiceTest {
 
     @Mock
-    lateinit var hostRepository: HostRepository
+    private lateinit var hostRepository: HostRepository
 
     @Mock
-    lateinit var inMemory: InMemory
+    private lateinit var inMemory: InMemory
 
     @InjectMocks
-    lateinit var hostService: HostService
+    private lateinit var hostService: HostService
 
     @Test
     fun addContainersToHost_Test() {
