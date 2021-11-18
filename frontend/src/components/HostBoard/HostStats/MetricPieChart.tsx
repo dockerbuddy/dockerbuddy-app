@@ -97,7 +97,7 @@ const MetricPieChart: React.FC<{
   return (
     <>
       <ResponsiveContainer width="100%" height={500}>
-        <PieChart>
+        <PieChart style={{ cursor: "pointer" }}>
           <Pie
             startAngle={200}
             endAngle={-20}
