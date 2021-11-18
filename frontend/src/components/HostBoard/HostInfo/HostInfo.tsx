@@ -37,7 +37,7 @@ const HostInfo: React.FC<HostInfoProps> = ({ hostData }) => {
         <Grid item>
           <Typography variant="h5">Containers</Typography>
         </Grid>
-        <Grid container item>
+        <Grid container item spacing={2}>
           {hostData?.hostSummary?.containers.map((cont: Container) => {
             return (
               <Grid item xs={2} key={cont.id}>
