@@ -19,6 +19,18 @@
       "value": 30,
       "total": 100,
       "percent": 30
+    },
+    {
+      "metricType": "NETWORK_IN",
+      "value": 30,
+      "total": 100,
+      "percent": 30
+    },
+    {
+      "metricType": "NETWORK_OUT",
+      "value": 30,
+      "total": 100,
+      "percent": 30
     }
   ],
   "containers": [

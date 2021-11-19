@@ -48,6 +48,8 @@ class AlertServiceTest {
         assertEquals(AlertType.CRITICAL, hostSummary.metrics.first { it.metricType == MetricType.CPU_USAGE }.alertType)
         assertEquals(AlertType.WARN, hostSummary.metrics.first { it.metricType == MetricType.MEMORY_USAGE }.alertType)
         assertEquals(AlertType.OK, hostSummary.metrics.first { it.metricType == MetricType.DISK_USAGE }.alertType)
+        assertEquals(AlertType.OK, hostSummary.metrics.first { it.metricType == MetricType.NETWORK_IN }.alertType)
+        assertEquals(AlertType.OK, hostSummary.metrics.first { it.metricType == MetricType.NETWORK_OUT }.alertType)
     }
 
     @Test
