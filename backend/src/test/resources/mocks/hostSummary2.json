@@ -6,13 +6,13 @@
       "metricType": "CPU_USAGE",
       "value": 90,
       "total": 100,
-      "percent": 90
+      "percent": 70
     },
     {
       "metricType": "MEMORY_USAGE",
       "value": 70,
       "total": 100,
-      "percent": 70
+      "percent": 40
     },
     {
       "metricType": "DISK_USAGE",
@@ -47,7 +47,7 @@
           "percent": 11
         },
         {
-          "metricType": "memory_usage",
+          "metricType": "MEMORY_USAGE",
           "value": 21,
           "total": 37,
           "percent": 8
@@ -79,6 +79,26 @@
       "name": "cont3",
       "image": "dockera-app",
       "status": "EXITED",
+      "metrics": [
+        {
+          "metricType": "CPU_USAGE",
+          "value": 21,
+          "total": 37,
+          "percent": 11
+        },
+        {
+          "metricType": "MEMORY_USAGE",
+          "value": 21,
+          "total": 37,
+          "percent": 8
+        }
+      ]
+    },
+    {
+      "id": "6fc25003-4768-44a0-8ee4-930867e2226g",
+      "name": "cont4",
+      "image": "dockera-app",
+      "status": "REMOVING",
       "metrics": [
         {
           "metricType": "CPU_USAGE",

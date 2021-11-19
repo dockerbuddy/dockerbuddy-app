@@ -176,7 +176,7 @@ class AlertService(
                         }
                     sendAlert(Alert(hostSummary.id, containerSummary.alertType!!, alertMessage))
                 }
-            } else if (containerSummary.alertType != AlertType.OK){
+            } else if (containerSummary.alertType != AlertType.OK) {
                 val alertMessage: String = "Host ${host.hostName}: something wrong with container ${containerSummary.name}. " +
                                            "State: ${containerSummary.status.humaneReadable()}"
                 sendAlert(Alert(hostSummary.id, containerSummary.alertType!!, alertMessage))
