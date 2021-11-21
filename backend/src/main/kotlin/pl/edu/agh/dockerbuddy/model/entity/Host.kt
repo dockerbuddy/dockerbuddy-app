@@ -21,7 +21,10 @@ class Host(
     var ip: String? = null,
 
     @OneToMany(cascade = [CascadeType.ALL], orphanRemoval = true, fetch = FetchType.EAGER)
-    var hostRules: MutableSet<MetricRule> = mutableSetOf(),
+    var hostPercentRules: MutableSet<PercentMetricRule> = mutableSetOf(),
+
+    @OneToMany(cascade = [CascadeType.ALL], orphanRemoval = true, fetch = FetchType.EAGER)
+    var hostBasicRules: MutableSet<BasicMetricRule> = mutableSetOf(),
 
     @OneToMany(cascade = [CascadeType.ALL], orphanRemoval = true, fetch = FetchType.EAGER)
     var containers: MutableSet<ContainerReport> = mutableSetOf()

@@ -14,7 +14,7 @@ import org.springframework.stereotype.Service
 import pl.edu.agh.dockerbuddy.model.alert.Alert
 import pl.edu.agh.dockerbuddy.model.alert.AlertType
 import pl.edu.agh.dockerbuddy.model.metric.HostSummary
-import pl.edu.agh.dockerbuddy.model.metric.MetricType
+import pl.edu.agh.dockerbuddy.model.metric.PercentMetricType
 import java.lang.IllegalArgumentException
 import java.time.*
 import java.util.*
@@ -40,7 +40,7 @@ class InfluxDbProxy {
     var checklist = mutableListOf<String>()
 
     init {
-        val metricTypes = MetricType.values().map { it.toString() }
+        val metricTypes = PercentMetricType.values().map { it.toString() }
         val metricVariations = listOf("total", "value", "percent")
 
         for (metric in metricTypes) {
@@ -69,8 +69,8 @@ class InfluxDbProxy {
             .addTag("host_id", hostId.toString())
             .addTag("metric_id", hostSummary.id.toString())
             .time(Instant.parse(hostSummary.timestamp).toEpochMilli(), WritePrecision.MS)
-        val hostMetrics = hostSummary.metrics.associateBy { it.metricType }
-        for (metricType in MetricType.values()) {
+        val hostMetrics = hostSummary.metrics.associateBy { it.percentMetricType }
+        for (metricType in PercentMetricType.values()) {
             val metricTypeLowercase = metricType.toString().lowercase()
             hostPoint.addField("${metricTypeLowercase}_total", hostMetrics[metricType]?.total)
             hostPoint.addField("${metricTypeLowercase}_value", hostMetrics[metricType]?.value)
@@ -90,8 +90,8 @@ class InfluxDbProxy {
                 .addField("status", container.status.toString())
                 .time(Instant.parse(hostSummary.timestamp).toEpochMilli(), WritePrecision.MS)
 
-            val containerMetrics = container.metrics.associateBy { it.metricType }
-            for (metricType in MetricType.values()) {
+            val containerMetrics = container.metrics.associateBy { it.percentMetricType }
+            for (metricType in PercentMetricType.values()) {
                 if (metricType in containerMetrics.keys) {
                     val metricTypeLowercase = metricType.toString().lowercase()
                     containerPoint.addField("${metricTypeLowercase}_total", hostMetrics[metricType]?.total)

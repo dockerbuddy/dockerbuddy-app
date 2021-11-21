@@ -54,7 +54,7 @@ class HostService (
             host.id!!,
             host.hostName!!,
             host.ip!!,
-            host.hostRules.toList().sortedBy { it.id },
+            host.hostPercentRules.toList().sortedBy { it.id },
             host.containers.toList().sortedBy { it.id },
             hostSummary
         )
@@ -76,7 +76,7 @@ class HostService (
                     host.id!!,
                     host.hostName!!,
                     host.ip!!,
-                    host.hostRules.toList().sortedBy { it.id },
+                    host.hostPercentRules.toList().sortedBy { it.id },
                     host.containers.toList().sortedBy { it.id },
                     hostSummary
                 )

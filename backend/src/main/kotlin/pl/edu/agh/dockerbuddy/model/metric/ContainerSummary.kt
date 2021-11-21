@@ -12,7 +12,7 @@ data class ContainerSummary(
     val name: String,
     val image: String,
     @JsonAlias("state") val status: ContainerState,
-    val metrics: List<BasicMetric>,
+    val metrics: List<PercentMetric>,
     var alertType: AlertType?,
     var reportStatus: ReportStatus?
 )

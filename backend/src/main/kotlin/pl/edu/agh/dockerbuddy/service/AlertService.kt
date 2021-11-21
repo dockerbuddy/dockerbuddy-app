@@ -13,12 +13,9 @@ import pl.edu.agh.dockerbuddy.model.alert.AlertWithCounter
 import pl.edu.agh.dockerbuddy.model.enums.ContainerState
 import pl.edu.agh.dockerbuddy.model.enums.RuleType
 import pl.edu.agh.dockerbuddy.model.entity.Host
-import pl.edu.agh.dockerbuddy.model.entity.MetricRule
+import pl.edu.agh.dockerbuddy.model.entity.PercentMetricRule
 import pl.edu.agh.dockerbuddy.model.enums.ReportStatus
-import pl.edu.agh.dockerbuddy.model.metric.BasicMetric
-import pl.edu.agh.dockerbuddy.model.metric.ContainerSummary
-import pl.edu.agh.dockerbuddy.model.metric.HostSummary
-import pl.edu.agh.dockerbuddy.model.metric.MetricType
+import pl.edu.agh.dockerbuddy.model.metric.*
 import java.util.*
 
 @Service
@@ -38,21 +35,22 @@ class AlertService(
         }
     }
 
-    fun appendAlertTypeToMetrics(hostSummary: HostSummary, rules: MutableSet<MetricRule>){
-        val hostMetrics = hostSummary.metrics.associateBy { it.metricType }
-        for (rule in rules) {
+    fun appendAlertTypeToMetrics(hostSummary: HostSummary, hostPercentRules: MutableSet<PercentMetricRule>){
+        val hostMetrics = hostSummary.metrics.associateBy { it.percentMetricType }
+        for (rule in hostPercentRules) {
             when (rule.type) {
-                RuleType.CPU_USAGE -> addAlertType(hostMetrics[MetricType.CPU_USAGE]!!, rule)
-                RuleType.MEMORY_USAGE -> addAlertType(hostMetrics[MetricType.MEMORY_USAGE]!!, rule)
-                RuleType.DISK_USAGE -> addAlertType(hostMetrics[MetricType.DISK_USAGE]!!, rule)
+                RuleType.CPU_USAGE -> addAlertType(hostMetrics[PercentMetricType.CPU_USAGE]!!, rule)
+                RuleType.MEMORY_USAGE -> addAlertType(hostMetrics[PercentMetricType.MEMORY_USAGE]!!, rule)
+                RuleType.DISK_USAGE -> addAlertType(hostMetrics[PercentMetricType.DISK_USAGE]!!, rule)
+                else -> throw IllegalStateException("Forbidden rule type: ${rule.type}")
             }
         }
     }
 
     fun checkForAlertSummary(hostSummary: HostSummary, prevHostSummary: HostSummary, host: Host){
-        val hostMetrics = hostSummary.metrics.associateBy { it.metricType }
-        val prevHostMetrics = prevHostSummary.metrics.associateBy { it.metricType }
-        for (mt in MetricType.values()) {
+        val hostMetrics = hostSummary.metrics.associateBy { it.percentMetricType }
+        val prevHostMetrics = prevHostSummary.metrics.associateBy { it.percentMetricType }
+        for (mt in PercentMetricType.values()) {
             if (hostMetrics.containsKey(mt) && prevHostMetrics.containsKey(mt)) {
                 checkForAlert(hostMetrics[mt]!!, prevHostMetrics[mt]!!, hostSummary, host.hostName!!)
             }
@@ -64,18 +62,18 @@ class AlertService(
     }
 
     fun checkForAlert(
-        basicMetric: BasicMetric,
-        prevBasicMetric: BasicMetric,
+        percentMetric: PercentMetric,
+        prevPercentMetric: PercentMetric,
         hostSummary: HostSummary,
         hostName: String
     ) {
-        if (basicMetric.alertType == null) return
-        logger.debug("Checking basic metric: ${basicMetric.metricType}")
-        if (basicMetric.alertType != prevBasicMetric.alertType) {
-            val alertMessage = "Host $hostName: ${basicMetric.metricType.humanReadable()} is ${basicMetric.percent}%"
+        if (percentMetric.alertType == null) return
+        logger.debug("Checking basic metric: ${percentMetric.percentMetricType}")
+        if (percentMetric.alertType != prevPercentMetric.alertType) {
+            val alertMessage = "Host $hostName: ${percentMetric.percentMetricType.humanReadable()} is ${percentMetric.percent}%"
             logger.info(alertMessage)
-            logger.debug("$basicMetric")
-            sendAlert(Alert(hostSummary.id, basicMetric.alertType!!, alertMessage))
+            logger.debug("$percentMetric")
+            sendAlert(Alert(hostSummary.id, percentMetric.alertType!!, alertMessage))
         }
     }
 
@@ -136,11 +134,16 @@ class AlertService(
             UUID.randomUUID(),
             "123",
             listOf(
-                BasicMetric(MetricType.CPU_USAGE, 0.0, 0.0, 0.0, AlertType.OK),
-                BasicMetric(MetricType.DISK_USAGE, 0.0, 0.0, 0.0, AlertType.OK),
-                BasicMetric(MetricType.MEMORY_USAGE, 0.0, 0.0, 0.0, AlertType.OK)
+                PercentMetric(PercentMetricType.CPU_USAGE, 0.0, 0.0, 0.0, AlertType.OK),
+                PercentMetric(PercentMetricType.DISK_USAGE, 0.0, 0.0, 0.0, AlertType.OK),
+                PercentMetric(PercentMetricType.MEMORY_USAGE, 0.0, 0.0, 0.0, AlertType.OK)
+            ),
+            listOf(
+                BasicMetric(BasicMetricType.NETWORK_IN, 0L, AlertType.OK),
+                BasicMetric(BasicMetricType.NETWORK_OUT, 0L, AlertType.OK)
             ),
             hostSummary.containers.toMutableList()
+
         )
         mockPrevHostSummary.containers.map { it.copy() }.forEach { it.alertType = AlertType.OK }
 
@@ -153,10 +156,10 @@ class AlertService(
         checkForAlertSummary(hostSummary, mockPrevHostSummary, hostService.addContainersToHost(host, newContainers))
     }
 
-    fun addAlertType(basicMetric: BasicMetric, rule: MetricRule) = when {
-        basicMetric.percent < rule.warnLevel.toDouble() -> basicMetric.alertType = AlertType.OK
-        basicMetric.percent > rule.criticalLevel.toDouble() -> basicMetric.alertType = AlertType.CRITICAL
-        else -> basicMetric.alertType = AlertType.WARN
+    fun addAlertType(percentMetric: PercentMetric, rulePercent: PercentMetricRule) = when {
+        percentMetric.percent < rulePercent.warnLevel.toDouble() -> percentMetric.alertType = AlertType.OK
+        percentMetric.percent > rulePercent.criticalLevel.toDouble() -> percentMetric.alertType = AlertType.CRITICAL
+        else -> percentMetric.alertType = AlertType.WARN
     }
 
     fun appendAlertTypeToContainers(hostSummary: HostSummary, host: Host) {

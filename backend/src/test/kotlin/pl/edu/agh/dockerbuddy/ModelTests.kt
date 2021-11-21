@@ -9,7 +9,7 @@ import org.mockito.Mockito
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest
-import pl.edu.agh.dockerbuddy.model.entity.MetricRule
+import pl.edu.agh.dockerbuddy.model.entity.PercentMetricRule
 import pl.edu.agh.dockerbuddy.model.entity.Host
 import pl.edu.agh.dockerbuddy.model.enums.RuleType
 import pl.edu.agh.dockerbuddy.repository.AbstractRuleRepository
@@ -60,7 +60,7 @@ class ModelTests (
     @Test
     fun hostRulesInitTest() {
         val host = Host("name", "192.168.1.1")
-        assertTrue(host.hostRules.isEmpty())
+        assertTrue(host.hostPercentRules.isEmpty())
     }
 
     @Test
@@ -68,35 +68,35 @@ class ModelTests (
         val host = Host(
             "name",
             "192.168.1.1",
-            mutableSetOf(Mockito.mock(MetricRule::class.java)))
-        assertFalse(host.hostRules.isEmpty())
+            mutableSetOf(Mockito.mock(PercentMetricRule::class.java)))
+        assertFalse(host.hostPercentRules.isEmpty())
     }
 
     @Test
     fun abstractRuleAlertLevelTest() {
         assertThrows(IllegalArgumentException::class.java, fun() {
-            MetricRule(RuleType.DISK_USAGE, 50, 10)
+            PercentMetricRule(RuleType.DISK_USAGE, 50, 10)
         })
     }
 
     @Test
     fun abstractRuleMinAlertLevelConstraintTest() {
-        val abstractRule1 = MetricRule(RuleType.DISK_USAGE, -1, 20)
+        val abstractRule1 = PercentMetricRule(RuleType.DISK_USAGE, -1, 20)
         var violations = validator.validate(abstractRule1)
         assertFalse(violations.isEmpty())
 
-        val abstractRule2 = MetricRule(RuleType.DISK_USAGE, -2, -1)
+        val abstractRule2 = PercentMetricRule(RuleType.DISK_USAGE, -2, -1)
         violations = validator.validate(abstractRule2)
         assertFalse(violations.isEmpty())
     }
 
     @Test
     fun abstractRuleMaxAlertLevelConstraintTest() {
-        val abstractRule1 = MetricRule(RuleType.DISK_USAGE, 50, 105)
+        val abstractRule1 = PercentMetricRule(RuleType.DISK_USAGE, 50, 105)
         var violations = validator.validate(abstractRule1)
         assertFalse(violations.isEmpty())
 
-        val abstractRule2 = MetricRule(RuleType.DISK_USAGE, 105, 150)
+        val abstractRule2 = PercentMetricRule(RuleType.DISK_USAGE, 105, 150)
         violations = validator.validate(abstractRule2)
         assertFalse(violations.isEmpty())
     }
@@ -111,10 +111,10 @@ class ModelTests (
     @Test
     fun saveAbstractRuleToDBTest() {
         val host = Host("host", "192.168.1.55")
-        val abstractRule = MetricRule(RuleType.DISK_USAGE, 50, 90)
-        host.hostRules.add(abstractRule)
+        val abstractRule = PercentMetricRule(RuleType.DISK_USAGE, 50, 90)
+        host.hostPercentRules.add(abstractRule)
         hostRepository.save(host) // AbstractRule is persisted when updated host is saved to DB
         assertEquals(abstractRule, abstractRuleRepository.findAll().first())
-        assertEquals(abstractRule, hostRepository.findAll().first().hostRules.first())
+        assertEquals(abstractRule, hostRepository.findAll().first().hostPercentRules.first())
     }
 }

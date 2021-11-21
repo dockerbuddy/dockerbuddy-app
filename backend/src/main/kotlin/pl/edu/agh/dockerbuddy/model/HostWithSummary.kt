@@ -2,7 +2,7 @@ package pl.edu.agh.dockerbuddy.model
 
 import lombok.ToString
 import pl.edu.agh.dockerbuddy.model.entity.ContainerReport
-import pl.edu.agh.dockerbuddy.model.entity.MetricRule
+import pl.edu.agh.dockerbuddy.model.entity.PercentMetricRule
 import pl.edu.agh.dockerbuddy.model.metric.HostSummary
 import java.util.*
 
@@ -11,7 +11,7 @@ data class HostWithSummary(
     val id: UUID,
     val hostName: String,
     val ip: String,
-    val hostRules: List<MetricRule>,
+    val hostRulePercents: List<PercentMetricRule>,
     val containersReports: List<ContainerReport>,
     val hostSummary: HostSummary?
 )
