@@ -69,7 +69,7 @@ class InfluxDbProxy {
             .addTag("host_id", hostId.toString())
             .addTag("metric_id", hostSummary.id.toString())
             .time(Instant.parse(hostSummary.timestamp).toEpochMilli(), WritePrecision.MS)
-        val hostMetrics = hostSummary.metrics.associateBy { it.percentMetricType }
+        val hostMetrics = hostSummary.percentMetrics.associateBy { it.metricType }
         for (metricType in PercentMetricType.values()) {
             val metricTypeLowercase = metricType.toString().lowercase()
             hostPoint.addField("${metricTypeLowercase}_total", hostMetrics[metricType]?.total)
@@ -90,7 +90,7 @@ class InfluxDbProxy {
                 .addField("status", container.status.toString())
                 .time(Instant.parse(hostSummary.timestamp).toEpochMilli(), WritePrecision.MS)
 
-            val containerMetrics = container.metrics.associateBy { it.percentMetricType }
+            val containerMetrics = container.metrics.associateBy { it.metricType }
             for (metricType in PercentMetricType.values()) {
                 if (metricType in containerMetrics.keys) {
                     val metricTypeLowercase = metricType.toString().lowercase()

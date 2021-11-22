@@ -29,7 +29,7 @@ class PercentMetricRule (
 ): BaseIdEntity()  {
 
     init {
-        require (warnLevel >= criticalLevel) {
+        require (criticalLevel >= warnLevel) {
             "warnLevel cannot be greater than nor equal to criticalLevel"
         }
 

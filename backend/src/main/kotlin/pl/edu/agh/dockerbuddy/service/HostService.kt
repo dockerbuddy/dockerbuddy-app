@@ -6,6 +6,7 @@ import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 import pl.edu.agh.dockerbuddy.inmemory.InMemory
 import pl.edu.agh.dockerbuddy.model.HostWithSummary
+import pl.edu.agh.dockerbuddy.model.entity.BasicMetricRule
 import pl.edu.agh.dockerbuddy.model.entity.ContainerReport
 import pl.edu.agh.dockerbuddy.model.entity.Host
 import pl.edu.agh.dockerbuddy.model.enums.ReportStatus
@@ -55,6 +56,7 @@ class HostService (
             host.hostName!!,
             host.ip!!,
             host.hostPercentRules.toList().sortedBy { it.id },
+            emptyList(),
             host.containers.toList().sortedBy { it.id },
             hostSummary
         )
@@ -77,6 +79,7 @@ class HostService (
                     host.hostName!!,
                     host.ip!!,
                     host.hostPercentRules.toList().sortedBy { it.id },
+                    emptyList(),
                     host.containers.toList().sortedBy { it.id },
                     hostSummary
                 )

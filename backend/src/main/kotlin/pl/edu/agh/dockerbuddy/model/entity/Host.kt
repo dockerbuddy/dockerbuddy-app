@@ -1,6 +1,8 @@
 package pl.edu.agh.dockerbuddy.model.entity
 
 import com.fasterxml.jackson.annotation.JsonAlias
+import com.fasterxml.jackson.annotation.JsonProperty
+import com.google.gson.annotations.SerializedName
 import lombok.ToString
 import javax.persistence.*
 import javax.validation.constraints.NotBlank
@@ -21,6 +23,8 @@ class Host(
     var ip: String? = null,
 
     @OneToMany(cascade = [CascadeType.ALL], orphanRemoval = true, fetch = FetchType.EAGER)
+    @field:JsonAlias("hostRules")
+    @get:JsonProperty("hostRules")
     var hostPercentRules: MutableSet<PercentMetricRule> = mutableSetOf(),
 
     @OneToMany(cascade = [CascadeType.ALL], orphanRemoval = true, fetch = FetchType.EAGER)

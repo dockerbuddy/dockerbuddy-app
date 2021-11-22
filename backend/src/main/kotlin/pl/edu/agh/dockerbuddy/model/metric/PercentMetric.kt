@@ -5,7 +5,7 @@ import pl.edu.agh.dockerbuddy.model.alert.AlertType
 
 @ToString
 data class PercentMetric (
-    val percentMetricType: PercentMetricType,
+    val metricType: PercentMetricType,
     val value: Double,
     val total: Double,
     val percent: Double,

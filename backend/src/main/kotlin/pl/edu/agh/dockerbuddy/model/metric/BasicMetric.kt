@@ -5,7 +5,7 @@ import pl.edu.agh.dockerbuddy.model.alert.AlertType
 
 @ToString
 data class BasicMetric(
-    val basicMetricType: BasicMetricType,
+    val metricType: BasicMetricType,
     val value: Long,
     var alertType: AlertType?
 )

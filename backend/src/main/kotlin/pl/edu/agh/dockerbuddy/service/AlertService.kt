@@ -36,7 +36,7 @@ class AlertService(
     }
 
     fun appendAlertTypeToMetrics(hostSummary: HostSummary, hostPercentRules: MutableSet<PercentMetricRule>){
-        val hostMetrics = hostSummary.metrics.associateBy { it.percentMetricType }
+        val hostMetrics = hostSummary.percentMetrics.associateBy { it.metricType }
         for (rule in hostPercentRules) {
             when (rule.type) {
                 RuleType.CPU_USAGE -> addAlertType(hostMetrics[PercentMetricType.CPU_USAGE]!!, rule)
@@ -48,8 +48,8 @@ class AlertService(
     }
 
     fun checkForAlertSummary(hostSummary: HostSummary, prevHostSummary: HostSummary, host: Host){
-        val hostMetrics = hostSummary.metrics.associateBy { it.percentMetricType }
-        val prevHostMetrics = prevHostSummary.metrics.associateBy { it.percentMetricType }
+        val hostMetrics = hostSummary.percentMetrics.associateBy { it.metricType }
+        val prevHostMetrics = prevHostSummary.percentMetrics.associateBy { it.metricType }
         for (mt in PercentMetricType.values()) {
             if (hostMetrics.containsKey(mt) && prevHostMetrics.containsKey(mt)) {
                 checkForAlert(hostMetrics[mt]!!, prevHostMetrics[mt]!!, hostSummary, host.hostName!!)
@@ -68,9 +68,9 @@ class AlertService(
         hostName: String
     ) {
         if (percentMetric.alertType == null) return
-        logger.debug("Checking basic metric: ${percentMetric.percentMetricType}")
+        logger.debug("Checking basic metric: ${percentMetric.metricType}")
         if (percentMetric.alertType != prevPercentMetric.alertType) {
-            val alertMessage = "Host $hostName: ${percentMetric.percentMetricType.humanReadable()} is ${percentMetric.percent}%"
+            val alertMessage = "Host $hostName: ${percentMetric.metricType.humanReadable()} is ${percentMetric.percent}%"
             logger.info(alertMessage)
             logger.debug("$percentMetric")
             sendAlert(Alert(hostSummary.id, percentMetric.alertType!!, alertMessage))
