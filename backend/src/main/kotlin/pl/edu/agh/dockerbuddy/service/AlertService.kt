@@ -26,103 +26,52 @@ class AlertService(
 ) {
     private val logger = LoggerFactory.getLogger(AlertService::class.java)
 
-    fun sendAlert(alert: Alert) {
-        logger.info("Sending alert...")
-        influxDbProxy.alertCounter += 1
-        template.convertAndSend("/alerts", AlertWithCounter(alert, influxDbProxy.alertCounter))
-        CoroutineScope(Dispatchers.IO).launch {
-            influxDbProxy.saveAlert(alert)
-        }
-    }
-
     fun appendAlertTypeToMetrics(hostSummary: HostSummary, hostPercentRules: MutableSet<PercentMetricRule>){
-        val hostMetrics = hostSummary.percentMetrics.associateBy { it.metricType }
+        val hostPercentMetrics = hostSummary.percentMetrics.associateBy { it.metricType }
         for (rule in hostPercentRules) {
             when (rule.type) {
-                RuleType.CPU_USAGE -> addAlertType(hostMetrics[PercentMetricType.CPU_USAGE]!!, rule)
-                RuleType.MEMORY_USAGE -> addAlertType(hostMetrics[PercentMetricType.MEMORY_USAGE]!!, rule)
-                RuleType.DISK_USAGE -> addAlertType(hostMetrics[PercentMetricType.DISK_USAGE]!!, rule)
+                RuleType.CPU_USAGE -> addAlertType(hostPercentMetrics[PercentMetricType.CPU_USAGE]!!, rule)
+                RuleType.MEMORY_USAGE -> addAlertType(hostPercentMetrics[PercentMetricType.MEMORY_USAGE]!!, rule)
+                RuleType.DISK_USAGE -> addAlertType(hostPercentMetrics[PercentMetricType.DISK_USAGE]!!, rule)
                 else -> throw IllegalStateException("Forbidden rule type: ${rule.type}")
             }
         }
-    }
 
-    fun checkForAlertSummary(hostSummary: HostSummary, prevHostSummary: HostSummary, host: Host){
-        val hostMetrics = hostSummary.percentMetrics.associateBy { it.metricType }
-        val prevHostMetrics = prevHostSummary.percentMetrics.associateBy { it.metricType }
-        for (mt in PercentMetricType.values()) {
-            if (hostMetrics.containsKey(mt) && prevHostMetrics.containsKey(mt)) {
-                checkForAlert(hostMetrics[mt]!!, prevHostMetrics[mt]!!, hostSummary, host.hostName!!)
-            }
-            else {
-                logger.warn("Missing metric $mt for host ${host.hostName}")
-            }
-        }
-        checkForContainerAlerts(hostSummary, prevHostSummary.containers, host)
-    }
-
-    fun checkForAlert(
-        percentMetric: PercentMetric,
-        prevPercentMetric: PercentMetric,
-        hostSummary: HostSummary,
-        hostName: String
-    ) {
-        if (percentMetric.alertType == null) return
-        logger.debug("Checking basic metric: ${percentMetric.metricType}")
-        if (percentMetric.alertType != prevPercentMetric.alertType) {
-            val alertMessage = "Host $hostName: ${percentMetric.metricType.humanReadable()} is ${percentMetric.percent}%"
-            logger.info(alertMessage)
-            logger.debug("$percentMetric")
-            sendAlert(Alert(hostSummary.id, percentMetric.alertType!!, alertMessage))
+        for ((_,v) in hostPercentMetrics) {
+            v.alertType = if (v.alertType == null) AlertType.OK else v.alertType
         }
     }
 
-    fun checkForContainerAlerts(
-        hostSummary: HostSummary,
-        prevContainersSummaryList: List<ContainerSummary>,
-        host: Host
-    ) {
-        val containerReportMap = host.containers.associateBy { it.containerName }
-        val containerMap = hostSummary.containers.associateBy { it.id }
-        val prevContainerMap = prevContainersSummaryList.associateBy { it.id }
-        val newContainerList = mutableListOf<ContainerSummary>()
-        for (cont in containerMap) {
-            val containerSummary = cont.value
-            if (containerReportMap[containerSummary.name]?.reportStatus == null) {
-                if (containerSummary.id !in prevContainerMap.keys) {
+    fun appendAlertTypeToContainers(hostSummary: HostSummary, host: Host) {
+        val reports = host.containers.toList()
+        val containers = hostSummary.containers
+        val containerMap = containers.associateBy { it.name }
+
+        for (report in reports) {
+            if (report.reportStatus == ReportStatus.WATCHED) {
+                if (report.containerName !in containerMap.keys) {
                     sendAlert(
                         Alert(
                             hostSummary.id,
-                            AlertType.WARN,
-                            "Host ${host.hostName}: new container: ${containerSummary.name}"
+                            AlertType.CRITICAL,
+                            "Host ${host.hostName}: missing container ${report.containerName}"
                         )
                     )
-                    containerSummary.reportStatus = ReportStatus.NEW
-                    newContainerList.add(containerSummary)
+                    continue
                 }
-            } else {
-                containerSummary.reportStatus = containerReportMap[containerSummary.name]?.reportStatus
-            }
-            if(prevContainerMap[containerSummary.id] != null) {
-                if (containerReportMap[containerSummary.name]?.reportStatus == ReportStatus.WATCHED &&
-                    containerSummary.alertType != prevContainerMap[containerSummary.id]?.alertType
-                ) {
-                    val alertMessage = if (containerSummary.alertType != AlertType.OK) {
-                            "Host ${host.hostName}: something wrong with container ${containerSummary.name}. " +
-                                    "State: ${containerSummary.status.humaneReadable()}"
-                        } else {
-                            "Host ${host.hostName}: container ${containerSummary.name} is back. " +
-                                    "State: ${containerSummary.status.humaneReadable()}"
-                        }
-                    sendAlert(Alert(hostSummary.id, containerSummary.alertType!!, alertMessage))
-                }
-            } else if (containerSummary.alertType != AlertType.OK){
-                val alertMessage: String = "Host ${host.hostName}: something wrong with container ${containerSummary.name}. " +
-                                           "State: ${containerSummary.status.humaneReadable()}"
-                sendAlert(Alert(hostSummary.id, containerSummary.alertType!!, alertMessage))
+                addAlertTypeToContainer(containerMap[report.containerName]!!)
             }
         }
-        hostService.addContainersToHost(host, newContainerList)
+
+        containers.forEach {
+            it.alertType = if (it.alertType == null) AlertType.OK else it.alertType
+        }
+    }
+
+    private fun addAlertTypeToContainer(containerSummary: ContainerSummary) = when {
+        ContainerState.RUNNING != containerSummary.status ->
+            containerSummary.alertType = AlertType.CRITICAL
+        else -> containerSummary.alertType = AlertType.OK
     }
 
     fun initialCheckForAlertSummary(hostSummary: HostSummary, host: Host) {
@@ -156,39 +105,98 @@ class AlertService(
         checkForAlertSummary(hostSummary, mockPrevHostSummary, hostService.addContainersToHost(host, newContainers))
     }
 
-    fun addAlertType(percentMetric: PercentMetric, rulePercent: PercentMetricRule) = when {
-        percentMetric.percent < rulePercent.warnLevel.toDouble() -> percentMetric.alertType = AlertType.OK
-        percentMetric.percent > rulePercent.criticalLevel.toDouble() -> percentMetric.alertType = AlertType.CRITICAL
-        else -> percentMetric.alertType = AlertType.WARN
+    fun checkForAlertSummary(hostSummary: HostSummary, prevHostSummary: HostSummary, host: Host){
+        val hostMetrics = hostSummary.percentMetrics.associateBy { it.metricType }
+        val prevHostMetrics = prevHostSummary.percentMetrics.associateBy { it.metricType }
+        for (mt in PercentMetricType.values()) {
+            if (hostMetrics.containsKey(mt) && prevHostMetrics.containsKey(mt)) {
+                checkForAlert(hostMetrics[mt]!!, prevHostMetrics[mt]!!, hostSummary, host.hostName!!)
+            }
+            else {
+                logger.warn("Missing metric $mt for host ${host.hostName}")
+            }
+        }
+        checkForContainerAlerts(hostSummary, prevHostSummary.containers, host)
     }
 
-    fun appendAlertTypeToContainers(hostSummary: HostSummary, host: Host) {
-        val reports = host.containers.toList()
-        val containers = hostSummary.containers
-        val containerMap = containers.associateBy { it.name }
-        for (report in reports) {
-            if (report.reportStatus == ReportStatus.WATCHED) {
-                if (report.containerName !in containerMap.keys) {
+    private fun checkForAlert(
+        percentMetric: PercentMetric,
+        prevPercentMetric: PercentMetric,
+        hostSummary: HostSummary,
+        hostName: String
+    ) {
+        if (percentMetric.alertType == null) return
+        logger.debug("Checking basic metric: ${percentMetric.metricType}")
+        if (percentMetric.alertType != prevPercentMetric.alertType) {
+            val alertMessage = "Host $hostName: ${percentMetric.metricType.humanReadable()} is ${percentMetric.percent}%"
+            logger.info(alertMessage)
+            logger.debug("$percentMetric")
+            sendAlert(Alert(hostSummary.id, percentMetric.alertType!!, alertMessage))
+        }
+    }
+
+    private fun checkForContainerAlerts(
+        hostSummary: HostSummary,
+        prevContainersSummaryList: List<ContainerSummary>,
+        host: Host
+    ) {
+        val containerReportMap = host.containers.associateBy { it.containerName }
+        val containerMap = hostSummary.containers.associateBy { it.id }
+        val prevContainerMap = prevContainersSummaryList.associateBy { it.id }
+        val newContainerList = mutableListOf<ContainerSummary>()
+
+        for (cont in containerMap) {
+            val containerSummary = cont.value
+            if (containerReportMap[containerSummary.name]?.reportStatus == null) {
+                if (containerSummary.id !in prevContainerMap.keys) {
                     sendAlert(
                         Alert(
                             hostSummary.id,
-                            AlertType.CRITICAL,
-                            "Host ${host.hostName}: missing container ${report.containerName}"
+                            AlertType.WARN,
+                            "Host ${host.hostName}: new container: ${containerSummary.name}"
                         )
                     )
-                    continue
+                    containerSummary.reportStatus = ReportStatus.NEW
+                    newContainerList.add(containerSummary)
                 }
-                addAlertTypeToContainer(containerMap[report.containerName]!!)
+            } else {
+                containerSummary.reportStatus = containerReportMap[containerSummary.name]?.reportStatus
             }
-        }
-        containers.forEach {
-            it.alertType = if (it.alertType == null) AlertType.OK else it.alertType
+            if (prevContainerMap[containerSummary.id] != null) {
+                if (containerReportMap[containerSummary.name]?.reportStatus == ReportStatus.WATCHED &&
+                    containerSummary.alertType != prevContainerMap[containerSummary.id]?.alertType
+                ) {
+                    val alertMessage = if (containerSummary.alertType != AlertType.OK) {
+                        "Host ${host.hostName}: something wrong with container ${containerSummary.name}. " +
+                                "State: ${containerSummary.status.humaneReadable()}"
+                    } else {
+                        "Host ${host.hostName}: container ${containerSummary.name} is back. " +
+                                "State: ${containerSummary.status.humaneReadable()}"
+                    }
+                    sendAlert(Alert(hostSummary.id, containerSummary.alertType!!, alertMessage))
+                }
+            } else if (containerSummary.alertType != AlertType.OK) {
+                val alertMessage: String =
+                    "Host ${host.hostName}: something wrong with container ${containerSummary.name}. " +
+                            "State: ${containerSummary.status.humaneReadable()}"
+                sendAlert(Alert(hostSummary.id, containerSummary.alertType!!, alertMessage))
+            }
         }
     }
 
-    fun addAlertTypeToContainer(containerSummary: ContainerSummary) = when {
-        ContainerState.RUNNING != containerSummary.status ->
-            containerSummary.alertType = AlertType.CRITICAL
-        else -> containerSummary.alertType = AlertType.OK
+    private fun addAlertType(percentMetric: PercentMetric, percentRule: PercentMetricRule) = when {
+        percentMetric.percent < percentRule.warnLevel.toDouble() -> percentMetric.alertType = AlertType.OK
+        percentMetric.percent > percentRule.criticalLevel.toDouble() -> percentMetric.alertType = AlertType.CRITICAL
+        else -> percentMetric.alertType = AlertType.WARN
+    }
+
+
+    private fun sendAlert(alert: Alert) {
+        logger.info("Sending alert...")
+        influxDbProxy.alertCounter += 1
+        template.convertAndSend("/alerts", AlertWithCounter(alert, influxDbProxy.alertCounter))
+        CoroutineScope(Dispatchers.IO).launch {
+            influxDbProxy.saveAlert(alert)
+        }
     }
 }

@@ -1,0 +1,96 @@
+{
+  "id": "f7e6f2a0-eca7-46df-90e2-15b3d0446920",
+  "timestamp": "2021-11-15T12:35:05Z",
+  "percentMetrics": [
+    {
+      "metricType": "CPU_USAGE",
+      "value": 90,
+      "total": 100,
+      "percent": 90
+    },
+    {
+      "metricType": "MEMORY_USAGE",
+      "value": 70,
+      "total": 100,
+      "percent": 70
+    },
+    {
+      "metricType": "DISK_USAGE",
+      "value": 30,
+      "total": 100,
+      "percent": 30
+    }
+  ],
+  "basicMetrics": [
+    {
+      "metricType": "NETWORK_IN",
+      "value": 30
+    },
+    {
+      "metricType": "NETWORK_OUT",
+      "value": 30
+    }
+  ],
+  "containers": [
+    {
+      "id": "6ac25993-4769-44a0-8ee5-930867e2226g",
+      "name": "cont1",
+      "image": "dockera-app",
+      "status": "RUNNING",
+      "metrics": [
+        {
+          "metricType": "CPU_USAGE",
+          "value": 21,
+          "total": 37,
+          "percent": 11
+        },
+        {
+          "metricType": "memory_usage",
+          "value": 21,
+          "total": 37,
+          "percent": 8
+        }
+      ]
+    },
+    {
+      "id": "6fc25993-4769-44a0-8ee4-930867e2226a",
+      "name": "cont2",
+      "image": "dockera-app",
+      "status": "EXITED",
+      "metrics": [
+        {
+          "metricType": "CPU_USAGE",
+          "value": 21,
+          "total": 37,
+          "percent": 11
+        },
+        {
+          "metricType": "MEMORY_USAGE",
+          "value": 21,
+          "total": 37,
+          "percent": 8
+        }
+      ]
+    },
+    {
+      "id": "6fc25993-4768-44a0-8ee4-930867e2226g",
+      "name": "cont3",
+      "image": "dockera-app",
+      "status": "EXITED",
+      "metrics": [
+        {
+          "metricType": "CPU_USAGE",
+          "value": 21,
+          "total": 37,
+          "percent": 11
+        },
+        {
+          "metricType": "MEMORY_USAGE",
+          "value": 21,
+          "total": 37,
+          "percent": 8
+        }
+      ]
+    }
+  ]
+}

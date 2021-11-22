@@ -1,0 +1,34 @@
+{
+  "id": "f7e6f2a0-eca7-46df-90e2-15b3d0446920",
+  "hostName": "host1",
+  "ip": "149.156.96.52",
+  "hostPercentRules": [
+    {
+      "type": "CPU_USAGE",
+      "warnLevel": 50,
+      "criticalLevel": 80,
+      "id": "857f7cca-fddf-4e09-bc06-2b059675ee6a"
+    },
+    {
+      "type": "MEMORY_USAGE",
+      "warnLevel": 50,
+      "criticalLevel": 80,
+      "id": "206798a4-0d9c-418f-9ccc-fef20b461cac"
+    }
+  ],
+  "hostBasicRules": [],
+  "containers": [
+    {
+      "containerName": "cont1",
+      "reportStatus": "NOT_WATCHED"
+    },
+    {
+      "containerName": "cont2",
+      "reportStatus": "NEW"
+    },
+    {
+      "containerName": "cont3",
+      "reportStatus": "WATCHED"
+    }
+  ]
+}

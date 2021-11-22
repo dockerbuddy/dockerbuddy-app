@@ -13,7 +13,7 @@ import javax.validation.constraints.Pattern
 @Entity
 class Host(
     @field:NotBlank
-    @Column(name = "host_name", unique= true, nullable = false)
+    @Column(name = "host_name", unique = true, nullable = false)
     @JsonAlias("host_name")
     var hostName: String? = null,
 
