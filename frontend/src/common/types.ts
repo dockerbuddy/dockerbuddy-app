@@ -31,16 +31,14 @@ export interface Host {
   hostName: string;
   ip: string;
   hostSummary: HostSummary;
-  // containersRules: ContainerRule[];
+  containersReports: ContainerReport[];
   hostRules: HostRule[];
 }
 
-// export interface ContainerRule {
-//   id: string;
-//   alertType: AlertType;
-//   containerName: string;
-//   type: RuleType; //todo MEM, CPU, DISK Usage right now isnt used
-// }
+export interface ContainerReport {
+  containerName: string;
+  reportStatus: ReportStatus;
+}
 
 export interface Container {
   id: string;

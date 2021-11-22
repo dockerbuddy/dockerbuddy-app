@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/ban-ts-comment */
 import React, { useState } from "react";
 import {
@@ -19,18 +20,18 @@ import { alertColors } from "../../util/alertStyle";
 const useStyles = makeStyles(() => ({
   newContainer: {
     backgroundColor: "transparent",
-    border: "3px solid",
+    border: "2px solid",
     borderColor: "#3ED7C2",
     boxShadow: "inset 0px 0px 5px 5px #3ED7C2",
   },
   watchedContainer: {
     backgroundColor: "transparent",
-    border: "3px solid",
+    border: "2px solid",
     borderColor: "#ababab",
   },
   nonWatchedContainer: {
     backgroundColor: "transparent",
-    border: "3px solid",
+    border: "2px solid",
     borderColor: "#3d3d3d",
   },
   dockerIcon: {
@@ -133,7 +134,7 @@ const ContainerCardComponent: React.FC<{
         direction="column"
         alignItems="center"
         className={getContainerClass(reportStatus)}
-        spacing={3}
+        style={{ paddingTop: "15px", paddingBottom: "15px" }}
       >
         <Grid item container xs={12}>
           <Grid item xs={2}></Grid>

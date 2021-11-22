@@ -1,10 +1,11 @@
 import {
-  ButtonBase,
   Card,
   CardContent,
+  Container,
   Grid,
   IconButton,
-  makeStyles,
+  Tab,
+  Tabs,
   Typography,
 } from "@material-ui/core";
 import SettingsIcon from "@material-ui/icons/Settings";
@@ -14,30 +15,13 @@ import { RouteComponentProps } from "react-router-dom";
 import { selectHost } from "../../redux/hostsSlice";
 import { useAppSelector } from "../../redux/hooks";
 import HostMenu from "./HostMenu";
-import InfluxHistory from "./InfluxHistory/InfluxHistory";
-import MetricPieChart from "./MetricPieChart";
-import { extractHostRule, extractMetric } from "../../util/util";
-import { MetricType, RuleType } from "../../common/enums";
-
-const useStyles = makeStyles(() => ({
-  pieChartButton: {
-    paddingTop: "40px",
-  },
-  inactiveColor: {
-    backgroundColor: "#111111",
-  },
-  activeColor: {
-    backgroundColor: "#222222",
-  },
-  shortenTopMargin: {
-    marginTop: "-12px",
-  },
-}));
+import HostStats from "./HostStats/HostStats";
+import HostInfo from "./HostInfo/HostInfo";
+import AlertsDashboard from "../AlertsDashboard/AlertsDashboard";
 
 type HParam = { id: string };
 
 const HostBoard: React.FC<RouteComponentProps<HParam>> = ({ match }) => {
-  const classes = useStyles();
   const hostId = match.params.id;
   const hostData = useAppSelector(selectHost).hosts[hostId];
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
@@ -51,20 +35,17 @@ const HostBoard: React.FC<RouteComponentProps<HParam>> = ({ match }) => {
     setAnchorEl(null);
   };
 
-  const summary = hostData?.hostSummary;
-  const mem = extractMetric(summary?.metrics, MetricType.MEMORY_USAGE);
-  const memRule = extractHostRule(hostData?.hostRules, RuleType.MEMORY_USAGE);
-  const cpu = extractMetric(summary?.metrics, MetricType.CPU_USAGE);
-  const cpuRule = extractHostRule(hostData?.hostRules, RuleType.CPU_USAGE);
-  const disk = extractMetric(summary?.metrics, MetricType.DISK_USAGE);
-  const diskRule = extractHostRule(hostData?.hostRules, RuleType.DISK_USAGE);
+  const [value, setValue] = React.useState<string>("1");
 
-  const [activeMetric, setActiveMetric] = React.useState<string>(
-    MetricType.CPU_USAGE
-  );
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const handleChange = (event: any, newValue: string) => {
+    setValue(newValue);
+  };
+
+  console.log(hostData);
 
   return (
-    <>
+    <Container maxWidth="xl">
       {hostData !== undefined ? (
         <Card>
           <CardContent>
@@ -94,85 +75,15 @@ const HostBoard: React.FC<RouteComponentProps<HParam>> = ({ match }) => {
                   </Typography>
                 </Grid>
               </Grid>
-              <Grid item container spacing={5}>
-                <Grid item xs={4}>
-                  <ButtonBase
-                    className={[
-                      activeMetric == MetricType.CPU_USAGE
-                        ? classes.activeColor
-                        : classes.inactiveColor,
-                      classes.pieChartButton,
-                    ]
-                      .filter((e) => !!e)
-                      .join(" ")}
-                    style={{ width: "100%", height: "100%" }}
-                    onClick={() => {
-                      setActiveMetric(MetricType.CPU_USAGE);
-                    }}
-                  >
-                    {mem == undefined ? (
-                      <Alert severity="error"> No CPU data to show </Alert>
-                    ) : (
-                      <MetricPieChart metric={cpu} name="CPU" rule={cpuRule} />
-                    )}
-                  </ButtonBase>
-                </Grid>
-                <Grid item xs={4}>
-                  <ButtonBase
-                    className={[
-                      activeMetric == MetricType.MEMORY_USAGE
-                        ? classes.activeColor
-                        : classes.inactiveColor,
-                      classes.pieChartButton,
-                    ]
-                      .filter((e) => !!e)
-                      .join(" ")}
-                    style={{ width: "100%", height: "100%" }}
-                    onClick={() => {
-                      setActiveMetric(MetricType.MEMORY_USAGE);
-                    }}
-                  >
-                    {mem == undefined ? (
-                      <Alert severity="error"> No memory data to show </Alert>
-                    ) : (
-                      <MetricPieChart metric={mem} name="MEM" rule={memRule} />
-                    )}
-                  </ButtonBase>
-                </Grid>
-                <Grid item xs={4}>
-                  <ButtonBase
-                    className={[
-                      activeMetric == MetricType.DISK_USAGE
-                        ? classes.activeColor
-                        : classes.inactiveColor,
-                      classes.pieChartButton,
-                    ]
-                      .filter((e) => !!e)
-                      .join(" ")}
-                    style={{ width: "100%", height: "100%" }}
-                    onClick={() => {
-                      setActiveMetric(MetricType.DISK_USAGE);
-                    }}
-                  >
-                    {mem == undefined ? (
-                      <Alert severity="error"> No disk data to show </Alert>
-                    ) : (
-                      <MetricPieChart
-                        metric={disk}
-                        name="DISK"
-                        rule={diskRule}
-                      />
-                    )}
-                  </ButtonBase>
-                </Grid>
-              </Grid>
-              <Grid
-                item
-                className={[classes.activeColor, classes.shortenTopMargin]
-                  .filter((e) => !!e)
-                  .join(" ")}
-              >
-                <InfluxHistory hostId={hostId} activeMetric={activeMetric} />
+              <Tabs value={value} onChange={handleChange}>
+                <Tab label="Host Details" value={"1"} />
+                <Tab label="Host Alerts" value={"2"} />
+                <Tab label="Charts" value={"3"} />
+              </Tabs>
+              <Grid item>
+                {value === "1" && <HostInfo hostData={hostData} />}
+                {value === "2" && <AlertsDashboard hostId={hostId} />}
+                {value === "3" && <HostStats hostData={hostData} />}
               </Grid>
             </Grid>
           </CardContent>
@@ -186,7 +97,7 @@ const HostBoard: React.FC<RouteComponentProps<HParam>> = ({ match }) => {
       ) : (
         <Alert severity="error"> Host not found </Alert>
       )}
-    </>
+    </Container>
   );
 };
 

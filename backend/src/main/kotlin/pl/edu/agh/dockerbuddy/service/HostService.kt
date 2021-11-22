@@ -35,11 +35,12 @@ class HostService (
         return hostRepository.deleteById(id)
     }
 
-    fun updateHost(id: UUID, host: Host): Host {
-        if (!hostRepository.existsById(id)) throw EntityNotFoundException("Host $id does not exist")
-        logger.info("Host $id update to: $host")
-        host.id = id
-        return hostRepository.save(host)
+    fun updateHost(id: UUID, updatedHost: Host): Host {
+        val oldHost = hostRepository.findByIdOrNull(id) ?: throw EntityNotFoundException("Host $id does not exist")
+        logger.info("Host $id update: $updatedHost")
+        updatedHost.id = id
+        updatedHost.containers = oldHost.containers
+        return hostRepository.save(updatedHost)
     }
 
     fun getHostWithSummary(id: UUID): HostWithSummary {

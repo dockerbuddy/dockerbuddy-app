@@ -1,10 +1,10 @@
 import React from "react";
 import { Cell, Pie, PieChart, ResponsiveContainer, Sector } from "recharts";
-import { AlertType } from "../../common/enums";
-import theme from "../../common/theme";
-import { BasicMetric, HostRule } from "../../common/types";
-import { alertColors } from "../../util/alertStyle";
-import { alertTypeToColor } from "../../util/util";
+import { AlertType } from "../../../common/enums";
+import theme from "../../../common/theme";
+import { BasicMetric, HostRule } from "../../../common/types";
+import { alertColors } from "../../../util/alertStyle";
+import { alertTypeToColor } from "../../../util/util";
 
 const renderActiveShape = (
   props: any,
@@ -97,7 +97,7 @@ const MetricPieChart: React.FC<{
   return (
     <>
       <ResponsiveContainer width="100%" height={500}>
-        <PieChart>
+        <PieChart style={{ cursor: "pointer" }}>
           <Pie
             startAngle={200}
             endAngle={-20}
