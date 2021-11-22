@@ -24,7 +24,7 @@
   "basicMetrics": [
     {
       "metricType": "NETWORK_IN",
-      "value": 30
+      "value": 2000
     },
     {
       "metricType": "NETWORK_OUT",

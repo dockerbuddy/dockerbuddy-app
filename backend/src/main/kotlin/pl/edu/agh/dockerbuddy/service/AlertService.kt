@@ -20,14 +20,18 @@ import pl.edu.agh.dockerbuddy.model.metric.*
 import java.util.*
 
 @Service
-class AlertService(
+class AlertService (
     val template: SimpMessagingTemplate,
     val influxDbProxy: InfluxDbProxy,
     val hostService: HostService
 ) {
     private val logger = LoggerFactory.getLogger(AlertService::class.java)
 
-    fun appendAlertTypeToMetrics(hostSummary: HostSummary, hostPercentRules: MutableSet<PercentMetricRule>, hostBasicRules: MutableSet<BasicMetricRule>){
+    fun appendAlertTypeToMetrics (
+        hostSummary: HostSummary,
+        hostPercentRules: MutableSet<PercentMetricRule>,
+        hostBasicRules: MutableSet<BasicMetricRule>
+    ) {
         val hostPercentMetrics = hostSummary.percentMetrics.associateBy { it.metricType }
         val hostBasicMetrics = hostSummary.basicMetrics.associateBy { it.metricType }
 
@@ -35,7 +39,10 @@ class AlertService(
         appendAlertTypeToBasicMetrics(hostBasicMetrics, hostBasicRules)
     }
 
-    private fun appendAlertTypeToPercentMetrics(hostPercentMetrics: Map<PercentMetricType, PercentMetric>, hostPercentRules: MutableSet<PercentMetricRule>) {
+    private fun appendAlertTypeToPercentMetrics (
+        hostPercentMetrics: Map<PercentMetricType, PercentMetric>,
+        hostPercentRules: MutableSet<PercentMetricRule>
+    ) {
         for (rule in hostPercentRules) {
             when (rule.type) {
                 RuleType.CPU_USAGE -> addAlertTypePercent(hostPercentMetrics[PercentMetricType.CPU_USAGE]!!, rule)
@@ -49,7 +56,10 @@ class AlertService(
         }
     }
 
-    private fun appendAlertTypeToBasicMetrics(hostBasicMetrics: Map<BasicMetricType, BasicMetric>, hostBasicRules: MutableSet<BasicMetricRule>) {
+    private fun appendAlertTypeToBasicMetrics (
+        hostBasicMetrics: Map<BasicMetricType, BasicMetric>, hostBasicRules:
+        MutableSet<BasicMetricRule>
+    ) {
         for (rule in hostBasicRules) {
             when (rule.type) {
                 RuleType.NETWORK_IN -> addAlertTypeBasic(hostBasicMetrics[BasicMetricType.NETWORK_IN]!!, rule)
@@ -62,7 +72,7 @@ class AlertService(
         }
     }
 
-    fun appendAlertTypeToContainers(hostSummary: HostSummary, host: Host) {
+    fun appendAlertTypeToContainers (hostSummary: HostSummary, host: Host) {
         val reports = host.containers.toList()
         val containers = hostSummary.containers
         val containerMap = containers.associateBy { it.name }
@@ -88,13 +98,13 @@ class AlertService(
         }
     }
 
-    private fun addAlertTypeToContainer(containerSummary: ContainerSummary) = when {
+    private fun addAlertTypeToContainer (containerSummary: ContainerSummary) = when {
         ContainerState.RUNNING != containerSummary.status ->
             containerSummary.alertType = AlertType.CRITICAL
         else -> containerSummary.alertType = AlertType.OK
     }
 
-    fun initialCheckForAlertSummary(hostSummary: HostSummary, host: Host) {
+    fun initialCheckForAlertSummary (hostSummary: HostSummary, host: Host) {
         logger.debug("Initial check for alerts")
         val reportsMap = host.containers.associateBy { it.containerName }
         val containerSummaryList = hostSummary.containers
@@ -125,28 +135,41 @@ class AlertService(
         checkForAlertSummary(hostSummary, mockPrevHostSummary, hostService.addContainersToHost(host, newContainers))
     }
 
-    fun checkForAlertSummary(hostSummary: HostSummary, prevHostSummary: HostSummary, host: Host){
-        val hostMetrics = hostSummary.percentMetrics.associateBy { it.metricType }
-        val prevHostMetrics = prevHostSummary.percentMetrics.associateBy { it.metricType }
+    fun checkForAlertSummary (hostSummary: HostSummary, prevHostSummary: HostSummary, host: Host) {
+        val hostPercentMetrics = hostSummary.percentMetrics.associateBy { it.metricType }
+        val prevHostPercentMetrics = prevHostSummary.percentMetrics.associateBy { it.metricType }
+        val hostBasicMetrics = hostSummary.basicMetrics.associateBy { it.metricType }
+        val prevHostBasicMetrics = prevHostSummary.basicMetrics.associateBy { it.metricType }
+
         for (mt in PercentMetricType.values()) {
-            if (hostMetrics.containsKey(mt) && prevHostMetrics.containsKey(mt)) {
-                checkForAlert(hostMetrics[mt]!!, prevHostMetrics[mt]!!, hostSummary, host.hostName!!)
+            if (hostPercentMetrics.containsKey(mt) && prevHostPercentMetrics.containsKey(mt)) {
+                checkForPercentAlert(hostPercentMetrics[mt]!!, prevHostPercentMetrics[mt]!!, hostSummary, host.hostName!!)
             }
             else {
                 logger.warn("Missing metric $mt for host ${host.hostName}")
             }
         }
+
+        for (mt in BasicMetricType.values()) {
+            if (hostBasicMetrics.containsKey(mt) && prevHostBasicMetrics.containsKey(mt)) {
+                checkForBasicAlert(hostBasicMetrics[mt]!!, prevHostBasicMetrics[mt]!!, hostSummary, host.hostName!!)
+            }
+            else {
+                logger.warn("Missing metric $mt for host ${host.hostName}")
+            }
+        }
+
         checkForContainerAlerts(hostSummary, prevHostSummary.containers, host)
     }
 
-    private fun checkForAlert(
+    private fun checkForPercentAlert (
         percentMetric: PercentMetric,
         prevPercentMetric: PercentMetric,
         hostSummary: HostSummary,
         hostName: String
     ) {
         if (percentMetric.alertType == null) return
-        logger.debug("Checking basic metric: ${percentMetric.metricType}")
+        logger.debug("Checking percent metric: ${percentMetric.metricType}")
         if (percentMetric.alertType != prevPercentMetric.alertType) {
             val alertMessage = "Host $hostName: ${percentMetric.metricType.humanReadable()} is ${percentMetric.percent}%"
             logger.info(alertMessage)
@@ -155,7 +178,23 @@ class AlertService(
         }
     }
 
-    private fun checkForContainerAlerts(
+    private fun checkForBasicAlert (
+        basicMetric: BasicMetric,
+        prevBasicMetric: BasicMetric,
+        hostSummary: HostSummary,
+        hostName: String
+    ) {
+        if (basicMetric.alertType == null) return
+        logger.debug("Checking basic metric: ${basicMetric.metricType}")
+        if (basicMetric.alertType != prevBasicMetric.alertType) {
+            val alertMessage = "Host $hostName: ${basicMetric.metricType.humanReadable()} is ${basicMetric.value}%"
+            logger.info(alertMessage)
+            logger.debug("$basicMetric")
+            sendAlert(Alert(hostSummary.id, basicMetric.alertType!!, alertMessage))
+        }
+    }
+
+    private fun checkForContainerAlerts (
         hostSummary: HostSummary,
         prevContainersSummaryList: List<ContainerSummary>,
         host: Host
@@ -204,19 +243,19 @@ class AlertService(
         }
     }
 
-    private fun addAlertTypePercent(percentMetric: PercentMetric, percentRule: PercentMetricRule) = when {
+    private fun addAlertTypePercent (percentMetric: PercentMetric, percentRule: PercentMetricRule) = when {
         percentMetric.percent < percentRule.warnLevel.toDouble() -> percentMetric.alertType = AlertType.OK
         percentMetric.percent > percentRule.criticalLevel.toDouble() -> percentMetric.alertType = AlertType.CRITICAL
         else -> percentMetric.alertType = AlertType.WARN
     }
 
-    private fun addAlertTypeBasic(basicMetric: BasicMetric, rule: BasicMetricRule) = when {
-        basicMetric.value < rule.transferLimit -> basicMetric.alertType = AlertType.OK
-        basicMetric.value > rule.transferLimit -> basicMetric.alertType = AlertType.CRITICAL
+    private fun addAlertTypeBasic (basicMetric: BasicMetric, rule: BasicMetricRule) = when {
+        basicMetric.value < rule.limit -> basicMetric.alertType = AlertType.OK
+        basicMetric.value > rule.limit -> basicMetric.alertType = AlertType.CRITICAL
         else -> basicMetric.alertType = AlertType.WARN
     }
 
-    private fun sendAlert(alert: Alert) {
+    private fun sendAlert (alert: Alert) {
         logger.info("Sending alert...")
         influxDbProxy.alertCounter += 1
         template.convertAndSend("/alerts", AlertWithCounter(alert, influxDbProxy.alertCounter))

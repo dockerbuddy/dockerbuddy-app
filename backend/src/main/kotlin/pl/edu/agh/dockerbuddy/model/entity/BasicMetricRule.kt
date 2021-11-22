@@ -13,7 +13,7 @@ class BasicMetricRule (
     var type: RuleType,
 
     @Column(name = "transfer_limit", nullable = false)
-    var transferLimit: Long // in bytes
+    var limit: Long // in bytes
 ): BaseIdEntity () {
     init {
         require(type in listOf(RuleType.NETWORK_IN, RuleType.NETWORK_OUT)) {

@@ -50,7 +50,7 @@ class AlertServiceTest {
         assertEquals(AlertType.CRITICAL, hostSummary.percentMetrics.first { it.metricType == PercentMetricType.CPU_USAGE }.alertType)
         assertEquals(AlertType.WARN, hostSummary.percentMetrics.first { it.metricType == PercentMetricType.MEMORY_USAGE }.alertType)
         assertEquals(AlertType.OK, hostSummary.percentMetrics.first { it.metricType == PercentMetricType.DISK_USAGE }.alertType)
-        assertEquals(AlertType.OK, hostSummary.basicMetrics.first { it.metricType == BasicMetricType.NETWORK_IN }.alertType)
+        assertEquals(AlertType.CRITICAL, hostSummary.basicMetrics.first { it.metricType == BasicMetricType.NETWORK_IN }.alertType)
         assertEquals(AlertType.OK, hostSummary.basicMetrics.first { it.metricType == BasicMetricType.NETWORK_OUT }.alertType)
     }
 
@@ -77,7 +77,7 @@ class AlertServiceTest {
         val host = loadMock("mocks/host1.json", Host::class.java)
 
         // when
-        alertService.appendAlertTypeToContainers(hostSummary, host) // TODO use proper json mock instead
+        alertService.appendAlertTypeToContainers(hostSummary, host)
         alertService.checkForAlertSummary(hostSummary, prevHostSummary, host)
 
         // then
