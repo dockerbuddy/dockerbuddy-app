@@ -29,7 +29,11 @@ const HostInfo: React.FC<HostInfoProps> = ({ hostData }) => {
             <Typography variant="h5">Recent alerts</Typography>
           </Grid>
           <Grid item>
-            <AlertsDashboard hostId={hostData?.id} onlyList={true} />
+            <AlertsDashboard
+              hostId={hostData?.id}
+              onlyList={true}
+              autoRefresh={true}
+            />
           </Grid>
         </Grid>
       </Grid>

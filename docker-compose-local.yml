@@ -16,7 +16,7 @@ services:
 
 
     webapp:
-        image: kraleppa/dockerbuddy:v1.2.0-beta
+        image: kraleppa/dockerbuddy:v1.3.0-beta
         ports:
             - '8080:8080'
         depends_on:

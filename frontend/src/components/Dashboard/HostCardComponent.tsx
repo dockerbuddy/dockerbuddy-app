@@ -16,10 +16,10 @@ import { Link } from "react-router-dom";
 import { MetricType } from "../../common/enums";
 
 const useStyles = makeStyles((theme) => ({
-  card: {
-    borderColor: "#1A1C19",
-    backgroundColor: "#1D1F22",
-  },
+  // card: {
+  //   borderColor: "#1A1C19",
+  //   backgroundColor: "#1D1F22",
+  // },
   settingsColor: {
     color: theme.palette.primary.main,
   },
@@ -41,7 +41,7 @@ const HostCardComponent: React.FC<{ host: Host }> = (props) => {
   const cpuUsage = extractMetric(hostSummary?.metrics, MetricType.CPU_USAGE);
 
   return (
-    <Card className={classes.card} variant="outlined">
+    <Card variant="outlined">
       <CardHeader
         title={
           <>

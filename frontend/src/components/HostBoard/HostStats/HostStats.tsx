@@ -12,10 +12,10 @@ const useStyles = makeStyles(() => ({
     paddingTop: "40px",
   },
   inactiveColor: {
-    backgroundColor: "#111111",
+    backgroundColor: "transparent",
   },
   activeColor: {
-    backgroundColor: "#222222",
+    backgroundColor: "rgba(18,11,19,1)",
   },
   shortenTopMargin: {
     marginTop: "-12px",
