@@ -45,9 +45,15 @@ class AlertService (
     ) {
         for (rule in hostPercentRules) {
             when (rule.type) {
-                RuleType.CPU_USAGE -> addAlertTypePercent(hostPercentMetrics[PercentMetricType.CPU_USAGE]!!, rule)
-                RuleType.MEMORY_USAGE -> addAlertTypePercent(hostPercentMetrics[PercentMetricType.MEMORY_USAGE]!!, rule)
-                RuleType.DISK_USAGE -> addAlertTypePercent(hostPercentMetrics[PercentMetricType.DISK_USAGE]!!, rule)
+                RuleType.CPU_USAGE -> hostPercentMetrics[PercentMetricType.CPU_USAGE]?.let {
+                    addAlertTypePercent(it, rule)
+                }
+                RuleType.MEMORY_USAGE -> hostPercentMetrics[PercentMetricType.MEMORY_USAGE]?.let {
+                    addAlertTypePercent(it, rule)
+                }
+                RuleType.DISK_USAGE -> hostPercentMetrics[PercentMetricType.DISK_USAGE]?.let {
+                    addAlertTypePercent(it, rule)
+                }
                 else -> throw IllegalStateException("Forbidden percent rule type: ${rule.type}")
             }
         }
@@ -62,8 +68,12 @@ class AlertService (
     ) {
         for (rule in hostBasicRules) {
             when (rule.type) {
-                RuleType.NETWORK_IN -> addAlertTypeBasic(hostBasicMetrics[BasicMetricType.NETWORK_IN]!!, rule)
-                RuleType.NETWORK_OUT -> addAlertTypeBasic(hostBasicMetrics[BasicMetricType.NETWORK_OUT]!!, rule)
+                RuleType.NETWORK_IN -> hostBasicMetrics[BasicMetricType.NETWORK_IN]?.let {
+                    addAlertTypeBasic(it, rule)
+                }
+                RuleType.NETWORK_OUT -> hostBasicMetrics[BasicMetricType.NETWORK_OUT]?.let {
+                    addAlertTypeBasic(it, rule)
+                }
                 else -> throw IllegalStateException("Forbidden basic rule type: ${rule.type}")
             }
         }
@@ -89,7 +99,9 @@ class AlertService (
                     )
                     continue
                 }
-                addAlertTypeToContainer(containerMap[report.containerName]!!)
+                containerMap[report.containerName]?.let {
+                    addAlertTypeToContainer(it)
+                }
             }
         }
 
@@ -143,7 +155,14 @@ class AlertService (
 
         for (mt in PercentMetricType.values()) {
             if (hostPercentMetrics.containsKey(mt) && prevHostPercentMetrics.containsKey(mt)) {
-                checkForPercentAlert(hostPercentMetrics[mt]!!, prevHostPercentMetrics[mt]!!, hostSummary, host.hostName!!)
+
+                hostPercentMetrics[mt]?.let { percentMetric ->
+                    prevHostPercentMetrics[mt]?.let { prevPercentMetric ->
+                        host.hostName?.let { hostName ->
+                            checkForPercentAlert(percentMetric, prevPercentMetric, hostSummary, hostName)
+                        }
+                    }
+                }
             }
             else {
                 logger.warn("Missing metric $mt for host ${host.hostName}")
@@ -152,7 +171,13 @@ class AlertService (
 
         for (mt in BasicMetricType.values()) {
             if (hostBasicMetrics.containsKey(mt) && prevHostBasicMetrics.containsKey(mt)) {
-                checkForBasicAlert(hostBasicMetrics[mt]!!, prevHostBasicMetrics[mt]!!, hostSummary, host.hostName!!)
+                hostBasicMetrics[mt]?.let { basicMetric ->
+                    prevHostBasicMetrics[mt]?.let { prevBasicMetric ->
+                        host.hostName?.let { hostName ->
+                            checkForBasicAlert(basicMetric, prevBasicMetric, hostSummary, hostName)
+                        }
+                    }
+                }
             }
             else {
                 logger.warn("Missing metric $mt for host ${host.hostName}")
@@ -232,13 +257,17 @@ class AlertService (
                         "Host ${host.hostName}: container ${containerSummary.name} is back. " +
                                 "State: ${containerSummary.status.humaneReadable()}"
                     }
-                    sendAlert(Alert(hostSummary.id, containerSummary.alertType!!, alertMessage))
+                    containerSummary.alertType?.let { alertType ->
+                        Alert(hostSummary.id, alertType, alertMessage)
+                    }?.let { alert -> sendAlert(alert) }
                 }
             } else if (containerSummary.alertType != AlertType.OK) {
                 val alertMessage: String =
                     "Host ${host.hostName}: something wrong with container ${containerSummary.name}. " +
                             "State: ${containerSummary.status.humaneReadable()}"
-                sendAlert(Alert(hostSummary.id, containerSummary.alertType!!, alertMessage))
+                containerSummary.alertType?.let { alertType ->
+                    Alert(hostSummary.id, alertType, alertMessage)
+                }?.let { alert -> sendAlert(alert) }
             }
         }
     }
