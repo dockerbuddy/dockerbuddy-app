@@ -12,8 +12,8 @@ data class HostSummary(
     val id: UUID,
     @field:Pattern(regexp = "^[1-9]\\d{3}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}Z\$")
     val timestamp: String,
-    @field:JsonAlias("percentMetrics")
-    @get:JsonProperty("metrics")
+    @field:JsonAlias("percentMetrics") // TODO unify variable names
+    @get:JsonProperty("metrics") // TODO unify variable names
     val percentMetrics: List<PercentMetric>,
     val basicMetrics: List<BasicMetric>,
     val containers: List<ContainerSummary>
