@@ -10,6 +10,7 @@ import pl.edu.agh.dockerbuddy.influxdb.InfluxDbProxy
 import pl.edu.agh.dockerbuddy.model.alert.Alert
 import pl.edu.agh.dockerbuddy.model.alert.AlertType
 import pl.edu.agh.dockerbuddy.model.alert.AlertWithCounter
+import pl.edu.agh.dockerbuddy.model.entity.BasicMetricRule
 import pl.edu.agh.dockerbuddy.model.enums.ContainerState
 import pl.edu.agh.dockerbuddy.model.enums.RuleType
 import pl.edu.agh.dockerbuddy.model.entity.Host
@@ -26,18 +27,37 @@ class AlertService(
 ) {
     private val logger = LoggerFactory.getLogger(AlertService::class.java)
 
-    fun appendAlertTypeToMetrics(hostSummary: HostSummary, hostPercentRules: MutableSet<PercentMetricRule>){
+    fun appendAlertTypeToMetrics(hostSummary: HostSummary, hostPercentRules: MutableSet<PercentMetricRule>, hostBasicRules: MutableSet<BasicMetricRule>){
         val hostPercentMetrics = hostSummary.percentMetrics.associateBy { it.metricType }
+        val hostBasicMetrics = hostSummary.basicMetrics.associateBy { it.metricType }
+
+        appendAlertTypeToPercentMetrics(hostPercentMetrics, hostPercentRules)
+        appendAlertTypeToBasicMetrics(hostBasicMetrics, hostBasicRules)
+    }
+
+    private fun appendAlertTypeToPercentMetrics(hostPercentMetrics: Map<PercentMetricType, PercentMetric>, hostPercentRules: MutableSet<PercentMetricRule>) {
         for (rule in hostPercentRules) {
             when (rule.type) {
-                RuleType.CPU_USAGE -> addAlertType(hostPercentMetrics[PercentMetricType.CPU_USAGE]!!, rule)
-                RuleType.MEMORY_USAGE -> addAlertType(hostPercentMetrics[PercentMetricType.MEMORY_USAGE]!!, rule)
-                RuleType.DISK_USAGE -> addAlertType(hostPercentMetrics[PercentMetricType.DISK_USAGE]!!, rule)
-                else -> throw IllegalStateException("Forbidden rule type: ${rule.type}")
+                RuleType.CPU_USAGE -> addAlertTypePercent(hostPercentMetrics[PercentMetricType.CPU_USAGE]!!, rule)
+                RuleType.MEMORY_USAGE -> addAlertTypePercent(hostPercentMetrics[PercentMetricType.MEMORY_USAGE]!!, rule)
+                RuleType.DISK_USAGE -> addAlertTypePercent(hostPercentMetrics[PercentMetricType.DISK_USAGE]!!, rule)
+                else -> throw IllegalStateException("Forbidden percent rule type: ${rule.type}")
             }
         }
-
         for ((_,v) in hostPercentMetrics) {
+            v.alertType = if (v.alertType == null) AlertType.OK else v.alertType
+        }
+    }
+
+    private fun appendAlertTypeToBasicMetrics(hostBasicMetrics: Map<BasicMetricType, BasicMetric>, hostBasicRules: MutableSet<BasicMetricRule>) {
+        for (rule in hostBasicRules) {
+            when (rule.type) {
+                RuleType.NETWORK_IN -> addAlertTypeBasic(hostBasicMetrics[BasicMetricType.NETWORK_IN]!!, rule)
+                RuleType.NETWORK_OUT -> addAlertTypeBasic(hostBasicMetrics[BasicMetricType.NETWORK_OUT]!!, rule)
+                else -> throw IllegalStateException("Forbidden basic rule type: ${rule.type}")
+            }
+        }
+        for ((_,v) in hostBasicMetrics) {
             v.alertType = if (v.alertType == null) AlertType.OK else v.alertType
         }
     }
@@ -184,12 +204,17 @@ class AlertService(
         }
     }
 
-    private fun addAlertType(percentMetric: PercentMetric, percentRule: PercentMetricRule) = when {
+    private fun addAlertTypePercent(percentMetric: PercentMetric, percentRule: PercentMetricRule) = when {
         percentMetric.percent < percentRule.warnLevel.toDouble() -> percentMetric.alertType = AlertType.OK
         percentMetric.percent > percentRule.criticalLevel.toDouble() -> percentMetric.alertType = AlertType.CRITICAL
         else -> percentMetric.alertType = AlertType.WARN
     }
 
+    private fun addAlertTypeBasic(basicMetric: BasicMetric, rule: BasicMetricRule) = when {
+        basicMetric.value < rule.transferLimit -> basicMetric.alertType = AlertType.OK
+        basicMetric.value > rule.transferLimit -> basicMetric.alertType = AlertType.CRITICAL
+        else -> basicMetric.alertType = AlertType.WARN
+    }
 
     private fun sendAlert(alert: Alert) {
         logger.info("Sending alert...")

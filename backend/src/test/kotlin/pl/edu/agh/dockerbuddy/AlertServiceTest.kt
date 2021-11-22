@@ -11,6 +11,7 @@ import pl.edu.agh.dockerbuddy.influxdb.InfluxDbProxy
 import pl.edu.agh.dockerbuddy.model.alert.AlertType
 import pl.edu.agh.dockerbuddy.model.entity.Host
 import pl.edu.agh.dockerbuddy.model.enums.ReportStatus
+import pl.edu.agh.dockerbuddy.model.metric.BasicMetricType
 import pl.edu.agh.dockerbuddy.model.metric.HostSummary
 import pl.edu.agh.dockerbuddy.model.metric.PercentMetricType
 import pl.edu.agh.dockerbuddy.repository.HostRepository
@@ -38,17 +39,19 @@ class AlertServiceTest {
     fun appendAlertTypeToMetrics_Test() {
         // given
         val hostSummary = loadMock("mocks/hostSummary1.json", HostSummary::class.java)
-        val hostPercentRules = loadMock("mocks/host1.json", Host::class.java).hostPercentRules
+        val host = loadMock("mocks/host1.json", Host::class.java)
+        val hostPercentRules = host.hostPercentRules
+        val hostBasicRules = host.hostBasicRules
 
         // when
-        alertService.appendAlertTypeToMetrics(hostSummary, hostPercentRules)
+        alertService.appendAlertTypeToMetrics(hostSummary, hostPercentRules, hostBasicRules)
 
         // then
         assertEquals(AlertType.CRITICAL, hostSummary.percentMetrics.first { it.metricType == PercentMetricType.CPU_USAGE }.alertType)
         assertEquals(AlertType.WARN, hostSummary.percentMetrics.first { it.metricType == PercentMetricType.MEMORY_USAGE }.alertType)
         assertEquals(AlertType.OK, hostSummary.percentMetrics.first { it.metricType == PercentMetricType.DISK_USAGE }.alertType)
-//        assertEquals(AlertType.OK, hostSummary.percentMetrics.first { it.metricType == PercentMetricType.NETWORK_IN }.alertType)
-//        assertEquals(AlertType.OK, hostSummary.percentMetrics.first { it.metricType == PercentMetricType.NETWORK_OUT }.alertType)
+        assertEquals(AlertType.OK, hostSummary.basicMetrics.first { it.metricType == BasicMetricType.NETWORK_IN }.alertType)
+        assertEquals(AlertType.OK, hostSummary.basicMetrics.first { it.metricType == BasicMetricType.NETWORK_OUT }.alertType)
     }
 
     @Test
