@@ -23,8 +23,8 @@ class Host(
     var ip: String? = null,
 
     @OneToMany(cascade = [CascadeType.ALL], orphanRemoval = true, fetch = FetchType.EAGER)
-    @field:JsonAlias("hostRules") // TODO unify variable names
-    @get:JsonProperty("hostRules") // TODO unify variable names
+//    @field:JsonAlias("hostRules") // TODO unify variable names
+//    @get:JsonProperty("hostRules") // TODO unify variable names
     var hostPercentRules: MutableSet<PercentMetricRule> = mutableSetOf(),
 
     @OneToMany(cascade = [CascadeType.ALL], orphanRemoval = true, fetch = FetchType.EAGER)
