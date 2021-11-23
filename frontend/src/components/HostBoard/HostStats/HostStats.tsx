@@ -2,7 +2,7 @@ import { Grid, ButtonBase, makeStyles } from "@material-ui/core";
 import { Alert } from "@mui/material";
 import React from "react";
 import { MetricType, RuleType } from "../../../common/enums";
-import { extractHostRule, extractMetric } from "../../../util/util";
+import { extractHostRule, extractMetricPercent } from "../../../util/util";
 import MetricPieChart from "./MetricPieChart";
 import InfluxHistory from "../InfluxHistory/InfluxHistory";
 import { Host } from "../../../common/types";
@@ -31,17 +31,26 @@ const HostStats: React.FC<HostStatsProps> = ({ hostData }) => {
   const hostId = hostData?.id;
 
   const classes = useStyles();
-  const mem = extractMetric(summary?.percentMetrics, MetricType.MEMORY_USAGE);
+  const mem = extractMetricPercent(
+    summary?.percentMetrics,
+    MetricType.MEMORY_USAGE
+  );
   const memRule = extractHostRule(
     hostData?.hostPercentRules,
     RuleType.MEMORY_USAGE
   );
-  const cpu = extractMetric(summary?.percentMetrics, MetricType.CPU_USAGE);
+  const cpu = extractMetricPercent(
+    summary?.percentMetrics,
+    MetricType.CPU_USAGE
+  );
   const cpuRule = extractHostRule(
     hostData?.hostPercentRules,
     RuleType.CPU_USAGE
   );
-  const disk = extractMetric(summary?.percentMetrics, MetricType.DISK_USAGE);
+  const disk = extractMetricPercent(
+    summary?.percentMetrics,
+    MetricType.DISK_USAGE
+  );
   const diskRule = extractHostRule(
     hostData?.hostPercentRules,
     RuleType.DISK_USAGE

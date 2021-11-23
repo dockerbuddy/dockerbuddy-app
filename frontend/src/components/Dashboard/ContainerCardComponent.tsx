@@ -9,7 +9,7 @@ import {
   IconButton,
   Tooltip,
 } from "@material-ui/core";
-import { extractMetric, statusTypeToColor } from "../../util/util";
+import { extractMetricPercent, statusTypeToColor } from "../../util/util";
 import { Container } from "../../common/types";
 import { AlertType, MetricType, ReportStatus } from "../../common/enums";
 import { AllOutOutlined, VisibilityOff, Visibility } from "@material-ui/icons";
@@ -54,8 +54,8 @@ const ContainerCardComponent: React.FC<{
   const classes = useStyles();
   //todo useClasses, override colors if container is inactive
 
-  const mem = extractMetric(container.metrics, MetricType.MEMORY_USAGE);
-  const cpu = extractMetric(container.metrics, MetricType.CPU_USAGE);
+  const mem = extractMetricPercent(container.metrics, MetricType.MEMORY_USAGE);
+  const cpu = extractMetricPercent(container.metrics, MetricType.CPU_USAGE);
 
   const [reportStatus, setReportStatus] = useState<ReportStatus>(
     //@ts-ignore
