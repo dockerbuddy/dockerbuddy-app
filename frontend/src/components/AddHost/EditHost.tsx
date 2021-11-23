@@ -3,7 +3,7 @@ import React, { useEffect, useState } from "react";
 import { RouteComponentProps } from "react-router-dom";
 import { proxy } from "../../common/api";
 import { RuleType } from "../../common/enums";
-import { HostRule, StandardApiResponse } from "../../common/types";
+import { HostPercentRule, StandardApiResponse } from "../../common/types";
 import AddHost, { AddHostFormData, PostHostResponse } from "./AddHost";
 
 type HParam = { id: string };
@@ -37,7 +37,7 @@ const EditHost: React.FC<RouteComponentProps<HParam>> = ({ match }) => {
       diskCrit: "",
     };
 
-    jsonBody.hostRules.forEach((rule: HostRule) => {
+    jsonBody.hostPercentRules.forEach((rule: HostPercentRule) => {
       if (rule.type === RuleType.CPU_USAGE)
         res = {
           ...res,

@@ -33,12 +33,18 @@ const HostCardComponent: React.FC<{ host: Host }> = (props) => {
   const host = props.host;
   const hostSummary = props.host.hostSummary;
 
-  const diskUsage = extractMetric(hostSummary?.metrics, MetricType.DISK_USAGE);
+  const diskUsage = extractMetric(
+    hostSummary?.percentMetrics,
+    MetricType.DISK_USAGE
+  );
   const memoryUsage = extractMetric(
-    hostSummary?.metrics,
+    hostSummary?.percentMetrics,
     MetricType.MEMORY_USAGE
   );
-  const cpuUsage = extractMetric(hostSummary?.metrics, MetricType.CPU_USAGE);
+  const cpuUsage = extractMetric(
+    hostSummary?.percentMetrics,
+    MetricType.CPU_USAGE
+  );
 
   return (
     <Card variant="outlined">

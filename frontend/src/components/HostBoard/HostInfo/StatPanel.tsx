@@ -10,7 +10,7 @@ interface StatPanelProps {
 }
 
 const StatPanel: React.FC<StatPanelProps> = ({ hostData }) => {
-  const metric = hostData?.hostSummary?.metrics;
+  const metric = hostData?.hostSummary?.percentMetrics;
   const cpu_metric = extractMetric(metric, MetricType.CPU_USAGE);
   const memory_metric = extractMetric(metric, MetricType.MEMORY_USAGE);
   const disk_metric = extractMetric(metric, MetricType.DISK_USAGE);

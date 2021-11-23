@@ -15,6 +15,8 @@ export enum RuleType {
   DISK_USAGE = "DISK_USAGE",
   CPU_USAGE = "CPU_USAGE",
   CONTAINER_STATE = "CONTAINER_STATE",
+  NETWORK_IN = "NETWORK_IN",
+  NETWORK_OUT = "NETWORK_OUT",
 }
 
 export enum ContainerState {
