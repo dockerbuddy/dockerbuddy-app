@@ -80,10 +80,23 @@ const HostCardComponent: React.FC<{ host: Host }> = (props) => {
         style={{ color: "inherit", textDecoration: "none" }}
       >
         <CardContent>
-          <ProgressBarComponent name="Disk" metric={diskUsage} />
-          <ProgressBarComponent name="Memory" metric={memoryUsage} />
-          <ProgressBarComponent name="CPU" metric={cpuUsage} />
-          <NetworkInfo networkIn={networkIn} networkOut={networkOut} />
+          <Grid container direction="column" spacing={2}>
+            <Grid item>
+              <Typography variant="h5">Current status</Typography>
+            </Grid>
+            <Grid item>
+              <ProgressBarComponent name={"Disk"} metric={diskUsage} />
+            </Grid>
+            <Grid item>
+              <ProgressBarComponent name={"Memory"} metric={memoryUsage} />
+            </Grid>
+            <Grid item>
+              <ProgressBarComponent name={"CPU"} metric={cpuUsage} />
+            </Grid>
+            <Grid item>
+              <NetworkInfo networkIn={networkIn} networkOut={networkOut} />
+            </Grid>
+          </Grid>
           <Grid container spacing={2}>
             <Grid item xs={12}>
               <Typography variant="h6" style={{ display: "inline-block" }}>
