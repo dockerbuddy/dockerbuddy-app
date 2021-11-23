@@ -8,7 +8,7 @@ import {
   Theme,
   makeStyles,
 } from "@material-ui/core";
-import { BasicMetric } from "../../common/types";
+import { PercentMetric } from "../../common/types";
 import { alertTypeToColor, humanFileSize } from "../../util/util";
 import { AlertType } from "../../common/enums";
 import { Alert } from "@mui/material";
@@ -52,7 +52,7 @@ function LinearProgressWithLabel(
 
 const ProgressBarComponent: React.FC<{
   name: string;
-  metric: BasicMetric | undefined;
+  metric: PercentMetric | undefined;
 }> = ({ name, metric }) => {
   const used =
     name === "CPU" ? `${metric?.value}%` : humanFileSize(metric?.value);

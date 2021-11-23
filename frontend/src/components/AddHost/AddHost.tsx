@@ -10,7 +10,7 @@ import {
 } from "@material-ui/core";
 import { useForm } from "react-hook-form";
 import { proxy } from "../../common/api";
-import { StandardApiResponse, HostRule } from "../../common/types";
+import { StandardApiResponse, HostPercentRule } from "../../common/types";
 import { Alert, AlertTitle } from "@material-ui/lab";
 import { Link } from "react-router-dom";
 import { useAppDispatch } from "../../redux/hooks";
@@ -44,7 +44,7 @@ export interface PostHostResponse {
   id: string;
   hostName: string;
   ip: string;
-  hostRules: HostRule[];
+  hostPercentRules: HostPercentRule[];
 }
 
 const AddHost: React.FC<AddHostProps> = ({
@@ -114,7 +114,7 @@ const AddHost: React.FC<AddHostProps> = ({
     const json = {
       hostName: data.hostName,
       ip: data.ip,
-      hostRules: rules,
+      hostPercentRules: rules,
     };
 
     const url =

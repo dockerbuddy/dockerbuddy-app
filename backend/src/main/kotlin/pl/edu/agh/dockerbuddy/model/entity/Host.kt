@@ -1,6 +1,8 @@
 package pl.edu.agh.dockerbuddy.model.entity
 
 import com.fasterxml.jackson.annotation.JsonAlias
+import com.fasterxml.jackson.annotation.JsonProperty
+import com.google.gson.annotations.SerializedName
 import lombok.ToString
 import javax.persistence.*
 import javax.validation.constraints.NotBlank
@@ -11,7 +13,7 @@ import javax.validation.constraints.Pattern
 @Entity
 class Host(
     @field:NotBlank
-    @Column(name = "host_name", unique= true, nullable = false)
+    @Column(name = "host_name", unique = true, nullable = false)
     @JsonAlias("host_name")
     var hostName: String? = null,
 
@@ -21,7 +23,12 @@ class Host(
     var ip: String? = null,
 
     @OneToMany(cascade = [CascadeType.ALL], orphanRemoval = true, fetch = FetchType.EAGER)
-    var hostRules: MutableSet<MetricRule> = mutableSetOf(),
+//    @field:JsonAlias("hostRules") // TODO unify variable names
+//    @get:JsonProperty("hostRules") // TODO unify variable names
+    var hostPercentRules: MutableSet<PercentMetricRule> = mutableSetOf(),
+
+    @OneToMany(cascade = [CascadeType.ALL], orphanRemoval = true, fetch = FetchType.EAGER)
+    var hostBasicRules: MutableSet<BasicMetricRule> = mutableSetOf(),
 
     @OneToMany(cascade = [CascadeType.ALL], orphanRemoval = true, fetch = FetchType.EAGER)
     var containers: MutableSet<ContainerReport> = mutableSetOf()

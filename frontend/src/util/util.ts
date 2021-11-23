@@ -1,5 +1,5 @@
 import { MetricType, AlertType, RuleType, ReportStatus } from "../common/enums";
-import { BasicMetric, HostRule } from "../common/types";
+import { PercentMetric, HostPercentRule } from "../common/types";
 import { alertColors } from "./alertStyle";
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
@@ -41,18 +41,18 @@ export function parseDateToDDMMYYYY(date: Date): string {
 }
 
 export function extractMetric(
-  metrics: BasicMetric[],
+  metrics: PercentMetric[],
   type: MetricType
-): BasicMetric | undefined {
+): PercentMetric | undefined {
   return metrics?.find(
     (metric) => MetricType[metric.metricType] === type.valueOf()
   );
 }
 
 export function extractHostRule(
-  rules: HostRule[],
+  rules: HostPercentRule[],
   type: RuleType
-): HostRule | undefined {
+): HostPercentRule | undefined {
   return rules?.find((rule) => RuleType[rule.type] === type.valueOf());
 }
 

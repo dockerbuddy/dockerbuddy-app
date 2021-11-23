@@ -8,7 +8,7 @@ import pl.edu.agh.dockerbuddy.inmemory.InMemoryStorage
 import pl.edu.agh.dockerbuddy.model.metric.HostSummary
 import java.util.*
 
-class InMemoryStorageTests {
+class InMemoryStorageTest {
     @Test
     fun saveHostSummaryTest1() {
         //given

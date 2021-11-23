@@ -31,12 +31,21 @@ const HostStats: React.FC<HostStatsProps> = ({ hostData }) => {
   const hostId = hostData?.id;
 
   const classes = useStyles();
-  const mem = extractMetric(summary?.metrics, MetricType.MEMORY_USAGE);
-  const memRule = extractHostRule(hostData?.hostRules, RuleType.MEMORY_USAGE);
-  const cpu = extractMetric(summary?.metrics, MetricType.CPU_USAGE);
-  const cpuRule = extractHostRule(hostData?.hostRules, RuleType.CPU_USAGE);
-  const disk = extractMetric(summary?.metrics, MetricType.DISK_USAGE);
-  const diskRule = extractHostRule(hostData?.hostRules, RuleType.DISK_USAGE);
+  const mem = extractMetric(summary?.percentMetrics, MetricType.MEMORY_USAGE);
+  const memRule = extractHostRule(
+    hostData?.hostPercentRules,
+    RuleType.MEMORY_USAGE
+  );
+  const cpu = extractMetric(summary?.percentMetrics, MetricType.CPU_USAGE);
+  const cpuRule = extractHostRule(
+    hostData?.hostPercentRules,
+    RuleType.CPU_USAGE
+  );
+  const disk = extractMetric(summary?.percentMetrics, MetricType.DISK_USAGE);
+  const diskRule = extractHostRule(
+    hostData?.hostPercentRules,
+    RuleType.DISK_USAGE
+  );
 
   const [activeMetric, setActiveMetric] = React.useState<string>(
     MetricType.CPU_USAGE

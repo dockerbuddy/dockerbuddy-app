@@ -1,9 +1,8 @@
 package pl.edu.agh.dockerbuddy.model.metric
 
-enum class MetricType {
-    MEMORY_USAGE,
-    DISK_USAGE,
-    CPU_USAGE;
+enum class BasicMetricType {
+    NETWORK_IN,
+    NETWORK_OUT;
 
     fun humanReadable(): String {
         return name.lowercase().replace('_', ' ')

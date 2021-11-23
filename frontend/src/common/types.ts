@@ -12,7 +12,14 @@ export type StandardApiResponse<T> = {
   body: T;
 };
 
-export interface HostRule {
+export interface HostPercentRule {
+  id?: string;
+  type: RuleType;
+  warnLevel: number;
+  criticalLevel: number;
+}
+
+export interface HostBasicRule {
   id?: string;
   type: RuleType;
   warnLevel: number;
@@ -22,7 +29,8 @@ export interface HostRule {
 export interface HostSummary {
   id: string;
   timestamp: string;
-  metrics: BasicMetric[];
+  basicMetrics: PercentMetric[];
+  percentMetrics: PercentMetric[];
   containers: Container[];
 }
 
@@ -32,7 +40,8 @@ export interface Host {
   ip: string;
   hostSummary: HostSummary;
   containersReports: ContainerReport[];
-  hostRules: HostRule[];
+  hostBasicRules: HostBasicRule[];
+  hostPercentRules: HostPercentRule[];
 }
 
 export interface ContainerReport {
@@ -45,12 +54,18 @@ export interface Container {
   name: string;
   image: string;
   status: ContainerState;
-  metrics: BasicMetric[];
+  metrics: PercentMetric[];
   alertType: AlertType;
   reportStatus: ReportStatus;
 }
 
-export interface BasicMetric {
+export interface BasicMetricss {
+  value: number;
+  alertType: AlertType;
+  metricType: MetricType;
+}
+
+export interface PercentMetric {
   value: number;
   total: number;
   percent: number;

@@ -9,9 +9,9 @@ import javax.validation.constraints.Max
 import javax.validation.constraints.Min
 
 @ToString
-@Table(name = "metric_rule")
+@Table(name = "percent_metric_rule")
 @Entity
-class MetricRule (
+class PercentMetricRule (
     @Enumerated(EnumType.STRING)
     @Column(name = "type", nullable = false)
     @JsonAlias("ruleType")
@@ -29,8 +29,14 @@ class MetricRule (
 ): BaseIdEntity()  {
 
     init {
-        if (warnLevel >= criticalLevel) {
-            throw IllegalArgumentException("warnLevel cannot be greater than nor equal to criticalLevel")
+        require (criticalLevel >= warnLevel) {
+            "warnLevel cannot be greater than nor equal to criticalLevel"
+        }
+
+        require(type in listOf(RuleType.CPU_USAGE, RuleType.MEMORY_USAGE, RuleType.DISK_USAGE)) {
+            "Percent metric rule type must be one of the following: CPU_USAGE, MEMORY_USAGE, DISK_USAGE"
         }
     }
+
+
 }

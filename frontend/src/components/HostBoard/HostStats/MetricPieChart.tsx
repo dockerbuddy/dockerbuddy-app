@@ -2,13 +2,13 @@ import React from "react";
 import { Cell, Pie, PieChart, ResponsiveContainer, Sector } from "recharts";
 import { AlertType } from "../../../common/enums";
 import theme from "../../../common/theme";
-import { BasicMetric, HostRule } from "../../../common/types";
+import { PercentMetric, HostPercentRule } from "../../../common/types";
 import { alertColors } from "../../../util/alertStyle";
 import { alertTypeToColor } from "../../../util/util";
 
 const renderActiveShape = (
   props: any,
-  metric: BasicMetric | undefined,
+  metric: PercentMetric | undefined,
   name: string
 ) => {
   const { cx, cy, innerRadius, outerRadius, startAngle, endAngle, fill } =
@@ -60,9 +60,9 @@ const renderActiveShape = (
 const colors = [alertColors.default, alertColors.yellow, alertColors.red];
 
 const MetricPieChart: React.FC<{
-  metric: BasicMetric | undefined;
+  metric: PercentMetric | undefined;
   name: string;
-  rule: HostRule | undefined;
+  rule: HostPercentRule | undefined;
 }> = ({ metric, name, rule }) => {
   const thresholds = [
     { name: "OK", value: rule?.warnLevel },
