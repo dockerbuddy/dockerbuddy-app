@@ -87,7 +87,7 @@ class InfluxDbProxy {
                 .addTag("container_id", container.id)
                 .addTag("container_name", container.name)
                 .addTag("image", container.image)
-                .addField("status", container.status.toString())
+                .addField("status", container.state.toString())
                 .time(Instant.parse(hostSummary.timestamp).toEpochMilli(), WritePrecision.MS)
 
             val containerMetrics = container.metrics.associateBy { it.metricType }

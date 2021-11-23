@@ -36,7 +36,7 @@
       "id": "6ac25993-4769-44a0-8ee5-930867e2226g",
       "name": "cont1",
       "image": "dockera-app",
-      "status": "RUNNING",
+      "state": "RUNNING",
       "metrics": [
         {
           "metricType": "CPU_USAGE",
@@ -56,7 +56,7 @@
       "id": "6fc25993-4769-44a0-8ee4-930867e2226a",
       "name": "cont2",
       "image": "dockera-app",
-      "status": "EXITED",
+      "state": "EXITED",
       "metrics": [
         {
           "metricType": "CPU_USAGE",
@@ -76,7 +76,7 @@
       "id": "6fc25993-4768-44a0-8ee4-930867e2226g",
       "name": "cont3",
       "image": "dockera-app",
-      "status": "EXITED",
+      "state": "EXITED",
       "metrics": [
         {
           "metricType": "CPU_USAGE",
@@ -96,7 +96,7 @@
       "id": "6fc25003-4768-44a0-8ee4-930867e2226g",
       "name": "cont4",
       "image": "dockera-app",
-      "status": "REMOVING",
+      "state": "REMOVING",
       "metrics": [
         {
           "metricType": "CPU_USAGE",

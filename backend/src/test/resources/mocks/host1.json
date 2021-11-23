@@ -19,7 +19,8 @@
   "hostBasicRules": [
     {
       "type": "NETWORK_IN",
-      "limit": 1000
+      "warnLevel": 1000,
+      "criticalLevel": 1500
     }
   ],
   "containers": [

@@ -111,7 +111,7 @@ class AlertService (
     }
 
     private fun addAlertTypeToContainer (containerSummary: ContainerSummary) = when {
-        ContainerState.RUNNING != containerSummary.status ->
+        ContainerState.RUNNING != containerSummary.state ->
             containerSummary.alertType = AlertType.CRITICAL
         else -> containerSummary.alertType = AlertType.OK
     }
@@ -212,7 +212,7 @@ class AlertService (
         if (basicMetric.alertType == null) return
         logger.debug("Checking basic metric: ${basicMetric.metricType}")
         if (basicMetric.alertType != prevBasicMetric.alertType) {
-            val alertMessage = "Host $hostName: ${basicMetric.metricType.humanReadable()} is ${basicMetric.value}%"
+            val alertMessage = "Host $hostName: ${basicMetric.metricType.humanReadable()} is ${basicMetric.alertType}"
             logger.info(alertMessage)
             logger.debug("$basicMetric")
             sendAlert(Alert(hostSummary.id, basicMetric.alertType!!, alertMessage))
@@ -252,10 +252,10 @@ class AlertService (
                 ) {
                     val alertMessage = if (containerSummary.alertType != AlertType.OK) {
                         "Host ${host.hostName}: something wrong with container ${containerSummary.name}. " +
-                                "State: ${containerSummary.status.humaneReadable()}"
+                                "State: ${containerSummary.state.humaneReadable()}"
                     } else {
                         "Host ${host.hostName}: container ${containerSummary.name} is back. " +
-                                "State: ${containerSummary.status.humaneReadable()}"
+                                "State: ${containerSummary.state.humaneReadable()}"
                     }
                     containerSummary.alertType?.let { alertType ->
                         Alert(hostSummary.id, alertType, alertMessage)
@@ -264,7 +264,7 @@ class AlertService (
             } else if (containerSummary.alertType != AlertType.OK) {
                 val alertMessage: String =
                     "Host ${host.hostName}: something wrong with container ${containerSummary.name}. " +
-                            "State: ${containerSummary.status.humaneReadable()}"
+                            "State: ${containerSummary.state.humaneReadable()}"
                 containerSummary.alertType?.let { alertType ->
                     Alert(hostSummary.id, alertType, alertMessage)
                 }?.let { alert -> sendAlert(alert) }
@@ -279,8 +279,8 @@ class AlertService (
     }
 
     private fun addAlertTypeBasic (basicMetric: BasicMetric, rule: BasicMetricRule) = when {
-        basicMetric.value < rule.limit -> basicMetric.alertType = AlertType.OK
-        basicMetric.value > rule.limit -> basicMetric.alertType = AlertType.CRITICAL
+        basicMetric.value < rule.warnLevel -> basicMetric.alertType = AlertType.OK
+        basicMetric.value > rule.criticalLevel -> basicMetric.alertType = AlertType.CRITICAL
         else -> basicMetric.alertType = AlertType.WARN
     }
 
