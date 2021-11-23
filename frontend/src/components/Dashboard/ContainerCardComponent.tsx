@@ -135,35 +135,18 @@ const ContainerCardComponent: React.FC<{
         alignItems="center"
         className={getContainerClass(reportStatus)}
         style={{ paddingTop: "15px", paddingBottom: "15px" }}
+        spacing={1}
       >
-        <Grid item container xs={12}>
-          <Grid item xs={2}></Grid>
-          <Grid
-            item
-            container
-            direction="column"
-            xs={8}
-            justify="center"
-            alignItems="center"
-          >
-            <Grid item>
-              <AllOutOutlined
-                fontSize="large"
-                className={classes.dockerIcon}
-                style={{ color: imgColor }}
-              />
-            </Grid>
-            <Grid item>
-              <Typography
-                variant="subtitle1"
-                align="center"
-                style={{ marginTop: -10, color: imgColor }}
-              >
-                {container.name}
-              </Typography>
-            </Grid>
+        <Grid item container xs={12} justify="center" alignItems="center">
+          <Grid item xs={3}></Grid>
+          <Grid item container xs={6} justify="center" alignItems="center">
+            <AllOutOutlined
+              fontSize="large"
+              className={classes.dockerIcon}
+              style={{ color: imgColor }}
+            />
           </Grid>
-          <Grid item xs={2}>
+          <Grid item xs={3}>
             <IconButton onClick={changeWatchedStatus}>
               {isWatched() ? (
                 <Visibility className={classes.enabled} />
@@ -172,18 +155,72 @@ const ContainerCardComponent: React.FC<{
               )}
             </IconButton>
           </Grid>
+          <Grid
+            item
+            container
+            justify="center"
+            alignItems="center"
+            // style={{ minHeight: "80px" }}
+          >
+            {/* {container.name.length <= 50 ? ( */}
+            <Typography
+              variant="subtitle1"
+              align="center"
+              style={{
+                paddingLeft: 10,
+                paddingRight: 10,
+                color: imgColor,
+              }}
+              noWrap
+            >
+              {container.name}
+            </Typography>
+            {/* ) : (
+              <>
+                <Typography
+                  variant="subtitle1"
+                  align="center"
+                  style={{
+                    padding: 10,
+                    marginTop: -20,
+                    color: imgColor,
+                    wordWrap: "break-word",
+                  }}
+                  // noWrap
+                  // gutterBottom
+                >
+                  {container.name.substring(0, 25)}
+                </Typography>
+                <Typography
+                  variant="subtitle1"
+                  align="center"
+                  style={{
+                    padding: 10,
+                    marginTop: -20,
+                    color: imgColor,
+                    wordWrap: "break-word",
+                  }}
+                  noWrap
+                  // gutterBottom
+                >
+                  {container.name.substring(25)}
+                </Typography>
+              </>
+            )} */}
+          </Grid>
         </Grid>
 
-        <Divider
-          variant="middle"
-          orientation="horizontal"
-          flexItem
-          style={{ height: 3 }}
-        />
-
-        <Grid item container justify="space-around">
+        <Grid item container justify="space-around" spacing={1}>
+          <Grid item xs={12}>
+            <Divider
+              variant="middle"
+              orientation="horizontal"
+              flexItem
+              style={{ height: 3 }}
+            />
+          </Grid>
           {/* or space-between */}
-          <Grid item xs={5}>
+          <Grid item xs={6}>
             <Tooltip arrow title={cpu?.value + "/" + cpu?.total}>
               <Typography
                 variant="subtitle1"
@@ -198,9 +235,15 @@ const ContainerCardComponent: React.FC<{
             variant="fullWidth"
             orientation="vertical"
             flexItem
-            style={{ width: 3 }}
+            style={{ width: 1.5, marginLeft: -1.5 }}
           />
-          <Grid item xs={5}>
+          <Divider
+            variant="fullWidth"
+            orientation="vertical"
+            flexItem
+            style={{ width: 1.5, marginRight: -1.5 }}
+          />
+          <Grid item xs={6}>
             <Tooltip arrow title={mem?.value + "/" + mem?.total}>
               <Typography
                 variant="subtitle1"

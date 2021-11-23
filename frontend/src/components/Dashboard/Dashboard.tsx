@@ -1,11 +1,18 @@
-import React, { useEffect } from "react";
-import { makeStyles, Grid, Container } from "@material-ui/core";
+import React, { useEffect, useState } from "react";
+import {
+  makeStyles,
+  Grid,
+  Container,
+  TextField,
+  InputAdornment,
+} from "@material-ui/core";
 import { Alert } from "@material-ui/lab";
 import HostCardComponent from "./HostCardComponent";
 import { selectHost, updateHostsAsync } from "../../redux/hostsSlice";
 import { useAppDispatch, useAppSelector } from "../../redux/hooks";
 import { Host } from "../../common/types";
 import NoHostsComponent from "./NoHostsComponent";
+import { Search } from "@material-ui/icons";
 
 const useStyles = makeStyles(() => ({
   root: {
@@ -26,6 +33,7 @@ const useStyles = makeStyles(() => ({
 const Dashboard: React.FC = () => {
   const classes = useStyles();
   const hostsData = useAppSelector(selectHost);
+  const [filterName, setFilterName] = useState<string>("");
 
   const dispatch = useAppDispatch();
 
@@ -54,11 +62,32 @@ const Dashboard: React.FC = () => {
           </Grid>
         ) : (
           <Grid container spacing={2}>
+            <Grid item xs={12}>
+              <TextField
+                id="filter-containers-textfield"
+                label="Find container"
+                value={filterName}
+                onChange={(e) => setFilterName(e.target.value)}
+                InputProps={{
+                  startAdornment: (
+                    <InputAdornment position="start">
+                      <Search />
+                    </InputAdornment>
+                  ),
+                }}
+                variant="standard"
+              />
+            </Grid>
             {Object.values(hostsData.hosts).map((obj: Host) => {
-              return (
-                <Grid item xs={6} key={obj.ip}>
+              return obj.hostName
+                .toLowerCase()
+                .includes(filterName.toLowerCase()) ||
+                obj.ip.includes(filterName) ? (
+                <Grid item xs={12} md={6} key={obj.ip}>
                   <HostCardComponent host={obj} />
                 </Grid>
+              ) : (
+                <></>
               );
             })}
           </Grid>

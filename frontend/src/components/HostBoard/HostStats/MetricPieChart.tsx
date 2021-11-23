@@ -4,13 +4,14 @@ import { AlertType } from "../../../common/enums";
 import theme from "../../../common/theme";
 import { PercentMetric, HostPercentRule } from "../../../common/types";
 import { alertColors } from "../../../util/alertStyle";
-import { alertTypeToColor } from "../../../util/util";
+import { alertTypeToColor, humanFileSize } from "../../../util/util";
 
 const renderActiveShape = (
   props: any,
   metric: PercentMetric | undefined,
   name: string
 ) => {
+  const showVal = name != "CPU";
   const { cx, cy, innerRadius, outerRadius, startAngle, endAngle, fill } =
     props;
 
@@ -19,7 +20,7 @@ const renderActiveShape = (
     <g>
       <text
         x={cx}
-        y={cy - 30}
+        y={showVal ? cy - 30 : cy - 10}
         dy={8}
         textAnchor="middle"
         fill={fill}
@@ -40,9 +41,13 @@ const renderActiveShape = (
         {...theme.palette.secondary}
         fontSize="28"
       >
-        <tspan>
-          {metric?.value} / {metric?.total}
-        </tspan>
+        {showVal ? (
+          <tspan>
+            {humanFileSize(metric?.value)} / {humanFileSize(metric?.total)}
+          </tspan>
+        ) : (
+          <></>
+        )}
       </text>
       <Sector
         cx={cx}
@@ -84,7 +89,7 @@ const MetricPieChart: React.FC<{
     },
   ];
   const dataColors = [
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    //eslint-disable-next-line @typescript-eslint/ban-ts-comment
     //@ts-ignore
     alertTypeToColor(AlertType[metric.alertType]),
     "#333333",

@@ -40,7 +40,7 @@ const InfluxHistory: React.FC<{ hostId: string, activeMetric: string}> = (props)
   const hostId: string = props.hostId.toString();
 
   const allMetricQueries: AllMetricQueries = {
-    Metric: ["_TOTAL", "_PERCENT", "_VALUE"],
+    Metric: ["Percent", "Total", "Value"],
   };
 
   const [hostHistory, setHostHistory] = useState<InfluxBody[]>();
@@ -49,7 +49,7 @@ const InfluxHistory: React.FC<{ hostId: string, activeMetric: string}> = (props)
   const handleQuery = async () => {
     setError("");
     const query: QueryParams = {
-      metricType: props.activeMetric + metricType,
+      metricType: props.activeMetric + "_" + metricType.toUpperCase(),
       hostId: hostId,
       start: (dateRange[0] != null ? dateRange[0] : yesterday).toISOString(),
       end: dateRange[1]?.toISOString(),
