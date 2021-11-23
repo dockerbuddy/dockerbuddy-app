@@ -16,6 +16,7 @@ import { AllOutOutlined, VisibilityOff, Visibility } from "@material-ui/icons";
 import { Link } from "react-router-dom";
 import { proxy } from "../../common/api";
 import { alertColors } from "../../util/alertStyle";
+import { Box } from "@mui/system";
 
 const useStyles = makeStyles(() => ({
   newContainer: {
@@ -222,13 +223,22 @@ const ContainerCardComponent: React.FC<{
           {/* or space-between */}
           <Grid item xs={6}>
             <Tooltip arrow title={cpu?.value + "/" + cpu?.total}>
-              <Typography
-                variant="subtitle1"
-                align="center"
-                style={{ color: textColor }}
-              >
-                CPU: {cpu?.percent.toFixed(2)}%
-              </Typography>
+              <Box textAlign="center">
+                <Typography
+                  variant="subtitle1"
+                  align="center"
+                  style={{ color: textColor }}
+                >
+                  CPU:
+                </Typography>
+                <Typography
+                  variant="subtitle1"
+                  align="center"
+                  style={{ color: textColor }}
+                >
+                  {cpu?.percent.toFixed(2)}%
+                </Typography>
+              </Box>
             </Tooltip>
           </Grid>
           <Divider
@@ -245,13 +255,22 @@ const ContainerCardComponent: React.FC<{
           />
           <Grid item xs={6}>
             <Tooltip arrow title={mem?.value + "/" + mem?.total}>
-              <Typography
-                variant="subtitle1"
-                align="center"
-                style={{ color: textColor }}
-              >
-                MEM: {mem?.percent.toFixed(2)}%
-              </Typography>
+              <Box textAlign="center">
+                <Typography
+                  variant="subtitle1"
+                  align="center"
+                  style={{ color: textColor }}
+                >
+                  MEM:
+                </Typography>
+                <Typography
+                  variant="subtitle1"
+                  align="center"
+                  style={{ color: textColor }}
+                >
+                  {mem?.percent.toFixed(2)}%
+                </Typography>
+              </Box>
             </Tooltip>
           </Grid>
         </Grid>

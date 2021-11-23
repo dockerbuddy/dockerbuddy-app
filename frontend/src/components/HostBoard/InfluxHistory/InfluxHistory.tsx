@@ -40,7 +40,7 @@ const InfluxHistory: React.FC<{ hostId: string, activeMetric: string}> = (props)
   const hostId: string = props.hostId.toString();
 
   const allMetricQueries: AllMetricQueries = {
-    Metric: ["Percent", "Total", "Value"],
+    Metric: ["Percent", "Value", "Total"],
   };
 
   const [hostHistory, setHostHistory] = useState<InfluxBody[]>();
