@@ -383,6 +383,11 @@ const AddHost: React.FC<AddHostProps> = ({
                   })}
                   error={!!errors.networkOutWarn}
                   helperText={errors.networkOutWarn?.message}
+                  InputProps={{
+                    endAdornment: (
+                      <InputAdornment position="end">B</InputAdornment>
+                    ),
+                  }}
                   style={{ marginRight: "40px" }}
                 />
                 <TextField
@@ -397,6 +402,11 @@ const AddHost: React.FC<AddHostProps> = ({
                   })}
                   error={!!errors.networkOutCrit}
                   helperText={errors.networkOutCrit?.message}
+                  InputProps={{
+                    endAdornment: (
+                      <InputAdornment position="end">B</InputAdornment>
+                    ),
+                  }}
                 />
               </Grid>
               <Grid item>
@@ -414,6 +424,11 @@ const AddHost: React.FC<AddHostProps> = ({
                   error={!!errors.networkInWarn}
                   helperText={errors.networkInWarn?.message}
                   style={{ marginRight: "40px" }}
+                  InputProps={{
+                    endAdornment: (
+                      <InputAdornment position="end">B</InputAdornment>
+                    ),
+                  }}
                 />
                 <TextField
                   name="networkInCrit"
@@ -427,6 +442,11 @@ const AddHost: React.FC<AddHostProps> = ({
                   })}
                   error={!!errors.networkInCrit}
                   helperText={errors.networkInCrit?.message}
+                  InputProps={{
+                    endAdornment: (
+                      <InputAdornment position="end">B</InputAdornment>
+                    ),
+                  }}
                 />
               </Grid>
               <Grid item>

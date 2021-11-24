@@ -65,7 +65,7 @@ const Dashboard: React.FC = () => {
             <Grid item xs={12}>
               <TextField
                 id="filter-containers-textfield"
-                label="Find container"
+                label="Find host"
                 value={filterName}
                 onChange={(e) => setFilterName(e.target.value)}
                 InputProps={{
