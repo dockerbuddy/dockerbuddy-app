@@ -18,12 +18,29 @@ export function humanFileSize(size: number | undefined): string {
   );
 }
 
+export function fromHumanFileSize(size: number, unit: string): number {
+  const map = {
+    B: 0,
+    kB: 1,
+    MB: 2,
+    GB: 3,
+    TB: 4,
+  };
+  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+  //@ts-ignore
+  const i = map[unit];
+  const y = +size * Math.pow(1024, i);
+  return y;
+}
+
 function addZero(i: number) {
   if (i < 10) {
     return "0" + i;
   }
   return i;
 }
+
+//107374182400
 
 export function parseDateToHour(date: Date): string {
   const h = addZero(date.getHours());
