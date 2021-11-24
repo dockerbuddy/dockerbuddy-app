@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import React, { useState } from "react";
 import {
   Box,
@@ -10,12 +11,17 @@ import {
 } from "@material-ui/core";
 import { useForm } from "react-hook-form";
 import { proxy } from "../../common/api";
-import { StandardApiResponse, HostPercentRule } from "../../common/types";
+import {
+  StandardApiResponse,
+  HostPercentRule,
+  HostBasicRule,
+} from "../../common/types";
 import { Alert, AlertTitle } from "@material-ui/lab";
 import { Link } from "react-router-dom";
 import { useAppDispatch } from "../../redux/hooks";
 import { updateHostsAsync } from "../../redux/hostsSlice";
 import { RuleType } from "../../common/enums";
+import { fromHumanFileSize } from "../../util/util";
 
 export interface Rule {
   ruleType: RuleType;
@@ -32,6 +38,10 @@ export interface AddHostFormData {
   memCrit: string;
   diskWarn: string;
   diskCrit: string;
+  networkOutWarn: string;
+  networkOutCrit: string;
+  networkInWarn: string;
+  networkInCrit: string;
 }
 
 interface AddHostProps {
@@ -45,6 +55,7 @@ export interface PostHostResponse {
   hostName: string;
   ip: string;
   hostPercentRules: HostPercentRule[];
+  hostBasicRules: HostBasicRule[];
 }
 
 const AddHost: React.FC<AddHostProps> = ({
@@ -67,8 +78,27 @@ const AddHost: React.FC<AddHostProps> = ({
     const memCrit = parseInt(data.memCrit);
     const diskWarn = parseInt(data.diskWarn);
     const diskCrit = parseInt(data.diskCrit);
+    const networkOutWarn = fromHumanFileSize(
+      parseFloat(data.networkOutWarn),
+      "MB"
+    );
+    const networkOutCrit = fromHumanFileSize(
+      parseFloat(data.networkOutCrit),
+      "MB"
+    );
+    const networkInWarn = fromHumanFileSize(
+      parseFloat(data.networkInWarn),
+      "MB"
+    );
+    const networkInCrit = fromHumanFileSize(
+      parseFloat(data.networkInCrit),
+      "MB"
+    );
 
-    const rules: Rule[] = [];
+    console.log("XD", networkInWarn);
+
+    const hostPercentRules: HostPercentRule[] = [];
+    const hostBasicRules: HostBasicRule[] = [];
 
     if (cpuWarn >= cpuCrit) {
       setError(
@@ -90,32 +120,63 @@ const AddHost: React.FC<AddHostProps> = ({
       );
       return;
     }
+
+    if (networkOutWarn >= networkOutCrit) {
+      setError(
+        "Network out warn threshold should be smaller than network out critical threshold"
+      );
+      return;
+    }
+
+    if (networkInWarn >= networkInCrit) {
+      setError(
+        "Network in warn threshold should be smaller than network in critical threshold"
+      );
+      return;
+    }
     if (!isNaN(cpuWarn) && !isNaN(cpuCrit))
-      rules.push({
-        ruleType: RuleType.CPU_USAGE,
+      hostPercentRules.push({
+        type: RuleType.CPU_USAGE,
         warnLevel: cpuWarn,
         criticalLevel: cpuCrit,
       });
 
     if (!isNaN(memWarn) && !isNaN(memCrit))
-      rules.push({
-        ruleType: RuleType.MEMORY_USAGE,
+      hostPercentRules.push({
+        type: RuleType.MEMORY_USAGE,
         warnLevel: memWarn,
         criticalLevel: memCrit,
       });
 
     if (!isNaN(diskWarn) && !isNaN(diskCrit))
-      rules.push({
-        ruleType: RuleType.DISK_USAGE,
+      hostPercentRules.push({
+        type: RuleType.DISK_USAGE,
         warnLevel: diskWarn,
         criticalLevel: diskCrit,
+      });
+
+    if (!isNaN(networkOutWarn) && !isNaN(networkOutCrit))
+      hostBasicRules.push({
+        type: RuleType.NETWORK_OUT,
+        warnLevel: networkOutWarn,
+        criticalLevel: networkOutCrit,
+      });
+
+    if (!isNaN(networkInWarn) && !isNaN(networkInCrit))
+      hostBasicRules.push({
+        type: RuleType.NETWORK_IN,
+        warnLevel: networkInWarn,
+        criticalLevel: networkInCrit,
       });
 
     const json = {
       hostName: data.hostName,
       ip: data.ip,
-      hostPercentRules: rules,
+      hostPercentRules: hostPercentRules,
+      hostBasicRules: hostBasicRules,
     };
+
+    console.log(json);
 
     const url =
       method === "POST" ? `${proxy}/hosts` : `${proxy}/hosts/${editHostId}`;
@@ -319,6 +380,86 @@ const AddHost: React.FC<AddHostProps> = ({
                   InputProps={{
                     endAdornment: (
                       <InputAdornment position="end">%</InputAdornment>
+                    ),
+                  }}
+                />
+              </Grid>
+              <Grid item>
+                <Typography variant="h6">Network out alerting</Typography>
+                <TextField
+                  name="networkOutWarn"
+                  label="Warn threshold"
+                  size="small"
+                  inputRef={register({
+                    pattern: {
+                      value: /^(?:[1-9]\d*|0)?(?:\.\d+)?$/,
+                      message: "Value should a positive float",
+                    },
+                  })}
+                  error={!!errors.networkOutWarn}
+                  helperText={errors.networkOutWarn?.message}
+                  InputProps={{
+                    endAdornment: (
+                      <InputAdornment position="end">MB</InputAdornment>
+                    ),
+                  }}
+                  style={{ marginRight: "40px" }}
+                />
+                <TextField
+                  name="networkOutCrit"
+                  label="Critical threshold"
+                  size="small"
+                  inputRef={register({
+                    pattern: {
+                      value: /^(?:[1-9]\d*|0)?(?:\.\d+)?$/,
+                      message: "Value should a positive float",
+                    },
+                  })}
+                  error={!!errors.networkOutCrit}
+                  helperText={errors.networkOutCrit?.message}
+                  InputProps={{
+                    endAdornment: (
+                      <InputAdornment position="end">MB</InputAdornment>
+                    ),
+                  }}
+                />
+              </Grid>
+              <Grid item>
+                <Typography variant="h6">Network in alerting</Typography>
+                <TextField
+                  name="networkInWarn"
+                  label="Warn threshold"
+                  size="small"
+                  inputRef={register({
+                    pattern: {
+                      value: /^(?:[1-9]\d*|0)?(?:\.\d+)?$/,
+                      message: "Value should a positive float",
+                    },
+                  })}
+                  error={!!errors.networkInWarn}
+                  helperText={errors.networkInWarn?.message}
+                  style={{ marginRight: "40px" }}
+                  InputProps={{
+                    endAdornment: (
+                      <InputAdornment position="end">MB</InputAdornment>
+                    ),
+                  }}
+                />
+                <TextField
+                  name="networkInCrit"
+                  label="Critical threshold"
+                  size="small"
+                  inputRef={register({
+                    pattern: {
+                      value: /^(?:[1-9]\d*|0)?(?:\.\d+)?$/,
+                      message: "Value should a positive float",
+                    },
+                  })}
+                  error={!!errors.networkInCrit}
+                  helperText={errors.networkInCrit?.message}
+                  InputProps={{
+                    endAdornment: (
+                      <InputAdornment position="end">MB</InputAdornment>
                     ),
                   }}
                 />

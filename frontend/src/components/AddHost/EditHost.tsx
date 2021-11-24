@@ -3,7 +3,12 @@ import React, { useEffect, useState } from "react";
 import { RouteComponentProps } from "react-router-dom";
 import { proxy } from "../../common/api";
 import { RuleType } from "../../common/enums";
-import { HostPercentRule, StandardApiResponse } from "../../common/types";
+import {
+  HostBasicRule,
+  HostPercentRule,
+  StandardApiResponse,
+} from "../../common/types";
+import { humanFileSizeSimple } from "../../util/util";
 import AddHost, { AddHostFormData, PostHostResponse } from "./AddHost";
 
 type HParam = { id: string };
@@ -35,6 +40,10 @@ const EditHost: React.FC<RouteComponentProps<HParam>> = ({ match }) => {
       memCrit: "",
       diskWarn: "",
       diskCrit: "",
+      networkOutCrit: "",
+      networkOutWarn: "",
+      networkInWarn: "",
+      networkInCrit: "",
     };
 
     jsonBody.hostPercentRules.forEach((rule: HostPercentRule) => {
@@ -57,6 +66,22 @@ const EditHost: React.FC<RouteComponentProps<HParam>> = ({ match }) => {
           ...res,
           diskWarn: rule.warnLevel.toString(),
           diskCrit: rule.criticalLevel.toString(),
+        };
+    });
+
+    jsonBody.hostBasicRules.forEach((rule: HostBasicRule) => {
+      if (rule.type === RuleType.NETWORK_IN)
+        res = {
+          ...res,
+          networkInWarn: humanFileSizeSimple(rule.warnLevel),
+          networkInCrit: humanFileSizeSimple(rule.criticalLevel),
+        };
+
+      if (rule.type === RuleType.NETWORK_OUT)
+        res = {
+          ...res,
+          networkOutWarn: humanFileSizeSimple(rule.warnLevel),
+          networkOutCrit: humanFileSizeSimple(rule.criticalLevel),
         };
     });
     setFormData(res);

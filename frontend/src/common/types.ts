@@ -29,7 +29,7 @@ export interface HostBasicRule {
 export interface HostSummary {
   id: string;
   timestamp: string;
-  basicMetrics: PercentMetric[];
+  basicMetrics: BasicMetric[];
   percentMetrics: PercentMetric[];
   containers: Container[];
 }
@@ -59,7 +59,7 @@ export interface Container {
   reportStatus: ReportStatus;
 }
 
-export interface BasicMetricss {
+export interface BasicMetric {
   value: number;
   alertType: AlertType;
   metricType: MetricType;

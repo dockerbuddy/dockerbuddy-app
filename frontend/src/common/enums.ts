@@ -2,6 +2,8 @@ export enum MetricType {
   CPU_USAGE = "CPU_USAGE",
   DISK_USAGE = "DISK_USAGE",
   MEMORY_USAGE = "MEMORY_USAGE",
+  NETWORK_IN = "NETWORK_IN",
+  NETWORK_OUT = "NETWORK_OUT",
 }
 
 export enum AlertType {

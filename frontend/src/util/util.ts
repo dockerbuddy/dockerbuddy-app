@@ -1,5 +1,5 @@
 import { MetricType, AlertType, RuleType, ReportStatus } from "../common/enums";
-import { PercentMetric, HostPercentRule } from "../common/types";
+import { PercentMetric, HostPercentRule, BasicMetric } from "../common/types";
 import { alertColors } from "./alertStyle";
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
@@ -18,12 +18,35 @@ export function humanFileSize(size: number | undefined): string {
   );
 }
 
+export function humanFileSizeSimple(size: number | undefined): string {
+  if (size === 0 || size === undefined) return "0";
+  const y: any = +size / Math.pow(1024, 2); //TODO number throw error
+  return y.toFixed(2) * 1 + "";
+}
+
+export function fromHumanFileSize(size: number, unit: string): number {
+  const map = {
+    B: 0,
+    kB: 1,
+    MB: 2,
+    GB: 3,
+    TB: 4,
+  };
+  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+  //@ts-ignore
+  const i = map[unit];
+  const y = +size * Math.pow(1024, i);
+  return y;
+}
+
 function addZero(i: number) {
   if (i < 10) {
     return "0" + i;
   }
   return i;
 }
+
+//107374182400
 
 export function parseDateToHour(date: Date): string {
   const h = addZero(date.getHours());
@@ -40,10 +63,19 @@ export function parseDateToDDMMYYYY(date: Date): string {
   return dd + "." + mm + "." + yyyy;
 }
 
-export function extractMetric(
+export function extractMetricPercent(
   metrics: PercentMetric[],
   type: MetricType
 ): PercentMetric | undefined {
+  return metrics?.find(
+    (metric) => MetricType[metric.metricType] === type.valueOf()
+  );
+}
+
+export function extractMetricBasic(
+  metrics: BasicMetric[],
+  type: MetricType
+): BasicMetric | undefined {
   return metrics?.find(
     (metric) => MetricType[metric.metricType] === type.valueOf()
   );
