@@ -149,7 +149,7 @@ const AddHost: React.FC<AddHostProps> = ({
 
     if (!isNaN(networkInWarn) && !isNaN(networkInCrit))
       hostBasicRules.push({
-        type: RuleType.NETWORK_OUT,
+        type: RuleType.NETWORK_IN,
         warnLevel: networkInWarn,
         criticalLevel: networkInCrit,
       });
