@@ -5,7 +5,7 @@ import { Link } from "react-router-dom";
 const useStyles = makeStyles(() => ({
   box: {
     borderColor: "#1A1C19",
-    backgroundColor: "#1D1F22",
+    backgroundColor: "rgba(8,1,9,1)",
     padding: "50px",
   },
   button: {
