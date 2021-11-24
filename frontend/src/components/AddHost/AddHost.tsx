@@ -108,14 +108,14 @@ const AddHost: React.FC<AddHostProps> = ({
 
     if (networkOutWarn >= networkOutCrit) {
       setError(
-        "Network sent warn threshold should be smaller than network sent critical threshold"
+        "Network out warn threshold should be smaller than network out critical threshold"
       );
       return;
     }
 
     if (networkInWarn >= networkInCrit) {
       setError(
-        "Network received warn threshold should be smaller than network sent critical threshold"
+        "Network in warn threshold should be smaller than network in critical threshold"
       );
       return;
     }
@@ -370,7 +370,7 @@ const AddHost: React.FC<AddHostProps> = ({
                 />
               </Grid>
               <Grid item>
-                <Typography variant="h6">Network sent alerting</Typography>
+                <Typography variant="h6">Network out alerting</Typography>
                 <TextField
                   name="networkOutWarn"
                   label="Warn threshold"
@@ -410,7 +410,7 @@ const AddHost: React.FC<AddHostProps> = ({
                 />
               </Grid>
               <Grid item>
-                <Typography variant="h6">Network received alerting</Typography>
+                <Typography variant="h6">Network in alerting</Typography>
                 <TextField
                   name="networkInWarn"
                   label="Warn threshold"

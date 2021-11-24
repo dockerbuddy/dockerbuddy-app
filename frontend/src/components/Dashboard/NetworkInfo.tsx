@@ -32,7 +32,7 @@ const NetworkInfo: React.FC<NetworkInfoProps> = ({ networkIn, networkOut }) => {
                 <Typography variant="h6">
                   {humanFileSize(networkIn.value)}
                 </Typography>
-                <Typography variant="subtitle1">RECEIVED</Typography>
+                <Typography variant="subtitle1">IN</Typography>
               </Box>
             </Grid>
             <Grid item>
@@ -40,7 +40,7 @@ const NetworkInfo: React.FC<NetworkInfoProps> = ({ networkIn, networkOut }) => {
                 <Typography variant="h6">
                   {humanFileSize(networkOut.value)}
                 </Typography>
-                <Typography variant="subtitle1">SENT</Typography>
+                <Typography variant="subtitle1">OUT</Typography>
               </Box>
             </Grid>
           </Grid>
