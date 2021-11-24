@@ -8,6 +8,7 @@ import {
   HostPercentRule,
   StandardApiResponse,
 } from "../../common/types";
+import { humanFileSizeSimple } from "../../util/util";
 import AddHost, { AddHostFormData, PostHostResponse } from "./AddHost";
 
 type HParam = { id: string };
@@ -72,15 +73,15 @@ const EditHost: React.FC<RouteComponentProps<HParam>> = ({ match }) => {
       if (rule.type === RuleType.NETWORK_IN)
         res = {
           ...res,
-          networkInWarn: rule.warnLevel.toString(),
-          networkInCrit: rule.criticalLevel.toString(),
+          networkInWarn: humanFileSizeSimple(rule.warnLevel),
+          networkInCrit: humanFileSizeSimple(rule.criticalLevel),
         };
 
       if (rule.type === RuleType.NETWORK_OUT)
         res = {
           ...res,
-          networkOutWarn: rule.warnLevel.toString(),
-          networkOutCrit: rule.criticalLevel.toString(),
+          networkOutWarn: humanFileSizeSimple(rule.warnLevel),
+          networkOutCrit: humanFileSizeSimple(rule.criticalLevel),
         };
     });
     setFormData(res);

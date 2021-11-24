@@ -18,6 +18,12 @@ export function humanFileSize(size: number | undefined): string {
   );
 }
 
+export function humanFileSizeSimple(size: number | undefined): string {
+  if (size === 0 || size === undefined) return "0";
+  const y: any = +size / Math.pow(1024, 2); //TODO number throw error
+  return y.toFixed(2) * 1 + "";
+}
+
 export function fromHumanFileSize(size: number, unit: string): number {
   const map = {
     B: 0,

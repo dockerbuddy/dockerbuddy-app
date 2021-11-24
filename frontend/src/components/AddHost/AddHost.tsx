@@ -21,6 +21,7 @@ import { Link } from "react-router-dom";
 import { useAppDispatch } from "../../redux/hooks";
 import { updateHostsAsync } from "../../redux/hostsSlice";
 import { RuleType } from "../../common/enums";
+import { fromHumanFileSize } from "../../util/util";
 
 export interface Rule {
   ruleType: RuleType;
@@ -77,10 +78,24 @@ const AddHost: React.FC<AddHostProps> = ({
     const memCrit = parseInt(data.memCrit);
     const diskWarn = parseInt(data.diskWarn);
     const diskCrit = parseInt(data.diskCrit);
-    const networkOutWarn = parseInt(data.networkOutWarn);
-    const networkOutCrit = parseInt(data.networkOutCrit);
-    const networkInWarn = parseInt(data.networkInWarn);
-    const networkInCrit = parseInt(data.networkInCrit);
+    const networkOutWarn = fromHumanFileSize(
+      parseFloat(data.networkOutWarn),
+      "MB"
+    );
+    const networkOutCrit = fromHumanFileSize(
+      parseFloat(data.networkOutCrit),
+      "MB"
+    );
+    const networkInWarn = fromHumanFileSize(
+      parseFloat(data.networkInWarn),
+      "MB"
+    );
+    const networkInCrit = fromHumanFileSize(
+      parseFloat(data.networkInCrit),
+      "MB"
+    );
+
+    console.log("XD", networkInWarn);
 
     const hostPercentRules: HostPercentRule[] = [];
     const hostBasicRules: HostBasicRule[] = [];
@@ -377,15 +392,15 @@ const AddHost: React.FC<AddHostProps> = ({
                   size="small"
                   inputRef={register({
                     pattern: {
-                      value: /^[1-9]\d*$/,
-                      message: "Value should be bigger than 0",
+                      value: /^(?:[1-9]\d*|0)?(?:\.\d+)?$/,
+                      message: "Value should a positive float",
                     },
                   })}
                   error={!!errors.networkOutWarn}
                   helperText={errors.networkOutWarn?.message}
                   InputProps={{
                     endAdornment: (
-                      <InputAdornment position="end">B</InputAdornment>
+                      <InputAdornment position="end">MB</InputAdornment>
                     ),
                   }}
                   style={{ marginRight: "40px" }}
@@ -396,15 +411,15 @@ const AddHost: React.FC<AddHostProps> = ({
                   size="small"
                   inputRef={register({
                     pattern: {
-                      value: /^[1-9]\d*$/,
-                      message: "Value should be bigger than 0",
+                      value: /^(?:[1-9]\d*|0)?(?:\.\d+)?$/,
+                      message: "Value should a positive float",
                     },
                   })}
                   error={!!errors.networkOutCrit}
                   helperText={errors.networkOutCrit?.message}
                   InputProps={{
                     endAdornment: (
-                      <InputAdornment position="end">B</InputAdornment>
+                      <InputAdornment position="end">MB</InputAdornment>
                     ),
                   }}
                 />
@@ -417,8 +432,8 @@ const AddHost: React.FC<AddHostProps> = ({
                   size="small"
                   inputRef={register({
                     pattern: {
-                      value: /^[1-9]\d*$/,
-                      message: "Value should be bigger than 0",
+                      value: /^(?:[1-9]\d*|0)?(?:\.\d+)?$/,
+                      message: "Value should a positive float",
                     },
                   })}
                   error={!!errors.networkInWarn}
@@ -426,7 +441,7 @@ const AddHost: React.FC<AddHostProps> = ({
                   style={{ marginRight: "40px" }}
                   InputProps={{
                     endAdornment: (
-                      <InputAdornment position="end">B</InputAdornment>
+                      <InputAdornment position="end">MB</InputAdornment>
                     ),
                   }}
                 />
@@ -436,15 +451,15 @@ const AddHost: React.FC<AddHostProps> = ({
                   size="small"
                   inputRef={register({
                     pattern: {
-                      value: /^[1-9]\d*$/,
-                      message: "Value should be bigger than 0",
+                      value: /^(?:[1-9]\d*|0)?(?:\.\d+)?$/,
+                      message: "Value should a positive float",
                     },
                   })}
                   error={!!errors.networkInCrit}
                   helperText={errors.networkInCrit?.message}
                   InputProps={{
                     endAdornment: (
-                      <InputAdornment position="end">B</InputAdornment>
+                      <InputAdornment position="end">MB</InputAdornment>
                     ),
                   }}
                 />
