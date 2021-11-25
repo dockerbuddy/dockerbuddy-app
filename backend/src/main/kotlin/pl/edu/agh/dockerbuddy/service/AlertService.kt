@@ -82,22 +82,38 @@ class AlertService (
         }
     }
 
-    fun appendAlertTypeToContainers (hostSummary: HostSummary, host: Host) {
+    fun appendAlertTypeToContainers (
+        hostSummary: HostSummary,
+        prevHostSummary: HostSummary?,
+        host: Host
+    ) {
         val reports = host.containers.toList()
         val containers = hostSummary.containers
         val containerMap = containers.associateBy { it.name }
+        val prevContainerNames = prevHostSummary?.containers?.map { it.name } ?: emptyList()
 
         for (report in reports) {
             if (report.reportStatus == ReportStatus.WATCHED) {
                 if (report.containerName !in containerMap.keys) {
+                    if (report.containerName in prevContainerNames) {
+                        sendAlert(
+                            Alert(
+                                hostSummary.id,
+                                AlertType.CRITICAL,
+                                "Host ${host.hostName}: missing container ${report.containerName}"
+                            )
+                        )
+                        continue
+                    }
+                } else if (report.containerName !in prevContainerNames) {
                     sendAlert(
                         Alert(
                             hostSummary.id,
-                            AlertType.CRITICAL,
-                            "Host ${host.hostName}: missing container ${report.containerName}"
+                            AlertType.OK,
+                            "Host ${host.hostName}: container ${report.containerName} is back. " +
+                                    "State: ${containerMap[report.containerName]?.state?.humaneReadable()}"
                         )
                     )
-                    continue
                 }
                 containerMap[report.containerName]?.let {
                     addAlertTypeToContainer(it)
@@ -183,7 +199,6 @@ class AlertService (
                 logger.warn("Missing metric $mt for host ${host.hostName}")
             }
         }
-
         checkForContainerAlerts(hostSummary, prevHostSummary.containers, host)
     }
 
@@ -253,7 +268,8 @@ class AlertService (
                     val alertMessage = if (containerSummary.alertType != AlertType.OK) {
                         "Host ${host.hostName}: something wrong with container ${containerSummary.name}. " +
                                 "State: ${containerSummary.state.humaneReadable()}"
-                    } else {
+                    }
+                    else {
                         "Host ${host.hostName}: container ${containerSummary.name} is back. " +
                                 "State: ${containerSummary.state.humaneReadable()}"
                     }

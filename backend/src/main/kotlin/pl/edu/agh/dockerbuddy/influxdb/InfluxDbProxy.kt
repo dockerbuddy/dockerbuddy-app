@@ -13,6 +13,7 @@ import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Service
 import pl.edu.agh.dockerbuddy.model.alert.Alert
 import pl.edu.agh.dockerbuddy.model.alert.AlertType
+import pl.edu.agh.dockerbuddy.model.metric.BasicMetricType
 import pl.edu.agh.dockerbuddy.model.metric.HostSummary
 import pl.edu.agh.dockerbuddy.model.metric.PercentMetricType
 import java.lang.IllegalArgumentException
@@ -40,12 +41,20 @@ class InfluxDbProxy {
     var checklist = mutableListOf<String>()
 
     init {
-        val metricTypes = PercentMetricType.values().map { it.toString() }
-        val metricVariations = listOf("total", "value", "percent")
+        val percentMetricTypes = PercentMetricType.values().map { it.toString() }
+        val percentMetricVariations = listOf("total", "value", "percent")
+        val basicMetricTypes = BasicMetricType.values().map { it.toString() }
+        val basicMetricVariations = listOf("value")
 
-        for (metric in metricTypes) {
-            for (variation in metricVariations) {
-                checklist.add(metric.lowercase() + "_" + variation)
+        for (metric in percentMetricTypes) {
+            for (variation in percentMetricVariations) {
+                checklist.add("${metric.lowercase()}_$variation")
+            }
+        }
+
+        for (metric in basicMetricTypes) {
+            for (variation in basicMetricVariations) {
+                checklist.add("${metric.lowercase()}_$variation")
             }
         }
 
@@ -69,16 +78,23 @@ class InfluxDbProxy {
             .addTag("host_id", hostId.toString())
             .addTag("metric_id", hostSummary.id.toString())
             .time(Instant.parse(hostSummary.timestamp).toEpochMilli(), WritePrecision.MS)
-        val hostMetrics = hostSummary.percentMetrics.associateBy { it.metricType }
+
+        val hostPercentMetrics = hostSummary.percentMetrics.associateBy { it.metricType }
         for (metricType in PercentMetricType.values()) {
             val metricTypeLowercase = metricType.toString().lowercase()
-            hostPoint.addField("${metricTypeLowercase}_total", hostMetrics[metricType]?.total)
-            hostPoint.addField("${metricTypeLowercase}_value", hostMetrics[metricType]?.value)
-            hostPoint.addField("${metricTypeLowercase}_percent", hostMetrics[metricType]?.percent)
+            hostPoint.addField("${metricTypeLowercase}_total", hostPercentMetrics[metricType]?.total)
+            hostPoint.addField("${metricTypeLowercase}_value", hostPercentMetrics[metricType]?.value)
+            hostPoint.addField("${metricTypeLowercase}_percent", hostPercentMetrics[metricType]?.percent)
+        }
+
+        val hostBasicMetrics = hostSummary.basicMetrics.associateBy { it.metricType }
+        for (metricType in BasicMetricType.values()) {
+            val metricTypeLowercase = metricType.toString().lowercase()
+            hostPoint.addField("${metricTypeLowercase}_value", hostBasicMetrics[metricType]?.value)
         }
         writeApi.writePoint(hostPoint)
 
-        logger.info("Processing container metrics for host $hostId")
+        logger.info("Processing container percent metrics for host $hostId")
         for (container in hostSummary.containers) {
             logger.debug("> $container")
             val containerPoint = Point.measurement("container")
@@ -94,19 +110,24 @@ class InfluxDbProxy {
             for (metricType in PercentMetricType.values()) {
                 if (metricType in containerMetrics.keys) {
                     val metricTypeLowercase = metricType.toString().lowercase()
-                    containerPoint.addField("${metricTypeLowercase}_total", hostMetrics[metricType]?.total)
-                    containerPoint.addField("${metricTypeLowercase}_value", hostMetrics[metricType]?.value)
-                    containerPoint.addField("${metricTypeLowercase}_percent", hostMetrics[metricType]?.percent)
+                    containerPoint.addField("${metricTypeLowercase}_total", hostPercentMetrics[metricType]?.total)
+                    containerPoint.addField("${metricTypeLowercase}_value", hostPercentMetrics[metricType]?.value)
+                    containerPoint.addField("${metricTypeLowercase}_percent", hostPercentMetrics[metricType]?.percent)
                 }
             }
             writeApi.writePoint(containerPoint)
         }
     }
 
-    suspend fun queryInfluxDb(metricTypeVariation: String, hostId: UUID, start: String, end: String): List<CustomFluxRecord> {
+    suspend fun queryInfluxDb(
+        metricTypeVariation: String,
+        hostId: UUID, start: String,
+        end: String): FluxRecordContainer {
+
         val metricTypeVariationLowercase = metricTypeVariation.lowercase()
-        if (metricTypeVariationLowercase !in checklist)
+        require(metricTypeVariationLowercase in checklist) {
             throw IllegalArgumentException("Unknown metric type: $metricTypeVariationLowercase")
+        }
 
         val influxDBClient = InfluxDBClientKotlinFactory.create(url, token.toCharArray(), organization, bucket)
         val fluxQuery = ("from(bucket: \"$bucket\")\n"
@@ -117,15 +138,26 @@ class InfluxDbProxy {
                     "r._field == \"$metricTypeVariationLowercase\"))"
                 )
 
-        val result = influxDBClient.getQueryKotlinApi().query(fluxQuery).toList().map { CustomFluxRecord(
-            it.time.toString(),
-            it.value as Double
-        ) }
+        var doubleMetrics: List<FluxRecordDouble> = emptyList()
+        var longMetrics: List<FluxRecordLong> = emptyList()
+        val result = influxDBClient.getQueryKotlinApi().query(fluxQuery).toList()
 
-        if (result.isEmpty()) emptyList<CustomFluxRecord>()
+        if ("network" in metricTypeVariationLowercase) {
+            longMetrics = result.map { FluxRecordLong(
+                it.time.toString(),
+                it.value as Long
+            ) }
+        } else {
+            doubleMetrics = result.map { FluxRecordDouble(
+                it.time.toString(),
+                it.value as Double
+            ) }
+        }
+
+        if (result.isEmpty()) emptyList<FluxRecordDouble>()
 
         logger.info("${result.size} records fetched form InfluxDB")
-        return result
+        return FluxRecordContainer(doubleMetrics, longMetrics)
     }
 
     suspend fun saveAlerts(alertList: List<AlertRecord>): List<AlertRecord> {
