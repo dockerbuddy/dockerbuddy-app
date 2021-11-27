@@ -1,7 +1,11 @@
 package pl.edu.agh.dockerbuddy.model.entity
 
 import com.fasterxml.jackson.annotation.JsonAlias
+import com.fasterxml.jackson.annotation.JsonIgnore
 import lombok.ToString
+import java.time.Instant
+import java.time.LocalDateTime
+import java.time.ZoneOffset
 import javax.persistence.*
 import javax.validation.constraints.NotBlank
 import javax.validation.constraints.Pattern
@@ -27,5 +31,16 @@ class Host(
     var hostBasicRules: MutableSet<BasicMetricRule> = mutableSetOf(),
 
     @OneToMany(cascade = [CascadeType.ALL], orphanRemoval = true, fetch = FetchType.EAGER)
-    var containers: MutableSet<ContainerReport> = mutableSetOf()
-): BaseIdEntity()
+    var containers: MutableSet<ContainerReport> = mutableSetOf(),
+
+    @Column(name = "timeout_interval")
+    var timeoutInterval: Long? = null
+
+): BaseIdEntity() {
+    @JsonIgnore
+    @Column(name = "is_timed_out", nullable = false)
+    var isTimedOut = false
+
+    @Column(name = "creation_date")
+    var creationDate: Instant = LocalDateTime.now().toInstant(ZoneOffset.UTC)
+}

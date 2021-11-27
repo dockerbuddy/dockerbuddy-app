@@ -41,7 +41,13 @@ class HostService (
         logger.info("Host $id update: $updatedHost")
         updatedHost.id = id
         updatedHost.containers = oldHost.containers
+        updatedHost.timeoutInterval = oldHost.timeoutInterval
+        updatedHost.isTimedOut = oldHost.isTimedOut
         return hostRepository.save(updatedHost)
+    }
+
+    fun getAllHosts(): List<Host> {
+        return hostRepository.findAll()
     }
 
     fun getHostWithSummary(id: UUID): HostWithSummary {

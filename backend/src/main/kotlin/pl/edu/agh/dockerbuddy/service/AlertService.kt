@@ -140,6 +140,7 @@ class AlertService (
         val mockPrevHostSummary = HostSummary(
             UUID.randomUUID(),
             "123",
+            60,
             listOf(
                 PercentMetric(PercentMetricType.CPU_USAGE, 0.0, 0.0, 0.0, AlertType.OK),
                 PercentMetric(PercentMetricType.DISK_USAGE, 0.0, 0.0, 0.0, AlertType.OK),
@@ -300,7 +301,7 @@ class AlertService (
         else -> basicMetric.alertType = AlertType.WARN
     }
 
-    private fun sendAlert (alert: Alert) {
+    fun sendAlert (alert: Alert) {
         logger.info("Sending alert...")
         influxDbProxy.alertCounter += 1
         template.convertAndSend("/alerts", AlertWithCounter(alert, influxDbProxy.alertCounter))

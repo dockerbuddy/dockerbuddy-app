@@ -10,6 +10,8 @@ data class HostSummary(
 
     @field:Pattern(regexp = "^[1-9]\\d{3}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}Z\$")
     val timestamp: String,
+
+    val senderInterval: Long, // in seconds
     val percentMetrics: List<PercentMetric>,
     val basicMetrics: List<BasicMetric>,
     val containers: List<ContainerSummary>

@@ -8,6 +8,8 @@ import org.springframework.messaging.simp.SimpMessagingTemplate
 import org.springframework.stereotype.Service
 import pl.edu.agh.dockerbuddy.influxdb.InfluxDbProxy
 import pl.edu.agh.dockerbuddy.inmemory.InMemory
+import pl.edu.agh.dockerbuddy.model.alert.Alert
+import pl.edu.agh.dockerbuddy.model.alert.AlertType
 import pl.edu.agh.dockerbuddy.model.entity.Host
 import pl.edu.agh.dockerbuddy.model.metric.HostSummary
 import pl.edu.agh.dockerbuddy.repository.HostRepository
@@ -48,6 +50,17 @@ class MetricService(
 
         inMemory.saveHostSummary(hostId, hostSummary)
         sendHostSummary(hostSummary)
+
+        if (host.isTimedOut) {
+            val alert = Alert(
+                host.id!!,
+                AlertType.OK,
+                "Host: ${host.hostName} is back online"
+            )
+            alertService.sendAlert(alert)
+        }
+        host.isTimedOut = false
+        hostRepository.save(host)
 
         CoroutineScope(Dispatchers.IO).launch {
             influxDbProxy.saveMetric(hostId, hostSummary)
