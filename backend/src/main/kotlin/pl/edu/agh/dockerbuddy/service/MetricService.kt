@@ -27,7 +27,7 @@ class MetricService(
 
     private val logger = LoggerFactory.getLogger(MetricService::class.java)
 
-    fun postMetric(hostSummary: HostSummary, hostId: UUID){
+    fun postNewMetrics(hostSummary: HostSummary, hostId: UUID){
         logger.info("Processing new metrics for host $hostId")
         logger.debug("$hostSummary")
         val host: Host = hostRepository.findByIdOrNull(hostId) ?:
@@ -38,7 +38,6 @@ class MetricService(
         alertService.appendAlertTypeToContainers(hostSummary, prevHostSummary, host)
 
         if (prevHostSummary != null){
-
             logger.info("Host found in cache. Checking for alerts...")
             alertService.checkForAlertSummary(hostSummary, prevHostSummary, host)
             logger.info("Metrics updated")
