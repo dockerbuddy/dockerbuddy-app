@@ -37,10 +37,9 @@ class Host(
     var timeoutInterval: Long? = null
 
 ): BaseIdEntity() {
-    @JsonIgnore
     @Column(name = "is_timed_out", nullable = false)
     var isTimedOut = false
 
-    @Column(name = "creation_date")
+    @Column(name = "creation_date", nullable = false)
     var creationDate: Instant = LocalDateTime.now().toInstant(ZoneOffset.UTC)
 }
