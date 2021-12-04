@@ -27,16 +27,24 @@ class MetricService(
 
     private val logger = LoggerFactory.getLogger(MetricService::class.java)
 
+    /**
+     * Process new host summary and send it to frontend client.
+     *
+     * @param hostSummary host summary received form an agent
+     * @param hostId id of a host that summary describes
+     */
     fun postNewMetrics(hostSummary: HostSummary, hostId: UUID){
         logger.info("Processing new metrics for host $hostId")
         logger.debug("$hostSummary")
         val host: Host = hostRepository.findByIdOrNull(hostId) ?:
             throw EntityNotFoundException("Host $hostId not found. Cannot add metric")
-        alertService.appendAlertTypeToMetrics(hostSummary, host.hostPercentRules, host.hostBasicRules)
 
+        // alert types must be set BEFORE checking for alerts
         val prevHostSummary: HostSummary? = inMemory.getHostSummary(hostId)
-        alertService.appendAlertTypeToContainers(hostSummary, prevHostSummary, host)
+        alertService.setMetricsAlertType(hostSummary, host.hostPercentRules, host.hostBasicRules)
+        alertService.setContainersAlertType(hostSummary, prevHostSummary, host)
 
+        // compare host summary with previous one (if exists)
         if (prevHostSummary != null){
             logger.info("Host found in cache. Checking for alerts...")
             alertService.checkForAlertSummary(hostSummary, prevHostSummary, host)
@@ -44,12 +52,13 @@ class MetricService(
             logger.debug("$hostSummary")
         } else {
             logger.info("No data for host $hostId in cache. Checking for alerts...")
-            alertService.initialCheckForAlertSummary(hostSummary, host)
+            alertService.initialCheckForAlertSummary(hostSummary, host) // compare with mock summary
         }
 
-        inMemory.saveHostSummary(hostId, hostSummary)
+        inMemory.saveHostSummary(hostId, hostSummary) // save host summary in cache (override previous one)
         sendHostSummary(hostSummary)
 
+        // update host timout status - metrics arrived so host is back online
         if (host.isTimedOut) {
             val alert = Alert(
                 host.id!!,
@@ -61,12 +70,13 @@ class MetricService(
         host.isTimedOut = false
         hostRepository.save(host)
 
+        // save metrics in an external database
         CoroutineScope(Dispatchers.IO).launch {
             influxDbProxy.saveMetric(hostId, hostSummary)
         }
     }
 
-    fun sendHostSummary(hostSummary: HostSummary) {
+    private fun sendHostSummary(hostSummary: HostSummary) {
         logger.info("Sending host summary...")
         template.convertAndSend("/metrics", hostSummary)
     }

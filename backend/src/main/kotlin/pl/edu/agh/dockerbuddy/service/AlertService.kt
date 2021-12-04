@@ -34,7 +34,7 @@ class AlertService (
      * @param hostPercentRules host's rules for percent metrics
      * @param hostBasicRules host's rules for basic metrics
      */
-    fun appendAlertTypeToMetrics (
+    fun setMetricsAlertType (
         hostSummary: HostSummary,
         hostPercentRules: MutableSet<PercentMetricRule>,
         hostBasicRules: MutableSet<BasicMetricRule>
@@ -42,11 +42,11 @@ class AlertService (
         val hostPercentMetrics = hostSummary.percentMetrics.associateBy { it.metricType }
         val hostBasicMetrics = hostSummary.basicMetrics.associateBy { it.metricType }
 
-        appendAlertTypeToPercentMetrics(hostPercentMetrics, hostPercentRules)
-        appendAlertTypeToBasicMetrics(hostBasicMetrics, hostBasicRules)
+        setPercentMetricsAlertType(hostPercentMetrics, hostPercentRules)
+        setBasicMetricsAlertType(hostBasicMetrics, hostBasicRules)
     }
 
-    private fun appendAlertTypeToPercentMetrics (
+    private fun setPercentMetricsAlertType (
         hostPercentMetrics: Map<PercentMetricType, PercentMetric>,
         hostPercentRules: MutableSet<PercentMetricRule>
     ) {
@@ -71,7 +71,7 @@ class AlertService (
         }
     }
 
-    private fun appendAlertTypeToBasicMetrics (
+    private fun setBasicMetricsAlertType (
         hostBasicMetrics: Map<BasicMetricType, BasicMetric>, hostBasicRules:
         MutableSet<BasicMetricRule>
     ) {
@@ -100,7 +100,7 @@ class AlertService (
      * @param prevHostSummary previous host summary for host (with alert types set)
      * @param host host data
      */
-    fun appendAlertTypeToContainers (
+    fun setContainersAlertType (
         hostSummary: HostSummary,
         prevHostSummary: HostSummary?,
         host: Host
@@ -108,7 +108,7 @@ class AlertService (
         val reports = host.containers.toList() // containers' metadata persisted with their host
         val containers = hostSummary.containers
         val containerMap = containers.associateBy { it.name }
-        val prevContainerNames = prevHostSummary?.containers?.map { it.name } ?: emptyList()
+        val prevContainerNames = prevHostSummary?.containers?.map { it.name } ?: hostSummary.containers.map { it.name }
 
         // process containers based on their metadata stored with host in form of 'reports' (like metric rules)
         for (report in reports) {
@@ -136,7 +136,7 @@ class AlertService (
                 }
                 // check if container is running
                 containerMap[report.containerName]?.let {
-                    addAlertTypeToContainer(it)
+                    setContainerAlertType(it)
                 }
             }
         }
@@ -147,7 +147,7 @@ class AlertService (
     }
 
     // check if container is running and set alert type accordingly
-    private fun addAlertTypeToContainer (containerSummary: ContainerSummary) = when {
+    private fun setContainerAlertType (containerSummary: ContainerSummary) = when {
         ContainerState.RUNNING != containerSummary.state ->
             containerSummary.alertType = AlertType.CRITICAL
         else -> containerSummary.alertType = AlertType.OK
@@ -178,10 +178,11 @@ class AlertService (
                 BasicMetric(BasicMetricType.NETWORK_IN, 0L, AlertType.OK),
                 BasicMetric(BasicMetricType.NETWORK_OUT, 0L, AlertType.OK)
             ),
-            hostSummary.containers.toMutableList()
+            hostSummary.containers.toMutableList().map { it.copy() }
 
         )
-        mockPrevHostSummary.containers.map { it.copy() }.forEach { it.alertType = AlertType.OK }
+        mockPrevHostSummary.containers.forEach { it.alertType = AlertType.OK }
+        mockPrevHostSummary.containers.forEach { it.state = ContainerState.RUNNING } // FIXME ugly fix
 
         for (containerSummary in containerSummaryList) {
             if (containerSummary.name !in reportsMap.keys) { // if container is not present in host data then add it there
@@ -189,7 +190,10 @@ class AlertService (
                 newContainers.add(containerSummary)
             }
         }
-        checkForAlertSummary(hostSummary, mockPrevHostSummary, hostService.addContainersToHost(host, newContainers))
+        checkForAlertSummary(
+            hostSummary,
+            mockPrevHostSummary,
+            if (newContainers.isEmpty()) host else hostService.addContainersToHost(host, newContainers))
     }
 
     /**

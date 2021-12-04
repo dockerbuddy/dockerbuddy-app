@@ -12,8 +12,8 @@ data class HostSummary(
     @field:Pattern(regexp = "^[1-9]\\d{3}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}Z\$")
     val timestamp: String,
 
-    @ApiModelProperty(value = "time in milliseconds",)
-    val senderInterval: Long, // in milliseconds
+    @ApiModelProperty(value = "time in seconds",)
+    val senderInterval: Int, // in seconds
 
     val percentMetrics: List<PercentMetric>,
     val basicMetrics: List<BasicMetric>,

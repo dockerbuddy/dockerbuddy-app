@@ -35,7 +35,7 @@ class HostSummaryTest {
             UUID.randomUUID(),
             "host",
             ip,
-            LocalDateTime.now().toInstant(ZoneOffset.UTC),
+            LocalDateTime.now().toInstant(ZoneOffset.UTC).toString(),
             false,
             emptyList(),
             emptyList(),
