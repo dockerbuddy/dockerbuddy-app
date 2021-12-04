@@ -3,8 +3,9 @@ package pl.edu.agh.dockerbuddy.model.entity
 import lombok.ToString
 import pl.edu.agh.dockerbuddy.model.enums.RuleType
 import javax.persistence.*
-import javax.validation.constraints.Max
 import javax.validation.constraints.Min
+
+// TODO common interface for basic and percent rules
 
 @ToString
 @Table(name = "basic_metric_rule")

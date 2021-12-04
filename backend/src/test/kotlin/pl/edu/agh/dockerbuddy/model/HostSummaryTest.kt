@@ -12,18 +12,18 @@ import javax.validation.Validation
 import javax.validation.Validator
 
 class HostSummaryTest {
-    lateinit var validator: Validator
+    private lateinit var validator: Validator
+    private val factory = Validation.buildDefaultValidatorFactory()
 
     @BeforeEach
     fun setUp() {
-        val factory = Validation.buildDefaultValidatorFactory()
         validator = factory.validator
     }
 
     @ParameterizedTest
     @ValueSource(strings = ["1970-01-01T00:00:00Z", "2021-12-31T23:59:99Z", "2005-04-02T21:37:00Z"])
     fun validTimestamp_Test(ip: String) {
-        val host = HostSummary(UUID.randomUUID(), ip, 60, mutableListOf(), mutableListOf(), mutableListOf())
+        val host = HostSummary(UUID.randomUUID(), ip, 60, emptyList(), emptyList(), emptyList())
         val violations = validator.validate(host)
         Assertions.assertTrue(violations.isEmpty())
     }
@@ -37,9 +37,9 @@ class HostSummaryTest {
             ip,
             LocalDateTime.now().toInstant(ZoneOffset.UTC),
             false,
-            mutableListOf(),
-            mutableListOf(),
-            mutableListOf(),
+            emptyList(),
+            emptyList(),
+            emptyList(),
             null
         )
         val violations = validator.validate(host)

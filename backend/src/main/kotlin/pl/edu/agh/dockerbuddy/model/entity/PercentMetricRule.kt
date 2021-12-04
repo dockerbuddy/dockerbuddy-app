@@ -3,10 +3,11 @@ package pl.edu.agh.dockerbuddy.model.entity
 import com.fasterxml.jackson.annotation.JsonAlias
 import lombok.ToString
 import pl.edu.agh.dockerbuddy.model.enums.RuleType
-import java.lang.IllegalArgumentException
 import javax.persistence.*
 import javax.validation.constraints.Max
 import javax.validation.constraints.Min
+
+// TODO common interface for basic and percent rules
 
 @ToString
 @Table(name = "percent_metric_rule")
@@ -16,6 +17,8 @@ class PercentMetricRule (
     @Column(name = "type", nullable = false)
     @JsonAlias("ruleType")
     var type: RuleType,
+
+    // optional TODO: possibility of setting only on level of alerts
 
     @field:Min(0)
     @field:Max(100)

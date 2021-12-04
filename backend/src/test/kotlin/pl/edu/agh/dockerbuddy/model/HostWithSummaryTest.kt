@@ -11,11 +11,11 @@ import javax.validation.Validation
 import javax.validation.Validator
 
 class HostWithSummaryTest {
-    lateinit var validator: Validator
+    private lateinit var validator: Validator
+    private val factory = Validation.buildDefaultValidatorFactory()
 
     @BeforeEach
     fun setUp() {
-        val factory = Validation.buildDefaultValidatorFactory()
         validator = factory.validator
     }
 
