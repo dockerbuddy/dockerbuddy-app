@@ -27,6 +27,13 @@ class AlertService (
 ) {
     private val logger = LoggerFactory.getLogger(AlertService::class.java)
 
+    /**
+     * Set alert types on host metrics.
+     *
+     * @param hostSummary host summary that was received from an agent
+     * @param hostPercentRules host's rules for percent metrics
+     * @param hostBasicRules host's rules for basic metrics
+     */
     fun appendAlertTypeToMetrics (
         hostSummary: HostSummary,
         hostPercentRules: MutableSet<PercentMetricRule>,
@@ -43,20 +50,22 @@ class AlertService (
         hostPercentMetrics: Map<PercentMetricType, PercentMetric>,
         hostPercentRules: MutableSet<PercentMetricRule>
     ) {
+        // based on existing rules check for alerts
         for (rule in hostPercentRules) {
             when (rule.type) {
                 RuleType.CPU_USAGE -> hostPercentMetrics[PercentMetricType.CPU_USAGE]?.let {
-                    addAlertTypePercent(it, rule)
+                    setAlertTypePercent(it, rule)
                 }
                 RuleType.MEMORY_USAGE -> hostPercentMetrics[PercentMetricType.MEMORY_USAGE]?.let {
-                    addAlertTypePercent(it, rule)
+                    setAlertTypePercent(it, rule)
                 }
                 RuleType.DISK_USAGE -> hostPercentMetrics[PercentMetricType.DISK_USAGE]?.let {
-                    addAlertTypePercent(it, rule)
+                    setAlertTypePercent(it, rule)
                 }
                 else -> throw IllegalStateException("Forbidden percent rule type: ${rule.type}")
             }
         }
+        // for metrics that weren't processed (don't have rules defined) set default alertType value (OK)
         for ((_,v) in hostPercentMetrics) {
             v.alertType = if (v.alertType == null) AlertType.OK else v.alertType
         }
@@ -66,36 +75,46 @@ class AlertService (
         hostBasicMetrics: Map<BasicMetricType, BasicMetric>, hostBasicRules:
         MutableSet<BasicMetricRule>
     ) {
+        // based on existing rules check for alerts
         for (rule in hostBasicRules) {
             when (rule.type) {
                 RuleType.NETWORK_IN -> hostBasicMetrics[BasicMetricType.NETWORK_IN]?.let {
-                    addAlertTypeBasic(it, rule)
+                    setAlertTypeBasic(it, rule)
                 }
                 RuleType.NETWORK_OUT -> hostBasicMetrics[BasicMetricType.NETWORK_OUT]?.let {
-                    addAlertTypeBasic(it, rule)
+                    setAlertTypeBasic(it, rule)
                 }
                 else -> throw IllegalStateException("Forbidden basic rule type: ${rule.type}")
             }
         }
+        // for metrics that weren't processed (don't have rules defined) set default alertType value (OK)
         for ((_,v) in hostBasicMetrics) {
             v.alertType = if (v.alertType == null) AlertType.OK else v.alertType
         }
     }
 
+    /**
+     * Set alert types on containers.
+     *
+     * @param hostSummary host summary that was received from an agent
+     * @param prevHostSummary previous host summary for host (with alert types set)
+     * @param host host data
+     */
     fun appendAlertTypeToContainers (
         hostSummary: HostSummary,
         prevHostSummary: HostSummary?,
         host: Host
     ) {
-        val reports = host.containers.toList()
+        val reports = host.containers.toList() // containers' metadata persisted with their host
         val containers = hostSummary.containers
         val containerMap = containers.associateBy { it.name }
         val prevContainerNames = prevHostSummary?.containers?.map { it.name } ?: emptyList()
 
+        // process containers based on their metadata stored with host in form of 'reports' (like metric rules)
         for (report in reports) {
-            if (report.reportStatus == ReportStatus.WATCHED) {
-                if (report.containerName !in containerMap.keys) {
-                    if (report.containerName in prevContainerNames) {
+            if (report.reportStatus == ReportStatus.WATCHED) { // process only containers that user marked as important
+                if (report.containerName !in containerMap.keys) { // check if container is missing from the newest host summary
+                    if (report.containerName in prevContainerNames) { // if missing container is in cache then it has just disappeared
                         sendAlert(
                             Alert(
                                 hostSummary.id,
@@ -105,7 +124,7 @@ class AlertService (
                         )
                         continue
                     }
-                } else if (report.containerName !in prevContainerNames) {
+                } else if (report.containerName !in prevContainerNames) { // container is present but wasn't before
                     sendAlert(
                         Alert(
                             hostSummary.id,
@@ -115,32 +134,41 @@ class AlertService (
                         )
                     )
                 }
+                // check if container is running
                 containerMap[report.containerName]?.let {
                     addAlertTypeToContainer(it)
                 }
             }
         }
-
+        // set alert types for the rest of containers
         containers.forEach {
             it.alertType = if (it.alertType == null) AlertType.OK else it.alertType
         }
     }
 
+    // check if container is running and set alert type accordingly
     private fun addAlertTypeToContainer (containerSummary: ContainerSummary) = when {
         ContainerState.RUNNING != containerSummary.state ->
             containerSummary.alertType = AlertType.CRITICAL
         else -> containerSummary.alertType = AlertType.OK
     }
 
+    /**
+     * Check for alerts when there is no previous host summary.
+     *
+     * @param hostSummary host summary that was received from an agent
+     * @param host host data
+     */
     fun initialCheckForAlertSummary (hostSummary: HostSummary, host: Host) {
         logger.debug("Initial check for alerts")
         val reportsMap = host.containers.associateBy { it.containerName }
         val containerSummaryList = hostSummary.containers
         val newContainers = mutableListOf<ContainerSummary>()
-        val mockPrevHostSummary = HostSummary(
+        val mockPrevHostSummary = HostSummary( // mock host summary. Normally there would be one form cache
             UUID.randomUUID(),
             "123",
             60,
+            // it is important to set alert types to OK so that we can discover eventual change of state (it triggers alert)
             listOf(
                 PercentMetric(PercentMetricType.CPU_USAGE, 0.0, 0.0, 0.0, AlertType.OK),
                 PercentMetric(PercentMetricType.DISK_USAGE, 0.0, 0.0, 0.0, AlertType.OK),
@@ -156,7 +184,7 @@ class AlertService (
         mockPrevHostSummary.containers.map { it.copy() }.forEach { it.alertType = AlertType.OK }
 
         for (containerSummary in containerSummaryList) {
-            if (containerSummary.name !in reportsMap.keys) {
+            if (containerSummary.name !in reportsMap.keys) { // if container is not present in host data then add it there
                 containerSummary.reportStatus = ReportStatus.NEW
                 newContainers.add(containerSummary)
             }
@@ -164,46 +192,52 @@ class AlertService (
         checkForAlertSummary(hostSummary, mockPrevHostSummary, hostService.addContainersToHost(host, newContainers))
     }
 
+    /**
+     * Check host summary for alerts and set accordingly.
+     *
+     * @param hostSummary host summary that was received from an agent
+     * @param prevHostSummary previous host summary for host (with alert types set)
+     * @param host host data
+     */
     fun checkForAlertSummary (hostSummary: HostSummary, prevHostSummary: HostSummary, host: Host) {
         val hostPercentMetrics = hostSummary.percentMetrics.associateBy { it.metricType }
         val prevHostPercentMetrics = prevHostSummary.percentMetrics.associateBy { it.metricType }
         val hostBasicMetrics = hostSummary.basicMetrics.associateBy { it.metricType }
         val prevHostBasicMetrics = prevHostSummary.basicMetrics.associateBy { it.metricType }
 
+        // check each percent metric for alert and set alert type accordingly
         for (mt in PercentMetricType.values()) {
             if (hostPercentMetrics.containsKey(mt) && prevHostPercentMetrics.containsKey(mt)) {
-
                 hostPercentMetrics[mt]?.let { percentMetric ->
                     prevHostPercentMetrics[mt]?.let { prevPercentMetric ->
                         host.hostName?.let { hostName ->
-                            checkForPercentAlert(percentMetric, prevPercentMetric, hostSummary, hostName)
+                            checkForPercentMetricAlert(percentMetric, prevPercentMetric, hostSummary, hostName)
                         }
                     }
                 }
-            }
-            else {
+            } else {
                 logger.warn("Missing metric $mt for host ${host.hostName}")
             }
         }
 
+        // check each basic metric for alert and set alert type accordingly
         for (mt in BasicMetricType.values()) {
             if (hostBasicMetrics.containsKey(mt) && prevHostBasicMetrics.containsKey(mt)) {
                 hostBasicMetrics[mt]?.let { basicMetric ->
                     prevHostBasicMetrics[mt]?.let { prevBasicMetric ->
                         host.hostName?.let { hostName ->
-                            checkForBasicAlert(basicMetric, prevBasicMetric, hostSummary, hostName)
+                            checkForBasicMetricAlert(basicMetric, prevBasicMetric, hostSummary, hostName)
                         }
                     }
                 }
-            }
-            else {
+            } else {
                 logger.warn("Missing metric $mt for host ${host.hostName}")
             }
         }
         checkForContainerAlerts(hostSummary, prevHostSummary.containers, host)
     }
 
-    private fun checkForPercentAlert (
+    private fun checkForPercentMetricAlert (
         percentMetric: PercentMetric,
         prevPercentMetric: PercentMetric,
         hostSummary: HostSummary,
@@ -211,7 +245,7 @@ class AlertService (
     ) {
         if (percentMetric.alertType == null) return
         logger.debug("Checking percent metric: ${percentMetric.metricType}")
-        if (percentMetric.alertType != prevPercentMetric.alertType) {
+        if (percentMetric.alertType != prevPercentMetric.alertType) { // trigger alert if alert type has changed
             val alertMessage = "Host $hostName: ${percentMetric.metricType.humanReadable()} is ${percentMetric.percent}%"
             logger.info(alertMessage)
             logger.debug("$percentMetric")
@@ -219,7 +253,7 @@ class AlertService (
         }
     }
 
-    private fun checkForBasicAlert (
+    private fun checkForBasicMetricAlert (
         basicMetric: BasicMetric,
         prevBasicMetric: BasicMetric,
         hostSummary: HostSummary,
@@ -227,7 +261,7 @@ class AlertService (
     ) {
         if (basicMetric.alertType == null) return
         logger.debug("Checking basic metric: ${basicMetric.metricType}")
-        if (basicMetric.alertType != prevBasicMetric.alertType) {
+        if (basicMetric.alertType != prevBasicMetric.alertType) { // trigger alert if alert type has changed
             val alertMessage = "Host $hostName: ${basicMetric.metricType.humanReadable()} is ${basicMetric.alertType}"
             logger.info(alertMessage)
             logger.debug("$basicMetric")
@@ -247,6 +281,7 @@ class AlertService (
 
         for (cont in containerMap) {
             val containerSummary = cont.value
+            // if container is not in host reports then send alert and add it to host
             if (containerReportMap[containerSummary.name]?.reportStatus == null) {
                 if (containerSummary.id !in prevContainerMap.keys) {
                     sendAlert(
@@ -260,8 +295,10 @@ class AlertService (
                     newContainerList.add(containerSummary)
                 }
             } else {
+                // set container report status to match with one from host
                 containerSummary.reportStatus = containerReportMap[containerSummary.name]?.reportStatus
             }
+
             if (prevContainerMap[containerSummary.id] != null) {
                 if (containerReportMap[containerSummary.name]?.reportStatus == ReportStatus.WATCHED &&
                     containerSummary.alertType != prevContainerMap[containerSummary.id]?.alertType
@@ -269,8 +306,7 @@ class AlertService (
                     val alertMessage = if (containerSummary.alertType != AlertType.OK) {
                         "Host ${host.hostName}: something wrong with container ${containerSummary.name}. " +
                                 "State: ${containerSummary.state.humaneReadable()}"
-                    }
-                    else {
+                    } else {
                         "Host ${host.hostName}: container ${containerSummary.name} is back. " +
                                 "State: ${containerSummary.state.humaneReadable()}"
                     }
@@ -289,18 +325,23 @@ class AlertService (
         }
     }
 
-    private fun addAlertTypePercent (percentMetric: PercentMetric, percentRule: PercentMetricRule) = when {
+    private fun setAlertTypePercent (percentMetric: PercentMetric, percentRule: PercentMetricRule) = when {
         percentMetric.percent < percentRule.warnLevel.toDouble() -> percentMetric.alertType = AlertType.OK
         percentMetric.percent > percentRule.criticalLevel.toDouble() -> percentMetric.alertType = AlertType.CRITICAL
         else -> percentMetric.alertType = AlertType.WARN
     }
 
-    private fun addAlertTypeBasic (basicMetric: BasicMetric, rule: BasicMetricRule) = when {
+    private fun setAlertTypeBasic (basicMetric: BasicMetric, rule: BasicMetricRule) = when {
         basicMetric.value < rule.warnLevel -> basicMetric.alertType = AlertType.OK
         basicMetric.value > rule.criticalLevel -> basicMetric.alertType = AlertType.CRITICAL
         else -> basicMetric.alertType = AlertType.WARN
     }
 
+    /**
+     * Send alert to frontend client.
+     *
+     * @param alert
+     */
     fun sendAlert (alert: Alert) {
         logger.info("Sending alert...")
         influxDbProxy.alertCounter += 1
