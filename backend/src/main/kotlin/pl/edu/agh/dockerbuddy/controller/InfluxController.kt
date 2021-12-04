@@ -56,7 +56,7 @@ class InfluxController (
         @RequestParam hostId: UUID,
         @RequestParam /*@Pattern(regexp = DATETIME_REGEX)*/ start: String,
         @RequestParam(required = false, defaultValue = "now()") end: String // FIXME default value that violates pattern
-    ): ResponseEntity<DefaultResponse<FluxRecordContainer>> {
+    ): ResponseEntity<DefaultResponse<List<FluxRecord>>> {
         logger.info("GET /api/v2/influxdb")
         logger.debug("getHostMetricFromRange: " +
                 "metricType: $metricType, " +
@@ -65,9 +65,9 @@ class InfluxController (
                 "end: $end"
         )
 
-        var response: ResponseEntity<DefaultResponse<FluxRecordContainer>>
+        var response: ResponseEntity<DefaultResponse<List<FluxRecord>>>
         runBlocking {
-            val result = influxDbProxy.queryInfluxDb(metricType, hostId, start, end)
+            val result = influxDbProxy.queryMetric(metricType, hostId, start, end)
                 response =  ResponseEntity.status(HttpStatus.OK)
                     .body(DefaultResponse(ResponseType.SUCCESS, "Influx records fetched", result))
         }

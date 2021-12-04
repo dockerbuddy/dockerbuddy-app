@@ -10,6 +10,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Value
+import org.springframework.expression.common.ExpressionUtils.toDouble
 import org.springframework.stereotype.Service
 import pl.edu.agh.dockerbuddy.model.alert.Alert
 import pl.edu.agh.dockerbuddy.model.alert.AlertType
@@ -119,10 +120,10 @@ class InfluxDbProxy {
         }
     }
 
-    suspend fun queryInfluxDb(
+    suspend fun queryMetric(
         metricTypeVariation: String,
         hostId: UUID, start: String,
-        end: String): FluxRecordContainer {
+        end: String): List<FluxRecord> {
 
         val metricTypeVariationLowercase = metricTypeVariation.lowercase()
         require(metricTypeVariationLowercase in checklist) {
@@ -138,26 +139,16 @@ class InfluxDbProxy {
                     "r._field == \"$metricTypeVariationLowercase\"))"
                 )
 
-        var doubleMetrics: List<FluxRecordDouble> = emptyList()
-        var longMetrics: List<FluxRecordLong> = emptyList()
-        val result = influxDBClient.getQueryKotlinApi().query(fluxQuery).toList()
+        val fetchedRecordsList = influxDBClient.getQueryKotlinApi().query(fluxQuery).toList()
 
-        if ("network" in metricTypeVariationLowercase) {
-            longMetrics = result.map { FluxRecordLong(
-                it.time.toString(),
-                it.value as Long
-            ) }
-        } else {
-            doubleMetrics = result.map { FluxRecordDouble(
-                it.time.toString(),
-                it.value as Double
-            ) }
-        }
+        fetchedRecordsList.forEach(System.out::println)
+        val metrics = fetchedRecordsList.map { FluxRecord(
+            it.time.toString(),
+            it.value.toString().toDouble()
+        ) }
 
-        if (result.isEmpty()) emptyList<FluxRecordDouble>()
-
-        logger.info("${result.size} records fetched form InfluxDB")
-        return FluxRecordContainer(doubleMetrics, longMetrics)
+        logger.info("${fetchedRecordsList.size} records fetched form InfluxDB")
+        return metrics
     }
 
     suspend fun saveAlerts(alertList: List<AlertRecord>): List<AlertRecord> {
