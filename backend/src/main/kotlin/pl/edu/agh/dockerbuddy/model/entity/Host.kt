@@ -1,9 +1,11 @@
 package pl.edu.agh.dockerbuddy.model.entity
 
 import com.fasterxml.jackson.annotation.JsonAlias
-import com.fasterxml.jackson.annotation.JsonProperty
-import com.google.gson.annotations.SerializedName
+import com.fasterxml.jackson.annotation.JsonIgnore
 import lombok.ToString
+import java.time.Instant
+import java.time.LocalDateTime
+import java.time.ZoneOffset
 import javax.persistence.*
 import javax.validation.constraints.NotBlank
 import javax.validation.constraints.Pattern
@@ -23,13 +25,21 @@ class Host(
     var ip: String? = null,
 
     @OneToMany(cascade = [CascadeType.ALL], orphanRemoval = true, fetch = FetchType.EAGER)
-//    @field:JsonAlias("hostRules") // TODO unify variable names
-//    @get:JsonProperty("hostRules") // TODO unify variable names
     var hostPercentRules: MutableSet<PercentMetricRule> = mutableSetOf(),
 
     @OneToMany(cascade = [CascadeType.ALL], orphanRemoval = true, fetch = FetchType.EAGER)
     var hostBasicRules: MutableSet<BasicMetricRule> = mutableSetOf(),
 
     @OneToMany(cascade = [CascadeType.ALL], orphanRemoval = true, fetch = FetchType.EAGER)
-    var containers: MutableSet<ContainerReport> = mutableSetOf()
-): BaseIdEntity()
+    var containers: MutableSet<ContainerReport> = mutableSetOf(),
+
+    @Column(name = "timeout_interval")
+    var timeoutInterval: Long? = null
+
+): BaseIdEntity() {
+    @Column(name = "is_timed_out", nullable = false)
+    var isTimedOut = false
+
+    @Column(name = "creation_date", nullable = false)
+    var creationDate: Instant = LocalDateTime.now().toInstant(ZoneOffset.UTC)
+}

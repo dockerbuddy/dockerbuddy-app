@@ -19,7 +19,7 @@ class MetricController(val metricService: MetricService) {
     @ApiOperation(value = "Add new metric reading")
     @PostMapping(produces = ["application/json"])
     fun addMetric(@RequestBody @Valid hostSummary: HostSummary): ResponseEntity<DefaultResponse<Any?>> {
-            metricService.postMetric(hostSummary, hostSummary.id)
+            metricService.postNewMetrics(hostSummary, hostSummary.id)
             return ResponseEntity.status(HttpStatus.OK)
                     .body(DefaultResponse(ResponseType.SUCCESS, "Metric uploaded", null))
     }

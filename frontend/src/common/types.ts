@@ -32,6 +32,7 @@ export interface HostSummary {
   basicMetrics: BasicMetric[];
   percentMetrics: PercentMetric[];
   containers: Container[];
+  senderInterval: number;
 }
 
 export interface Host {
@@ -42,6 +43,8 @@ export interface Host {
   containersReports: ContainerReport[];
   hostBasicRules: HostBasicRule[];
   hostPercentRules: HostPercentRule[];
+  isTimedOut: boolean;
+  creationDate: string;
 }
 
 export interface ContainerReport {

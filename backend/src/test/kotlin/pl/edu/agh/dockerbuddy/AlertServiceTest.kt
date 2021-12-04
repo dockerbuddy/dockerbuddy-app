@@ -58,10 +58,11 @@ class AlertServiceTest {
     fun appendAlertTypeToContainer_Test() {
         // given
         val hostSummary = loadMock("mocks/hostSummary1.json", HostSummary::class.java)
+        val prevHostSummary = loadMock("mocks/hostSummary2.json", HostSummary::class.java)
         val host = loadMock("mocks/host1.json", Host::class.java)
 
         // when
-        alertService.appendAlertTypeToContainers(hostSummary, host)
+        alertService.appendAlertTypeToContainers(hostSummary, prevHostSummary, host)
 
         // then
         assertEquals(AlertType.OK, hostSummary.containers.first { it.name == "cont1" }.alertType)
@@ -77,7 +78,7 @@ class AlertServiceTest {
         val host = loadMock("mocks/host1.json", Host::class.java)
 
         // when
-        alertService.appendAlertTypeToContainers(hostSummary, host)
+        alertService.appendAlertTypeToContainers(hostSummary, prevHostSummary, host)
         alertService.checkForAlertSummary(hostSummary, prevHostSummary, host)
 
         // then

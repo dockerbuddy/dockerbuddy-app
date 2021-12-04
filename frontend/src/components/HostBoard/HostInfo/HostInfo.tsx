@@ -10,7 +10,6 @@ interface HostInfoProps {
 }
 
 const HostInfo: React.FC<HostInfoProps> = ({ hostData }) => {
-  console.log("Info " + hostData);
   return (
     <Grid container direction="column" style={{ padding: "15px" }} spacing={4}>
       <Grid

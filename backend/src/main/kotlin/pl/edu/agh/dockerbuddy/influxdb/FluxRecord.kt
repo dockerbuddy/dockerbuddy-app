@@ -1,6 +1,6 @@
 package pl.edu.agh.dockerbuddy.influxdb
 
-data class CustomFluxRecord (
+data class FluxRecord (
     val time: String,
     val value: Double
 )

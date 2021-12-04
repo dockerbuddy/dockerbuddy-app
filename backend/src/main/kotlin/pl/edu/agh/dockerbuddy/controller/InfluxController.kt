@@ -9,9 +9,7 @@ import org.springframework.validation.annotation.Validated
 import org.springframework.web.bind.annotation.*
 import pl.edu.agh.dockerbuddy.controller.response.DefaultResponse
 import pl.edu.agh.dockerbuddy.controller.response.ResponseType
-import pl.edu.agh.dockerbuddy.influxdb.AlertRecord
-import pl.edu.agh.dockerbuddy.influxdb.CustomFluxRecord
-import pl.edu.agh.dockerbuddy.influxdb.InfluxDbProxy
+import pl.edu.agh.dockerbuddy.influxdb.*
 import java.util.*
 
 @Api(tags = ["Influx"])
@@ -58,7 +56,7 @@ class InfluxController (
         @RequestParam hostId: UUID,
         @RequestParam /*@Pattern(regexp = DATETIME_REGEX)*/ start: String,
         @RequestParam(required = false, defaultValue = "now()") end: String // FIXME default value that violates pattern
-    ): ResponseEntity<DefaultResponse<List<CustomFluxRecord>>> {
+    ): ResponseEntity<DefaultResponse<List<FluxRecord>>> {
         logger.info("GET /api/v2/influxdb")
         logger.debug("getHostMetricFromRange: " +
                 "metricType: $metricType, " +
@@ -67,9 +65,9 @@ class InfluxController (
                 "end: $end"
         )
 
-        var response: ResponseEntity<DefaultResponse<List<CustomFluxRecord>>>
+        var response: ResponseEntity<DefaultResponse<List<FluxRecord>>>
         runBlocking {
-            val result = influxDbProxy.queryInfluxDb(metricType, hostId, start, end)
+            val result = influxDbProxy.queryMetric(metricType, hostId, start, end)
                 response =  ResponseEntity.status(HttpStatus.OK)
                     .body(DefaultResponse(ResponseType.SUCCESS, "Influx records fetched", result))
         }
