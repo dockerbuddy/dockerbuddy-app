@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import {
   Card,
   CardContent,
@@ -18,6 +19,7 @@ import HostMenu from "./HostMenu";
 import HostStats from "./HostStats/HostStats";
 import HostInfo from "./HostInfo/HostInfo";
 import AlertsDashboard from "../AlertsDashboard/AlertsDashboard";
+import { parseDateToDDMMYYYY, parseDateToHour } from "../../util/util";
 
 type HParam = { id: string };
 
@@ -43,6 +45,7 @@ const HostBoard: React.FC<RouteComponentProps<HParam>> = ({ match }) => {
   };
 
   console.log(hostData);
+  const date = new Date(hostData?.hostSummary?.timestamp);
 
   return (
     <Container maxWidth="xl">
@@ -72,6 +75,11 @@ const HostBoard: React.FC<RouteComponentProps<HParam>> = ({ match }) => {
                 <Grid item>
                   <Typography variant="subtitle1">
                     IP Address: {hostData.ip}
+                  </Typography>
+                </Grid>
+                <Grid item>
+                  <Typography variant="subtitle1">
+                    Last update: {date.toUTCString()}
                   </Typography>
                 </Grid>
               </Grid>
