@@ -36,8 +36,10 @@ class MetricService(
     fun postNewMetrics(hostSummary: HostSummary, hostId: UUID){
         logger.info("Processing new metrics for host $hostId")
         logger.debug("$hostSummary")
-        val host: Host = hostRepository.findByIdOrNull(hostId) ?:
-            throw EntityNotFoundException("Host $hostId not found. Cannot add metric")
+        val foundHost = hostRepository.findById(hostId)
+        if (foundHost.isEmpty) throw EntityNotFoundException("Host $hostId not found. Cannot add metric")
+
+        val host = foundHost.get()
 
         // alert types must be set BEFORE checking for alerts
         val prevHostSummary: HostSummary? = inMemory.getHostSummary(hostId)
@@ -72,7 +74,7 @@ class MetricService(
 
         // save metrics in an external database
         CoroutineScope(Dispatchers.IO).launch {
-            influxDbProxy.saveMetric(hostId, hostSummary)
+            influxDbProxy.saveMetrics(hostId, hostSummary)
         }
     }
 

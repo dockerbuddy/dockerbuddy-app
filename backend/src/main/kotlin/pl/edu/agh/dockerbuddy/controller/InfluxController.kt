@@ -135,7 +135,7 @@ class InfluxController (
         logger.info("PUT /api/v2/influxdb/alerts")
         var response: ResponseEntity<DefaultResponse<Int>>
         runBlocking {
-            val result = influxDbProxy.saveAlerts(alertList)
+            influxDbProxy.markAlertsRead(alertList)
             response =  ResponseEntity.status(HttpStatus.OK)
                 .body(DefaultResponse(ResponseType.SUCCESS, "Alerts marked as read", influxDbProxy.alertCounter))
         }

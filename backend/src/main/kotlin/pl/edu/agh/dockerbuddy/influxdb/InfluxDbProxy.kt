@@ -2,6 +2,7 @@ package pl.edu.agh.dockerbuddy.influxdb
 
 import com.influxdb.client.kotlin.InfluxDBClientKotlinFactory
 import com.influxdb.client.domain.WritePrecision
+import com.influxdb.client.kotlin.InfluxDBClientKotlin
 import com.influxdb.client.write.Point
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -10,7 +11,6 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Value
-import org.springframework.expression.common.ExpressionUtils.toDouble
 import org.springframework.stereotype.Service
 import pl.edu.agh.dockerbuddy.model.alert.Alert
 import pl.edu.agh.dockerbuddy.model.alert.AlertType
@@ -24,24 +24,24 @@ import java.util.*
 @Service
 class InfluxDbProxy {
     @Value("\${influxdb.token}")
-    lateinit var token: String
+    private lateinit var token: String
 
     @Value("\${influxdb.organization}")
-    lateinit var organization: String
+    private lateinit var organization: String
 
     @Value("\${influxdb.bucket}")
-    lateinit var bucket: String
+    private lateinit var bucket: String
 
     @Value("\${influxdb.url}")
-    lateinit var url: String
+    private lateinit var url: String
 
     private val logger = LoggerFactory.getLogger(InfluxDbProxy::class.java)
-
     @Volatile var alertCounter = 0
-
-    var checklist = mutableListOf<String>()
+    private final val checklist = mutableListOf<String>()
+    private lateinit var influxDBClient: InfluxDBClientKotlin
 
     init {
+        // create list of metrics allowed to be queried form influx
         val percentMetricTypes = PercentMetricType.values().map { it.toString() }
         val percentMetricVariations = listOf("total", "value", "percent")
         val basicMetricTypes = BasicMetricType.values().map { it.toString() }
@@ -59,27 +59,41 @@ class InfluxDbProxy {
             }
         }
 
+        //  query unread alerts form influx
         var unreadAlerts: List<AlertRecord>
         CoroutineScope(Dispatchers.IO).launch {
-            while (!::url.isInitialized) {
-                delay(1)
+            // wait until all properties from env variables are initialized
+            while (!::token.isInitialized &&
+                !::organization.isInitialized &&
+                !::bucket.isInitialized &&
+                !::url.isInitialized
+            ) {
+                delay(10)
             }
+            influxDBClient = InfluxDBClientKotlinFactory.create(url, token.toCharArray(), organization, bucket)
             unreadAlerts = queryAlerts(null, "1970-01-01T00:00:00Z", null,false)
             alertCounter = unreadAlerts.size
         }
     }
 
-    suspend fun saveMetric(hostId: UUID, hostSummary: HostSummary) {
+    /**
+     * Save host summary metrics to influxDB.
+     *
+     * @param hostId id of host
+     * @param hostSummary host summary received from an agent
+     */
+    suspend fun saveMetrics(hostId: UUID, hostSummary: HostSummary) {
         logger.info("Saving metric for host $hostId")
         logger.debug("$hostSummary")
-        val influxDBClient = InfluxDBClientKotlinFactory.create(url, token.toCharArray(), organization, bucket)
         val writeApi = influxDBClient.getWriteKotlinApi()
 
+        // create point metadata that wall be saved in influx
         val hostPoint = Point.measurement("host_stats")
             .addTag("host_id", hostId.toString())
             .addTag("metric_id", hostSummary.id.toString())
             .time(Instant.parse(hostSummary.timestamp).toEpochMilli(), WritePrecision.MS)
 
+        // add fields containing percent metrics to the point
         val hostPercentMetrics = hostSummary.percentMetrics.associateBy { it.metricType }
         for (metricType in PercentMetricType.values()) {
             val metricTypeLowercase = metricType.toString().lowercase()
@@ -88,13 +102,17 @@ class InfluxDbProxy {
             hostPoint.addField("${metricTypeLowercase}_percent", hostPercentMetrics[metricType]?.percent)
         }
 
+        // add fields containing basic metrics to the point
         val hostBasicMetrics = hostSummary.basicMetrics.associateBy { it.metricType }
         for (metricType in BasicMetricType.values()) {
             val metricTypeLowercase = metricType.toString().lowercase()
             hostPoint.addField("${metricTypeLowercase}_value", hostBasicMetrics[metricType]?.value)
         }
+
+        // save point in influxDB
         writeApi.writePoint(hostPoint)
 
+        // create point for each of the host's containers
         logger.info("Processing container percent metrics for host $hostId")
         for (container in hostSummary.containers) {
             logger.debug("> $container")
@@ -120,18 +138,30 @@ class InfluxDbProxy {
         }
     }
 
+    /**
+     * Query metrics form influxDB.
+     *
+     * @param metricTypeVariation metric type with variation (for example cpu_usage_percent)
+     * @param hostId id of a host
+     * @param start most recent timestamp of measurement (iso string)
+     * @param end oldest timestamp of measurement (iso string)
+     *
+     * @return list of flux records with metrics form given time interval
+     */
     suspend fun queryMetric(
         metricTypeVariation: String,
-        hostId: UUID, start: String,
-        end: String): List<FluxRecord> {
-
+        hostId: UUID,
+        start: String,
+        end: String
+    ): List<FluxRecord> {
+        // validate whether requested metric is valid
         val metricTypeVariationLowercase = metricTypeVariation.lowercase()
         require(metricTypeVariationLowercase in checklist) {
             throw IllegalArgumentException("Unknown metric type: $metricTypeVariationLowercase")
         }
 
-        val influxDBClient = InfluxDBClientKotlinFactory.create(url, token.toCharArray(), organization, bucket)
-        val fluxQuery = ("from(bucket: \"$bucket\")\n"
+        val fluxQuery = (
+                "from(bucket: \"$bucket\")\n"
                 + " |> range(start: $start, stop: $end)"
                 + " |> filter(fn: (r) => (" +
                     "r._measurement == \"host_stats\" and " +
@@ -141,7 +171,7 @@ class InfluxDbProxy {
 
         val fetchedRecordsList = influxDBClient.getQueryKotlinApi().query(fluxQuery).toList()
 
-        fetchedRecordsList.forEach(System.out::println)
+        // map fetched flux records to custom data class
         val metrics = fetchedRecordsList.map { FluxRecord(
             it.time.toString(),
             it.value.toString().toDouble()
@@ -151,23 +181,33 @@ class InfluxDbProxy {
         return metrics
     }
 
-    suspend fun saveAlerts(alertList: List<AlertRecord>): List<AlertRecord> {
+    /**
+     * Mark alerts as read and update them in influxDB
+     *
+     * @param alertList list of alerts to be updated
+     */
+    suspend fun markAlertsRead(alertList: List<AlertRecord>) {
         for (alertRecord in alertList) {
-            alertCounter = if (alertCounter > 0) --alertCounter else alertCounter
+            alertCounter = if (alertCounter > 0) --alertCounter else alertCounter // counter can't hold negative values
             saveAlert(
                 Alert(alertRecord.hostId,
                     alertRecord.alertType,
                     alertRecord.alertMessage,
                     true),
-                Instant.parse(alertRecord.time).toEpochMilli())
+                Instant.parse(alertRecord.time).toEpochMilli()
+            )
         }
-        return alertList
     }
 
+    /**
+     * Save alert to influxDB
+     *
+     * @param alert alert to be saved
+     * @param time (OPTIONAL PARAM) alert's creation timestamp
+     */
     suspend fun saveAlert(alert: Alert, time: Long = Instant.now().toEpochMilli()) {
         logger.info("Saving alert for hostId ${alert.hostId}")
         logger.debug("$alert")
-        val influxDBClient = InfluxDBClientKotlinFactory.create(url, token.toCharArray(), organization, bucket)
         val writeApi = influxDBClient.getWriteKotlinApi()
 
         val alertPoint = Point.measurement("alerts")
@@ -180,7 +220,24 @@ class InfluxDbProxy {
         writeApi.writePoint(alertPoint)
     }
 
-    suspend fun queryAlerts(hostId: UUID?, start: String, end: String?, fetchAll: Boolean, read: Boolean?): List<AlertRecord> {
+    /**
+     * Query alerts form influxDB
+     *
+     * @param hostId id of a host
+     * @param start most recent timestamp of alert (iso string)
+     * @param end oldest timestamp of alert (iso string)
+     * @param fetchAll flag for fetching all alerts for given host
+     * @param read if fetchAll is false then specify alerts to be fetched (read on unread)
+     *
+     * @return list of alerts
+     */
+    suspend fun queryAlerts(
+        hostId: UUID?,
+        start: String,
+        end: String?,
+        fetchAll: Boolean,
+        read: Boolean?
+    ): List<AlertRecord> {
         return when {
             fetchAll -> queryAlerts(hostId, start, end, null)
             read != null -> queryAlerts(hostId, start, end, read)
@@ -189,7 +246,6 @@ class InfluxDbProxy {
     }
 
     private suspend fun queryAlerts(hostId: UUID?, start: String, end: String?, read: Boolean?): List<AlertRecord> {
-        val influxDBClient = InfluxDBClientKotlinFactory.create(url, token.toCharArray(), organization, bucket)
         val fluxQuery = ("from(bucket: \"$bucket\")\n " +
                 "|> range(start: $start, stop: ${end ?: "now()"}) " +
                 "|> filter(fn: (r) => (" +
