@@ -77,8 +77,7 @@ const ContainerCardComponent: React.FC<{
     ReportStatus[container.reportStatus],
     container.status
   );
-  const textColor =
-    imgColor === alertColors.red ? alertColors.disabled : imgColor;
+  const textColor = imgColor === alertColors.red ? alertColors.red : imgColor;
 
   const changeWatchedStatus = (e: React.MouseEvent<HTMLButtonElement>) => {
     if (!mock) {

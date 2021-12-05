@@ -2,6 +2,7 @@ import React from "react";
 import DialogTitle from "@mui/material/DialogTitle";
 import IconButton from "@mui/material/IconButton";
 import { Close } from "@material-ui/icons";
+import { Typography } from "@material-ui/core";
 
 export interface DialogTitleProps {
   id: string;
@@ -16,7 +17,7 @@ const BootstrapDialogTitle: React.FC<DialogTitleProps> = (
 
   return (
     <DialogTitle sx={{ m: 0, p: 2 }} {...other}>
-      {children}
+      <Typography variant="h5">{children}</Typography>
       {onClose ? (
         <IconButton
           aria-label="close"
