@@ -42,7 +42,7 @@ const HostBoard: React.FC<RouteComponentProps<HParam>> = ({ match }) => {
     setValue(newValue);
   };
 
-  console.log(hostData);
+  const date = new Date(hostData?.hostSummary?.timestamp);
 
   return (
     <Container maxWidth="xl">
@@ -72,6 +72,11 @@ const HostBoard: React.FC<RouteComponentProps<HParam>> = ({ match }) => {
                 <Grid item>
                   <Typography variant="subtitle1">
                     IP Address: {hostData.ip}
+                  </Typography>
+                </Grid>
+                <Grid item>
+                  <Typography variant="subtitle1">
+                    Last update: {date.toUTCString()}
                   </Typography>
                 </Grid>
               </Grid>
