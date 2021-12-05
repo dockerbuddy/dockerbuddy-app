@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 import {
   Card,
   CardContent,
@@ -19,7 +18,6 @@ import HostMenu from "./HostMenu";
 import HostStats from "./HostStats/HostStats";
 import HostInfo from "./HostInfo/HostInfo";
 import AlertsDashboard from "../AlertsDashboard/AlertsDashboard";
-import { parseDateToDDMMYYYY, parseDateToHour } from "../../util/util";
 
 type HParam = { id: string };
 

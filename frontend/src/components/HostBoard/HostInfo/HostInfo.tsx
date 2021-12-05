@@ -1,6 +1,7 @@
 import {
   Box,
   Grid,
+  IconButton,
   InputAdornment,
   TextField,
   Typography,
@@ -11,6 +12,7 @@ import { Container, Host } from "../../../common/types";
 import AlertsDashboard from "../../AlertsDashboard/AlertsDashboard";
 import ContainerCardComponent from "../../Dashboard/ContainerCardComponent";
 import StatPanel from "./StatPanel";
+import { HelpOutline } from "@material-ui/icons";
 
 interface HostInfoProps {
   hostData: Host;
@@ -47,7 +49,21 @@ const HostInfo: React.FC<HostInfoProps> = ({ hostData }) => {
       </Grid>
       <Grid item container direction="column" spacing={4}>
         <Grid item>
-          <Typography variant="h5">Containers</Typography>
+          <Grid container alignItems="center">
+            <Grid item>
+              <Typography variant="h5" component="span">
+                Containers
+              </Typography>
+            </Grid>
+            <Grid item>
+              <IconButton>
+                <HelpOutline
+                  fontSize="small"
+                  style={{ fill: "rgba(173,186,199,1)" }}
+                />
+              </IconButton>
+            </Grid>
+          </Grid>
           <Box mt={1}>
             <TextField
               id="filter-containers-textfield"
