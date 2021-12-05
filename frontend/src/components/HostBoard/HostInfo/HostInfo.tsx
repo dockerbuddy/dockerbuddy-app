@@ -13,7 +13,7 @@ import AlertsDashboard from "../../AlertsDashboard/AlertsDashboard";
 import ContainerCardComponent from "../../Dashboard/ContainerCardComponent";
 import StatPanel from "./StatPanel";
 import { HelpOutline } from "@material-ui/icons";
-import HelpDialog from "./HelpDialog";
+import HelpDialog from "./HelpDialog/HelpDialog";
 
 interface HostInfoProps {
   hostData: Host;

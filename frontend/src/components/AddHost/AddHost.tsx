@@ -95,8 +95,6 @@ const AddHost: React.FC<AddHostProps> = ({
       "MB"
     );
 
-    console.log("XD", networkInWarn);
-
     const hostPercentRules: HostPercentRule[] = [];
     const hostBasicRules: HostBasicRule[] = [];
 
@@ -175,8 +173,6 @@ const AddHost: React.FC<AddHostProps> = ({
       hostPercentRules: hostPercentRules,
       hostBasicRules: hostBasicRules,
     };
-
-    console.log(json);
 
     const url =
       method === "POST" ? `${proxy}/hosts` : `${proxy}/hosts/${editHostId}`;

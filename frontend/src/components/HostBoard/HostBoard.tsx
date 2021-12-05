@@ -42,7 +42,6 @@ const HostBoard: React.FC<RouteComponentProps<HParam>> = ({ match }) => {
     setValue(newValue);
   };
 
-  console.log(hostData);
   const date = new Date(hostData?.hostSummary?.timestamp);
 
   return (
