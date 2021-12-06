@@ -193,11 +193,12 @@ class AlertService (
         checkForAlertSummary(
             hostSummary,
             mockPrevHostSummary,
-            if (newContainers.isEmpty()) host else hostService.addContainersToHost(host, newContainers))
+            if (newContainers.isEmpty()) host else hostService.addContainersToHost(host, newContainers)
+        )
     }
 
     /**
-     * Check host summary for alerts and set accordingly.
+     * Check host summary for alerts, set accordingly and send if any appeared.
      *
      * @param hostSummary host summary that was received from an agent
      * @param prevHostSummary previous host summary for host (with alert types set)
@@ -209,7 +210,7 @@ class AlertService (
         val hostBasicMetrics = hostSummary.basicMetrics.associateBy { it.metricType }
         val prevHostBasicMetrics = prevHostSummary.basicMetrics.associateBy { it.metricType }
 
-        // check each percent metric for alert and set alert type accordingly
+        // check each percent metric for alert and send if there is one
         for (mt in PercentMetricType.values()) {
             if (hostPercentMetrics.containsKey(mt) && prevHostPercentMetrics.containsKey(mt)) {
                 hostPercentMetrics[mt]?.let { percentMetric ->
@@ -224,7 +225,7 @@ class AlertService (
             }
         }
 
-        // check each basic metric for alert and set alert type accordingly
+        // check each basic metric for alert and send if there is one
         for (mt in BasicMetricType.values()) {
             if (hostBasicMetrics.containsKey(mt) && prevHostBasicMetrics.containsKey(mt)) {
                 hostBasicMetrics[mt]?.let { basicMetric ->
@@ -286,20 +287,17 @@ class AlertService (
         for (cont in containerMap) {
             val containerSummary = cont.value
             // if container is not in host reports then send alert and add it to host
-            if (containerReportMap[containerSummary.name]?.reportStatus == null) {
-                if (containerSummary.id !in prevContainerMap.keys) {
-                    sendAlert(
-                        Alert(
-                            hostSummary.id,
-                            AlertType.WARN,
-                            "Host ${host.hostName}: new container: ${containerSummary.name}"
-                        )
+            if (!containerReportMap.containsKey(containerSummary.name)) {
+                sendAlert(
+                    Alert(
+                        hostSummary.id,
+                        AlertType.OK,
+                        "Host ${host.hostName}: new container: ${containerSummary.name}"
                     )
-                    containerSummary.reportStatus = ReportStatus.NEW
-                    newContainerList.add(containerSummary)
-                }
+                )
+                containerSummary.reportStatus = ReportStatus.NEW
+                newContainerList.add(containerSummary)
             } else {
-                // set container report status to match with one from host
                 containerSummary.reportStatus = containerReportMap[containerSummary.name]?.reportStatus
             }
 
@@ -307,13 +305,9 @@ class AlertService (
                 if (containerReportMap[containerSummary.name]?.reportStatus == ReportStatus.WATCHED &&
                     containerSummary.alertType != prevContainerMap[containerSummary.id]?.alertType
                 ) {
-                    val alertMessage = if (containerSummary.alertType != AlertType.OK) {
+                    val alertMessage =
                         "Host ${host.hostName}: something wrong with container ${containerSummary.name}. " +
-                                "State: ${containerSummary.state.humaneReadable()}"
-                    } else {
-                        "Host ${host.hostName}: container ${containerSummary.name} is back. " +
-                                "State: ${containerSummary.state.humaneReadable()}"
-                    }
+                        "State: ${containerSummary.state.humaneReadable()}"
                     containerSummary.alertType?.let { alertType ->
                         Alert(hostSummary.id, alertType, alertMessage)
                     }?.let { alert -> sendAlert(alert) }
@@ -326,6 +320,9 @@ class AlertService (
                     Alert(hostSummary.id, alertType, alertMessage)
                 }?.let { alert -> sendAlert(alert) }
             }
+        }
+        if (newContainerList.isNotEmpty()) {
+            hostService.addContainersToHost(host, newContainerList)
         }
     }
 

@@ -74,11 +74,16 @@ class AlertServiceTest {
     }
 
     @Test
-    fun checkForAlertSummary_UpdateContainerReportStatus_Test() {
+    fun `add new container to reports and set proper reportStatuses`() {
         // given
-        val prevHostSummary = loadMock("mocks/hostSummary1.json", HostSummary::class.java)
         val hostSummary = loadMock("mocks/hostSummary2.json", HostSummary::class.java)
+        val prevHostSummary = loadMock("mocks/hostSummary1.json", HostSummary::class.java)
         val host = loadMock("mocks/host1.json", Host::class.java)
+        val alert1 = Alert(
+            hostSummary.id,
+            AlertType.OK,
+            "Host ${host.hostName}: new container: cont4"
+        )
 
         // when
         alertService.setContainersAlertType(hostSummary, prevHostSummary, host)
@@ -91,8 +96,10 @@ class AlertServiceTest {
         assertEquals(ReportStatus.NEW, hostSummary.containers.first { it.name == "cont4" }.reportStatus)
 
         // verify sendAlert calls
-        val captor2 = argumentCaptor<AlertWithCounter>()
-        verify(template, times(2)).convertAndSend(eq("/alerts"), captor2.capture())
+        verify(hostService, times(1))
+            .addContainersToHost(eq(host), eq(mutableListOf(hostSummary.containers.find { it.name == "cont4" }!!)))
+        verify(template, times(1)).convertAndSend(eq("/alerts"), eq(AlertWithCounter(alert1, 0)))
+
     }
 
     @Test
@@ -134,4 +141,31 @@ class AlertServiceTest {
         verify(template, times(1))
             .convertAndSend(eq("/alerts"), eq(AlertWithCounter(alert, 0)))
     }
+
+    @Test
+    fun `send alert when watched container's status is exited`() {
+        // given
+        val hostSummary1 = loadMock("mocks/hostSummary1.json", HostSummary::class.java)
+        val hostSummary2 = loadMock("mocks/hostSummary2.json", HostSummary::class.java)
+        val host = loadMock("mocks/host1.json", Host::class.java)
+        val alert = Alert(
+            hostSummary2.id,
+            AlertType.CRITICAL,
+            "Host ${host.hostName}: something wrong with container cont3. " +
+                    "State: exited"
+        )
+
+        // when
+        alertService.setContainersAlertType(hostSummary2, hostSummary1, host)
+        alertService.checkForAlertSummary(hostSummary2, hostSummary1, host)
+
+        // then
+        verify(template, times(1)).convertAndSend(eq("/alerts"), eq(AlertWithCounter(alert, 0)))
+    }
+
+    /*
+    TODO
+     - alert for missing container
+     - alert for container that is back online
+    */
 }
