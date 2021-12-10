@@ -1,6 +1,6 @@
 import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { RootState } from "./store";
-import { fetchHosts } from "../common/api";
+import { fetchHosts, getHostSummary } from "../common/api";
 import { Host, HostSummary } from "../common/types";
 
 export interface HostState {
@@ -22,6 +22,17 @@ export const updateHostsAsync = createAsyncThunk("hosts/update", async () => {
   }
   return [];
 });
+
+export const updateSingleHostAsync = createAsyncThunk(
+  "hosts/update/single",
+  async (hostId: string) => {
+    const response = await getHostSummary(hostId);
+    if (response.ok) {
+      return response.json();
+    }
+    return {};
+  }
+);
 
 export const hostsSlice = createSlice({
   name: "hosts",
@@ -52,6 +63,12 @@ export const hostsSlice = createSlice({
         } else {
           state.hosts = {};
           state.status = "LOADED";
+        }
+      })
+      .addCase(updateSingleHostAsync.fulfilled, (state, action) => {
+        const host = action.payload.body;
+        if (host != null) {
+          state.hosts[host.id] = host;
         }
       });
   },
