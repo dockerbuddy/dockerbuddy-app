@@ -21,7 +21,7 @@ class HostWithSummaryTest {
 
     @ParameterizedTest
     @ValueSource(strings = ["192.168.1.1", "1.1.1.1", "255.255.255.255", "5.5.5.5"])
-    fun valid_Test(ip: String) {
+    fun `check valid ip input`(ip: String) {
         val host = HostWithSummary(
             UUID.randomUUID(),
             "host",
@@ -39,7 +39,7 @@ class HostWithSummaryTest {
 
     @ParameterizedTest
     @ValueSource(strings = ["", "999.999.999.999", "256.1.0.0", "x.y.z.q", "ip"])
-    fun invalidIp_Test(ip: String) {
+    fun `check invalid ip input`(ip: String) {
         val host = HostWithSummary(
             UUID.randomUUID(),
             "host",

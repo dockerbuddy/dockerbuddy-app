@@ -1,7 +1,7 @@
 package pl.edu.agh.dockerbuddy.model.entity
 
 import lombok.ToString
-import pl.edu.agh.dockerbuddy.model.enums.RuleType
+import pl.edu.agh.dockerbuddy.model.enums.BasicMetricType
 import javax.persistence.*
 import javax.validation.constraints.Min
 
@@ -10,10 +10,10 @@ import javax.validation.constraints.Min
 @ToString
 @Table(name = "basic_metric_rule")
 @Entity
-class BasicMetricRule (
+class BasicMetricRule(
     @Enumerated(EnumType.STRING)
     @Column(name = "type", nullable = false)
-    var type: RuleType,
+    var type: BasicMetricType,
 
     @field:Min(0)
     @Column(name = "warn_level", nullable = false)
@@ -26,10 +26,6 @@ class BasicMetricRule (
     init {
         require (criticalLevel >= warnLevel) {
             "warnLevel cannot be greater than nor equal to criticalLevel"
-        }
-
-        require(type in listOf(RuleType.NETWORK_IN, RuleType.NETWORK_OUT)) {
-            "Basic metric rule type must be one of the following: NETWORK_IN, NETWORK_OUT"
         }
     }
 }

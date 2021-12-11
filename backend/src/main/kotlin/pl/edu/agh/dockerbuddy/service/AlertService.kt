@@ -12,9 +12,10 @@ import pl.edu.agh.dockerbuddy.model.alert.AlertType
 import pl.edu.agh.dockerbuddy.model.alert.AlertWithCounter
 import pl.edu.agh.dockerbuddy.model.entity.BasicMetricRule
 import pl.edu.agh.dockerbuddy.model.enums.ContainerState
-import pl.edu.agh.dockerbuddy.model.enums.RuleType
 import pl.edu.agh.dockerbuddy.model.entity.Host
 import pl.edu.agh.dockerbuddy.model.entity.PercentMetricRule
+import pl.edu.agh.dockerbuddy.model.enums.BasicMetricType
+import pl.edu.agh.dockerbuddy.model.enums.PercentMetricType
 import pl.edu.agh.dockerbuddy.model.enums.ReportStatus
 import pl.edu.agh.dockerbuddy.model.metric.*
 import java.util.*
@@ -53,16 +54,15 @@ class AlertService (
         // based on existing rules check for alerts
         for (rule in hostPercentRules) {
             when (rule.type) {
-                RuleType.CPU_USAGE -> hostPercentMetrics[PercentMetricType.CPU_USAGE]?.let {
+                PercentMetricType.CPU_USAGE -> hostPercentMetrics[PercentMetricType.CPU_USAGE]?.let {
                     setAlertTypePercent(it, rule)
                 }
-                RuleType.MEMORY_USAGE -> hostPercentMetrics[PercentMetricType.MEMORY_USAGE]?.let {
+                PercentMetricType.MEMORY_USAGE -> hostPercentMetrics[PercentMetricType.MEMORY_USAGE]?.let {
                     setAlertTypePercent(it, rule)
                 }
-                RuleType.DISK_USAGE -> hostPercentMetrics[PercentMetricType.DISK_USAGE]?.let {
+                PercentMetricType.DISK_USAGE -> hostPercentMetrics[PercentMetricType.DISK_USAGE]?.let {
                     setAlertTypePercent(it, rule)
                 }
-                else -> throw IllegalStateException("Forbidden percent rule type: ${rule.type}")
             }
         }
         // for metrics that weren't processed (don't have rules defined) set default alertType value (OK)
@@ -78,13 +78,12 @@ class AlertService (
         // based on existing rules check for alerts
         for (rule in hostBasicRules) {
             when (rule.type) {
-                RuleType.NETWORK_IN -> hostBasicMetrics[BasicMetricType.NETWORK_IN]?.let {
+                BasicMetricType.NETWORK_IN -> hostBasicMetrics[BasicMetricType.NETWORK_IN]?.let {
                     setAlertTypeBasic(it, rule)
                 }
-                RuleType.NETWORK_OUT -> hostBasicMetrics[BasicMetricType.NETWORK_OUT]?.let {
+                BasicMetricType.NETWORK_OUT -> hostBasicMetrics[BasicMetricType.NETWORK_OUT]?.let {
                     setAlertTypeBasic(it, rule)
                 }
-                else -> throw IllegalStateException("Forbidden basic rule type: ${rule.type}")
             }
         }
         // for metrics that weren't processed (don't have rules defined) set default alertType value (OK)

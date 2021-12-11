@@ -22,7 +22,7 @@ class HostSummaryTest {
 
     @ParameterizedTest
     @ValueSource(strings = ["1970-01-01T00:00:00Z", "2021-12-31T23:59:99Z", "2005-04-02T21:37:00Z"])
-    fun validTimestamp_Test(ip: String) {
+    fun `check valid timestamp input`(ip: String) {
         val host = HostSummary(UUID.randomUUID(), ip, 60, emptyList(), emptyList(), emptyList())
         val violations = validator.validate(host)
         Assertions.assertTrue(violations.isEmpty())
@@ -30,7 +30,7 @@ class HostSummaryTest {
 
     @ParameterizedTest
     @ValueSource(strings = ["1970-01-01T00:00:00", "1970-01-01-00:00:00Z", "21970-01-01 00:00:00"])
-    fun invalidTimestamp_Test(ip: String) {
+    fun `check invalid timestamp input`(ip: String) {
         val host = HostWithSummary(
             UUID.randomUUID(),
             "host",

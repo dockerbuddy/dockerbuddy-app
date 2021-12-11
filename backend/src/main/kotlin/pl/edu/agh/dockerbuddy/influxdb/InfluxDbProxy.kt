@@ -14,9 +14,9 @@ import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Service
 import pl.edu.agh.dockerbuddy.model.alert.Alert
 import pl.edu.agh.dockerbuddy.model.alert.AlertType
-import pl.edu.agh.dockerbuddy.model.metric.BasicMetricType
+import pl.edu.agh.dockerbuddy.model.enums.BasicMetricType
 import pl.edu.agh.dockerbuddy.model.metric.HostSummary
-import pl.edu.agh.dockerbuddy.model.metric.PercentMetricType
+import pl.edu.agh.dockerbuddy.model.enums.PercentMetricType
 import java.lang.IllegalArgumentException
 import java.time.*
 import java.util.*

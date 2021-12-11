@@ -14,9 +14,9 @@ import pl.edu.agh.dockerbuddy.model.alert.AlertType
 import pl.edu.agh.dockerbuddy.model.alert.AlertWithCounter
 import pl.edu.agh.dockerbuddy.model.entity.Host
 import pl.edu.agh.dockerbuddy.model.enums.ReportStatus
-import pl.edu.agh.dockerbuddy.model.metric.BasicMetricType
+import pl.edu.agh.dockerbuddy.model.enums.BasicMetricType
 import pl.edu.agh.dockerbuddy.model.metric.HostSummary
-import pl.edu.agh.dockerbuddy.model.metric.PercentMetricType
+import pl.edu.agh.dockerbuddy.model.enums.PercentMetricType
 import pl.edu.agh.dockerbuddy.repository.HostRepository
 import pl.edu.agh.dockerbuddy.service.AlertService
 import pl.edu.agh.dockerbuddy.service.HostService
@@ -39,7 +39,7 @@ class AlertServiceTest {
     private lateinit var alertService: AlertService
 
     @Test
-    fun setMetricsAlertType_Test() {
+    fun `set metrics AlertType`() {
         // given
         val hostSummary = loadMock("mocks/hostSummary1.json", HostSummary::class.java)
         val host = loadMock("mocks/host1.json", Host::class.java)
@@ -58,7 +58,7 @@ class AlertServiceTest {
     }
 
     @Test
-    fun setContainersAlertType_Test() {
+    fun `set containers alertType`() {
         // given
         val hostSummary = loadMock("mocks/hostSummary1.json", HostSummary::class.java)
         val prevHostSummary = loadMock("mocks/hostSummary2.json", HostSummary::class.java)
@@ -103,7 +103,7 @@ class AlertServiceTest {
     }
 
     @Test
-    fun initialCheckForAlertSummary_UpdateContainerReportStatus_Test() {
+    fun `perform initialCheckForAlertSummary and update containers reportStatuses`() {
         // given
         val hostSummary = loadMock("mocks/hostSummary1.json", HostSummary::class.java)
         val host = loadMock("mocks/host1.json", Host::class.java)
@@ -118,7 +118,7 @@ class AlertServiceTest {
     }
 
     @Test
-    fun initialCheckForAlertSummary_Test() {
+    fun `perform initialCheckForAlertSummary`() {
         // given
         val hostSummary = loadMock("mocks/hostSummary1.json", HostSummary::class.java)
         val host = loadMock("mocks/host1.json", Host::class.java)

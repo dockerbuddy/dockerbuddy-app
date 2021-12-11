@@ -3,14 +3,12 @@ package pl.edu.agh.dockerbuddy.service
 import kotlinx.coroutines.*
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Qualifier
-import org.springframework.data.repository.findByIdOrNull
 import org.springframework.messaging.simp.SimpMessagingTemplate
 import org.springframework.stereotype.Service
 import pl.edu.agh.dockerbuddy.influxdb.InfluxDbProxy
 import pl.edu.agh.dockerbuddy.inmemory.InMemory
 import pl.edu.agh.dockerbuddy.model.alert.Alert
 import pl.edu.agh.dockerbuddy.model.alert.AlertType
-import pl.edu.agh.dockerbuddy.model.entity.Host
 import pl.edu.agh.dockerbuddy.model.metric.HostSummary
 import pl.edu.agh.dockerbuddy.repository.HostRepository
 import java.util.*
@@ -33,7 +31,7 @@ class MetricService(
      * @param hostSummary host summary received form an agent
      * @param hostId id of a host that summary describes
      */
-    fun postNewMetrics(hostSummary: HostSummary, hostId: UUID){
+    fun processMetrics(hostSummary: HostSummary, hostId: UUID){
         logger.info("Processing new metrics for host $hostId")
         logger.debug("$hostSummary")
         val foundHost = hostRepository.findById(hostId)

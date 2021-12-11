@@ -31,7 +31,7 @@ class HostServiceTest {
     private lateinit var hostService: HostService
 
     @Test
-    fun getHostWithSummary_Test() {
+    fun `get HostWithSummary`() {
         // given
         val host = loadMock("mocks/host1.json", Host::class.java)
         val hostId = host.id
@@ -56,7 +56,7 @@ class HostServiceTest {
     }
 
     @Test
-    fun addContainersToHost_Test() {
+    fun `add containers to host`() {
         // given
         val host = Host("host", "1.1.1.1")
         val containerSummary1 = ContainerSummary(
@@ -107,7 +107,7 @@ class HostServiceTest {
     }
 
     @Test
-    fun updateContainerReport_Test() {
+    fun `update containerReports`() {
         // given
         val host = Host("host", "1.1.1.1")
         val hostId = UUID.randomUUID()

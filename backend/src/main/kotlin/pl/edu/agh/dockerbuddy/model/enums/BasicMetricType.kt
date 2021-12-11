@@ -1,4 +1,4 @@
-package pl.edu.agh.dockerbuddy.model.metric
+package pl.edu.agh.dockerbuddy.model.enums
 
 enum class BasicMetricType {
     NETWORK_IN,

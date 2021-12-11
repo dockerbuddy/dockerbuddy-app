@@ -34,7 +34,7 @@ class MetricServiceTest {
     @InjectMocks private lateinit var metricService: MetricService
 
     @Test
-    fun `post first metrics`() {
+    suspend fun `post first metrics`() {
         // given
         val host = loadMock("mocks/host1.json", Host::class.java)
         val hostSummary = loadMock("mocks/hostSummary1.json", HostSummary::class.java)
@@ -44,13 +44,13 @@ class MetricServiceTest {
         `when`(inMemory.getHostSummary(host.id!!)).thenReturn(null)
 
         // then
-        metricService.postNewMetrics(hostSummary, host.id!!)
+        metricService.processMetrics(hostSummary, host.id!!)
 
         // verify method calls
         verify(alertService, times(1)).initialCheckForAlertSummary(hostSummary, host)
-        runBlocking {
+//        runBlocking {
             verify(influxDbProxy, times(1)).saveMetrics(host.id!!, hostSummary)
-        }
+//        }
     }
 
     @Test
@@ -65,7 +65,7 @@ class MetricServiceTest {
         `when`(inMemory.getHostSummary(host.id!!)).thenReturn(hostSummary2)
 
         // then
-        metricService.postNewMetrics(hostSummary1, host.id!!)
+        metricService.processMetrics(hostSummary1, host.id!!)
 
         // verify method calls
         verify(alertService, times(1)).checkForAlertSummary(hostSummary1, hostSummary2, host)
@@ -88,7 +88,7 @@ class MetricServiceTest {
         // when
         host.isTimedOut = true
         `when`(hostRepository.findById(host.id!!)).thenReturn(Optional.of(host))
-        metricService.postNewMetrics(hostSummary1, host.id!!)
+        metricService.processMetrics(hostSummary1, host.id!!)
 
         // then
         assertEquals(false, host.isTimedOut)
@@ -106,7 +106,7 @@ class MetricServiceTest {
 
         // then
         assertThrows(EntityNotFoundException::class.java, fun () {
-            metricService.postNewMetrics(hostSummary1, host.id!!)
+            metricService.processMetrics(hostSummary1, host.id!!)
         })
     }
 }

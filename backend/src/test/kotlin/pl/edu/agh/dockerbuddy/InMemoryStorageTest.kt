@@ -10,7 +10,7 @@ import java.util.*
 
 class InMemoryStorageTest {
     @Test
-    fun saveHostSummaryTest1() {
+    fun `save HostSummary 1`() {
         //given
         val inMemory: InMemory = InMemoryStorage()
         val id: UUID = UUID.randomUUID()
@@ -24,7 +24,7 @@ class InMemoryStorageTest {
     }
 
     @Test
-    fun saveHostSummaryTest2() {
+    fun `save HostSummary 2`() {
         //given
         val inMemory: InMemory = InMemoryStorage()
         val id: UUID = UUID.randomUUID()
@@ -53,7 +53,7 @@ class InMemoryStorageTest {
 //    }
 
     @Test
-    fun getAllHostSummariesTest2() {
+    fun `get all HostSummaries 1`() {
         //given
         val inMemory: InMemory = InMemoryStorage()
 
@@ -62,7 +62,7 @@ class InMemoryStorageTest {
     }
 
     @Test
-    fun deleteHostSummaryTest1() {
+    fun `get all HostSummaries 2`() {
         //given
         val inMemory: InMemory = InMemoryStorage()
         val id: UUID = UUID.randomUUID()
@@ -77,7 +77,7 @@ class InMemoryStorageTest {
     }
 
     @Test
-    fun deleteHostSummaryTest2() {
+    fun `delete HostSummary`() {
         //given
         val inMemory: InMemory = InMemoryStorage()
         val id: UUID = UUID.randomUUID()

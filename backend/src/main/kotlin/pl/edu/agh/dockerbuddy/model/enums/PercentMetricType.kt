@@ -1,11 +1,9 @@
 package pl.edu.agh.dockerbuddy.model.enums
 
-enum class RuleType {
+enum class PercentMetricType {
     MEMORY_USAGE,
     DISK_USAGE,
-    CPU_USAGE,
-    NETWORK_IN,
-    NETWORK_OUT;
+    CPU_USAGE;
 
     fun humanReadable(): String {
         return name.lowercase().replace('_', ' ')
