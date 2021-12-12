@@ -56,7 +56,7 @@ const AggregatedContainersComponent: React.FC<{ containers: Container[] }> = ({
             Watched containers
           </Typography>
           <Typography variant="h2" className={classes.bold} align="center">
-            <g>{watchedContainers.length}</g>
+            <>{watchedContainers.length}</>
             {/* {" "} */}
             <g className={classes.disabled}>/{containers.length}</g>
           </Typography>

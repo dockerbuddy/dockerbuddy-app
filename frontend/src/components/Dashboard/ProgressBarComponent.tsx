@@ -60,7 +60,11 @@ function LinearProgressWithLabel(
         <LinearProgress
           variant="determinate"
           value={props.value}
-          classes={classes}
+          classes={{
+            root: classes.root,
+            colorPrimary: classes.colorPrimary,
+            bar: classes.bar,
+          }}
         />
       </Box>
       <Box minWidth={250} mr={1}>

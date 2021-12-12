@@ -51,17 +51,15 @@ export const hostsSlice = createSlice({
       })
       .addCase(updateHostsAsync.fulfilled, (state, action) => {
         const hosts = action.payload.body;
+        state.hosts = {};
         if (hosts == null) {
           state.status = "ERROR";
-          state.hosts = {};
         } else if (hosts.length > 0) {
-          state.hosts = {};
           hosts.forEach((e: Host) => {
             state.hosts[e.id] = e;
           });
           state.status = "LOADED";
         } else {
-          state.hosts = {};
           state.status = "LOADED";
         }
       })

@@ -70,22 +70,20 @@ const HostCardComponent: React.FC<{ host: Host }> = ({ host }) => {
   const creationDate = new Date(host.creationDate);
   const timestamp = new Date(hostSummary?.timestamp);
 
-  console.log(host.hostPercentRules);
-
   return (
     <div style={{ position: "relative" }}>
       <Card style={{ padding: "15px" }} variant="outlined">
         <CardHeader
           title={
-            <g>
+            <>
               <Typography variant="h4" className={classes.nameColor}>
                 {host.hostName}
               </Typography>
               <Typography variant="h6">IP Address: {host.ip}</Typography>
-            </g>
+            </>
           }
           action={
-            <g>
+            <>
               <Typography align="right" color="textSecondary">
                 {`Created: ${creationDate.toLocaleTimeString()}, ${creationDate.toDateString()}`}
               </Typography>
@@ -94,7 +92,7 @@ const HostCardComponent: React.FC<{ host: Host }> = ({ host }) => {
                   {`Last update: ${timestamp.toLocaleTimeString()}, ${timestamp.toDateString()}`}
                 </Typography>
               )}
-            </g>
+            </>
           }
         />
         <CardContent
@@ -102,7 +100,7 @@ const HostCardComponent: React.FC<{ host: Host }> = ({ host }) => {
           className={host.isTimedOut ? classes.inactiveHost : ""}
         >
           {hostSummary != undefined ? (
-            <g>
+            <>
               <Grid container direction="column" spacing={2}>
                 <Grid item>
                   <Typography variant="h5" style={{ marginBottom: "-15px" }}>
@@ -141,7 +139,7 @@ const HostCardComponent: React.FC<{ host: Host }> = ({ host }) => {
               ) : (
                 <Alert severity="error"> NO CONTAINERS INFO </Alert>
               )}
-            </g>
+            </>
           ) : (
             <NoMetricsComponent hostId={host.id} />
           )}
