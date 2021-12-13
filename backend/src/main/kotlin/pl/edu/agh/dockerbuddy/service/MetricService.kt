@@ -37,7 +37,7 @@ class MetricService(
         val foundHost = hostRepository.findById(hostId)
         if (foundHost.isEmpty) throw EntityNotFoundException("Host $hostId not found. Cannot add metric")
 
-        val host = foundHost.get()
+        var host = foundHost.get()
 
         // alert types must be set BEFORE checking for alerts
         val prevHostSummary: HostSummary? = inMemory.getHostSummary(hostId)
@@ -47,12 +47,12 @@ class MetricService(
         // compare host summary with previous one (if exists)
         if (prevHostSummary != null){
             logger.info("Host found in cache. Checking for alerts...")
-            alertService.checkForAlertSummary(hostSummary, prevHostSummary, host)
+            host = alertService.checkForAlertSummary(hostSummary, prevHostSummary, host)
             logger.info("Metrics updated")
             logger.debug("$hostSummary")
         } else {
             logger.info("No data for host $hostId in cache. Checking for alerts...")
-            alertService.initialCheckForAlertSummary(hostSummary, host) // compare with mock summary
+            host = alertService.initialCheckForAlertSummary(hostSummary, host) // compare with mock summary
         }
 
         inMemory.saveHostSummary(hostId, hostSummary) // save host summary in cache (override previous one)

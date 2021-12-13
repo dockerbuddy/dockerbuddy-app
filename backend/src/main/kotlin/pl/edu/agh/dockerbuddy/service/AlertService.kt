@@ -158,7 +158,7 @@ class AlertService (
      * @param hostSummary host summary that was received from an agent
      * @param host host data
      */
-    fun initialCheckForAlertSummary (hostSummary: HostSummary, host: Host) {
+    fun initialCheckForAlertSummary (hostSummary: HostSummary, host: Host): Host {
         logger.debug("Initial check for alerts")
         val reportsMap = host.containers.associateBy { it.containerName }
         val containerSummaryList = hostSummary.containers
@@ -177,7 +177,7 @@ class AlertService (
                 BasicMetric(BasicMetricType.NETWORK_IN, 0L, AlertType.OK),
                 BasicMetric(BasicMetricType.NETWORK_OUT, 0L, AlertType.OK)
             ),
-            hostSummary.containers.toMutableList().map { it.copy() }
+            hostSummary.containers.toMutableList().map { it.copy() } // FIXME does not clone metrics!
 
         )
         mockPrevHostSummary.containers.forEach { it.alertType = AlertType.OK }
@@ -189,7 +189,7 @@ class AlertService (
                 newContainers.add(containerSummary)
             }
         }
-        checkForAlertSummary(
+        return checkForAlertSummary(
             hostSummary,
             mockPrevHostSummary,
             if (newContainers.isEmpty()) host else hostService.addContainersToHost(host, newContainers)
@@ -203,7 +203,7 @@ class AlertService (
      * @param prevHostSummary previous host summary for host (with alert types set)
      * @param host host data
      */
-    fun checkForAlertSummary (hostSummary: HostSummary, prevHostSummary: HostSummary, host: Host) {
+    fun checkForAlertSummary (hostSummary: HostSummary, prevHostSummary: HostSummary, host: Host): Host {
         val hostPercentMetrics = hostSummary.percentMetrics.associateBy { it.metricType }
         val prevHostPercentMetrics = prevHostSummary.percentMetrics.associateBy { it.metricType }
         val hostBasicMetrics = hostSummary.basicMetrics.associateBy { it.metricType }
@@ -238,7 +238,7 @@ class AlertService (
                 logger.warn("Missing metric $mt for host ${host.hostName}")
             }
         }
-        checkForContainerAlerts(hostSummary, prevHostSummary.containers, host)
+        return checkForContainerAlerts(hostSummary, prevHostSummary.containers, host)
     }
 
     private fun checkForPercentMetricAlert (
@@ -277,7 +277,7 @@ class AlertService (
         hostSummary: HostSummary,
         prevContainersSummaryList: List<ContainerSummary>,
         host: Host
-    ) {
+    ): Host {
         val containerReportMap = host.containers.associateBy { it.containerName }
         val containerMap = hostSummary.containers.associateBy { it.id }
         val prevContainerMap = prevContainersSummaryList.associateBy { it.id }
@@ -320,8 +320,10 @@ class AlertService (
                 }?.let { alert -> sendAlert(alert) }
             }
         }
-        if (newContainerList.isNotEmpty()) {
+        return if (newContainerList.isNotEmpty()) {
             hostService.addContainersToHost(host, newContainerList)
+        } else {
+            host
         }
     }
 

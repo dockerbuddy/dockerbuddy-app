@@ -9,6 +9,7 @@ import org.mockito.InjectMocks
 import org.mockito.Mock
 import org.mockito.Mockito.`when`
 import org.mockito.junit.jupiter.MockitoExtension
+import org.mockito.kotlin.any
 import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.springframework.messaging.simp.SimpMessagingTemplate
@@ -20,6 +21,7 @@ import pl.edu.agh.dockerbuddy.model.entity.Host
 import pl.edu.agh.dockerbuddy.model.metric.HostSummary
 import pl.edu.agh.dockerbuddy.repository.HostRepository
 import pl.edu.agh.dockerbuddy.service.AlertService
+import pl.edu.agh.dockerbuddy.service.HostService
 import pl.edu.agh.dockerbuddy.service.MetricService
 import java.util.*
 import javax.persistence.EntityNotFoundException
@@ -62,6 +64,7 @@ class MetricServiceTest {
 
         // when
         `when`(hostRepository.findById(host.id!!)).thenReturn(Optional.of(host))
+        `when`(alertService.checkForAlertSummary(hostSummary1, hostSummary2, host)).thenReturn(host)
         `when`(inMemory.getHostSummary(host.id!!)).thenReturn(hostSummary2)
 
         // then
@@ -88,6 +91,8 @@ class MetricServiceTest {
         // when
         host.isTimedOut = true
         `when`(hostRepository.findById(host.id!!)).thenReturn(Optional.of(host))
+        `when`(alertService.initialCheckForAlertSummary(hostSummary1, host)).thenReturn(host)
+
         metricService.processMetrics(hostSummary1, host.id!!)
 
         // then
