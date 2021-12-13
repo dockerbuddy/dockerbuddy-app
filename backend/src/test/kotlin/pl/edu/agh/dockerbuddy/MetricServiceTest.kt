@@ -36,13 +36,14 @@ class MetricServiceTest {
     @InjectMocks private lateinit var metricService: MetricService
 
     @Test
-    suspend fun `post first metrics`() {
+    fun `post first metrics`() {
         // given
         val host = loadMock("mocks/host1.json", Host::class.java)
         val hostSummary = loadMock("mocks/hostSummary1.json", HostSummary::class.java)
 
         // when
         `when`(hostRepository.findById(host.id!!)).thenReturn(Optional.of(host))
+        `when`(alertService.initialCheckForAlertSummary(hostSummary, host)).thenReturn(host)
         `when`(inMemory.getHostSummary(host.id!!)).thenReturn(null)
 
         // then
@@ -50,9 +51,9 @@ class MetricServiceTest {
 
         // verify method calls
         verify(alertService, times(1)).initialCheckForAlertSummary(hostSummary, host)
-//        runBlocking {
+        runBlocking {
             verify(influxDbProxy, times(1)).saveMetrics(host.id!!, hostSummary)
-//        }
+        }
     }
 
     @Test
