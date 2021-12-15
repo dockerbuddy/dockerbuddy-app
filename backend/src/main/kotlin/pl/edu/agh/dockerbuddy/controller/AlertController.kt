@@ -26,54 +26,6 @@ class AlertController (
         const val DATETIME_REGEX: String = "^[1-9]\\d{3}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}Z\$"
     }
 
-//    @ApiOperation(value = "Get host's metrics form a range of time")
-//    @ApiImplicitParams(value = [
-//        ApiImplicitParam(
-//            name = "metricType",
-//            value = "Type of a metric",
-//            dataTypeClass = String::class
-//        ),
-//        ApiImplicitParam(
-//            name = "hostId",
-//            value = "Id of a host",
-//            dataTypeClass = UUID::class,
-//            example = "123e4567-e89b-12d3-a456-426614174000"
-//        ),
-//        ApiImplicitParam(
-//            name = "start",
-//            value = "Start time, eg -1d, -10m, etc.",
-//            dataTypeClass = String::class
-//        ),
-//        ApiImplicitParam(
-//            name = "end",
-//            value = "End time, must be greater than start time",
-//            dataTypeClass = String::class
-//        )
-//    ])
-//    @GetMapping(produces = ["application/json"])
-//    fun getHostMetricFromRange(
-//        @RequestParam metricType: String,
-//        @RequestParam hostId: UUID,
-//        @RequestParam /*@Pattern(regexp = DATETIME_REGEX)*/ start: String,
-//        @RequestParam(required = false, defaultValue = "now()") end: String // FIXME default value that violates pattern
-//    ): ResponseEntity<DefaultResponse<List<FluxRecord>>> {
-//        logger.info("GET /api/v2/influxdb")
-//        logger.debug("getHostMetricFromRange: " +
-//                "metricType: $metricType, " +
-//                "hostId: $hostId, " +
-//                "start: $start, " +
-//                "end: $end"
-//        )
-//
-//        var response: ResponseEntity<DefaultResponse<List<FluxRecord>>>
-//        runBlocking {
-//            val result = influxDbProxy.queryMetric(metricType, hostId, start, end)
-//                response =  ResponseEntity.status(HttpStatus.OK)
-//                    .body(DefaultResponse(ResponseType.SUCCESS, "Influx records fetched", result))
-//        }
-//        return response
-//    }
-
     @ApiOperation(value = "Get host's alerts form a range of time")
     @ApiImplicitParams(value = [
         ApiImplicitParam(
