@@ -50,7 +50,8 @@ const useStyles = makeStyles(() => ({
 const ContainerCardComponent: React.FC<{
   container: Container;
   hostId: string;
-}> = ({ container, hostId }) => {
+  mock?: boolean;
+}> = ({ container, hostId, mock = false }) => {
   const classes = useStyles();
   //todo useClasses, override colors if container is inactive
 
@@ -76,21 +77,24 @@ const ContainerCardComponent: React.FC<{
     ReportStatus[container.reportStatus],
     container.status
   );
-  const textColor =
-    imgColor === alertColors.red ? alertColors.disabled : imgColor;
+  const textColor = imgColor === alertColors.red ? alertColors.red : imgColor;
 
   const changeWatchedStatus = (e: React.MouseEvent<HTMLButtonElement>) => {
-    const newStatus = isWatched()
-      ? ReportStatus.NOT_WATCHED
-      : ReportStatus.WATCHED;
-    setReportStatus(newStatus);
-    changeContainerReportStatus(newStatus);
-    e.preventDefault();
+    if (!mock) {
+      const newStatus = isWatched()
+        ? ReportStatus.NOT_WATCHED
+        : ReportStatus.WATCHED;
+      setReportStatus(newStatus);
+      changeContainerReportStatus(newStatus);
+      e.preventDefault();
+    }
   };
 
   const disableNewContainer = () => {
-    setReportStatus(ReportStatus.NOT_WATCHED);
-    changeContainerReportStatus(ReportStatus.NOT_WATCHED);
+    if (!mock) {
+      setReportStatus(ReportStatus.NOT_WATCHED);
+      changeContainerReportStatus(ReportStatus.NOT_WATCHED);
+    }
   };
 
   const changeContainerReportStatus = async (newStaus: ReportStatus) => {

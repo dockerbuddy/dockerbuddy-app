@@ -94,8 +94,6 @@ const AlertsListComponent: React.FC<AlertsListProps> = ({
 
   let prev = "";
 
-  console.log(alertsToDelete);
-
   return (
     <Menu
       id="basic-menu"

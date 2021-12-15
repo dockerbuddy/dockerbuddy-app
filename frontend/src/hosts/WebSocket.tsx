@@ -7,7 +7,11 @@ import { AlertType } from "../common/enums";
 import { AlertsSummary, HostSummary } from "../common/types";
 import { setCounter } from "../redux/alertCounterSlice";
 import { useAppDispatch } from "../redux/hooks";
-import { updateHostsAsync, updateSingleHost } from "../redux/hostsSlice";
+import {
+  updateHostsAsync,
+  updateSingleHost,
+  updateSingleHostAsync,
+} from "../redux/hostsSlice";
 
 const WebSocketProvider: React.FC = ({ children }) => {
   const { enqueueSnackbar } = useSnackbar();
@@ -31,6 +35,7 @@ const WebSocketProvider: React.FC = ({ children }) => {
             //@ts-ignore
             variant: AlertType[alertParsed.alert.alertType],
           });
+          dispatch(updateSingleHostAsync(alertParsed.alert.hostId));
         });
       });
     });
