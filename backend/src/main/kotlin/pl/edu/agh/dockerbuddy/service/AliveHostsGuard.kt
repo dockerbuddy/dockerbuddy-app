@@ -18,7 +18,7 @@ class AliveHostsGuard (
     val hostRepository: HostRepository
 ) {
     private val timeoutThresholdMultiplier = 2.5
-    private val initialConnectionTimeout = 300L // 300 seconds
+    private val initialConnectionTimeout = 300 // 300 seconds
     private val logger = LoggerFactory.getLogger(AliveHostsGuard::class.java)
     private val formatter = DateTimeFormatter.ofPattern("HH:mm dd.MM.yyyy")
 
@@ -64,7 +64,7 @@ class AliveHostsGuard (
         formatter.format(LocalDateTime.parse(timestamp.dropLast(1)))
 
 
-    private fun isHostTimedOut(lastTimestamp: String, senderInterval: Long): Boolean {
+    private fun isHostTimedOut(lastTimestamp: String, senderInterval: Int): Boolean {
         val lastUpdate = Instant.parse(lastTimestamp).epochSecond
         val currentTime = Instant.now().epochSecond
         return currentTime - lastUpdate >= timeoutThresholdMultiplier*senderInterval

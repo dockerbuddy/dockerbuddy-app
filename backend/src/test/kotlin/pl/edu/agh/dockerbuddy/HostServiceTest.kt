@@ -1,8 +1,6 @@
 package pl.edu.agh.dockerbuddy
 
 import org.junit.jupiter.api.Assertions.assertEquals
-import org.junit.jupiter.api.Assertions.assertTrue
-import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.mockito.InjectMocks
@@ -17,6 +15,7 @@ import pl.edu.agh.dockerbuddy.service.HostService
 import org.mockito.junit.jupiter.MockitoExtension
 import pl.edu.agh.dockerbuddy.model.entity.ContainerReport
 import pl.edu.agh.dockerbuddy.model.enums.ReportStatus
+import pl.edu.agh.dockerbuddy.model.metric.HostSummary
 import java.util.*
 
 @ExtendWith(MockitoExtension::class)
@@ -32,7 +31,32 @@ class HostServiceTest {
     private lateinit var hostService: HostService
 
     @Test
-    fun addContainersToHost_Test() {
+    fun `get HostWithSummary`() {
+        // given
+        val host = loadMock("mocks/host1.json", Host::class.java)
+        val hostId = host.id
+        val hostSummary = loadMock("mocks/hostSummary1.json", HostSummary::class.java)
+
+        // when
+        `when`(hostRepository.findById(hostId!!)).thenReturn(Optional.of(host))
+        `when`(inMemory.getHostSummary(hostId)).thenReturn(hostSummary)
+
+        // then
+        val hostWithSummary = hostService.getHostWithSummary(hostId)
+
+        assertEquals(host.id, hostWithSummary.id)
+        assertEquals(host.hostName, hostWithSummary.hostName)
+        assertEquals(host.ip, hostWithSummary.ip)
+        assertEquals(host.creationDate, hostWithSummary.creationDate)
+        assertEquals(host.isTimedOut, hostWithSummary.isTimedOut)
+        assertEquals(host.hostPercentRules.toList(), hostWithSummary.hostPercentRules)
+        assertEquals(host.hostBasicRules.toList(), hostWithSummary.hostBasicRules)
+        assertEquals(host.containers.toList(), hostWithSummary.containersReports)
+        assertEquals(hostSummary, hostWithSummary.hostSummary)
+    }
+
+    @Test
+    fun `add containers to host`() {
         // given
         val host = Host("host", "1.1.1.1")
         val containerSummary1 = ContainerSummary(
@@ -83,7 +107,7 @@ class HostServiceTest {
     }
 
     @Test
-    fun updateContainerReport_Test() {
+    fun `update containerReports`() {
         // given
         val host = Host("host", "1.1.1.1")
         val hostId = UUID.randomUUID()

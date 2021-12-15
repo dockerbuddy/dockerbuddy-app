@@ -12,16 +12,16 @@ import javax.validation.Validation
 import javax.validation.Validator
 
 class HostTest {
-    lateinit var validator: Validator
+    private lateinit var validator: Validator
+    private val factory = Validation.buildDefaultValidatorFactory()
 
     @BeforeEach
     fun setUp() {
-        val factory = Validation.buildDefaultValidatorFactory()
         validator = factory.validator
     }
 
     @Test
-    fun notBlankName_Test() {
+    fun `name shouldn't be blank`() {
         val host = Host("")
         val violations = validator.validate(host)
         Assertions.assertFalse(violations.isEmpty())
@@ -29,7 +29,7 @@ class HostTest {
 
     @ParameterizedTest
     @ValueSource(strings = ["192.168.1.1", "1.1.1.1", "255.255.255.255", "5.5.5.5"])
-    fun ValidIp_Test(ip: String) {
+    fun `check valid ip input`(ip: String) {
         val host = Host("host", ip)
         val violations = validator.validate(host)
         Assertions.assertTrue(violations.isEmpty())
@@ -38,20 +38,22 @@ class HostTest {
 
     @ParameterizedTest
     @ValueSource(strings = ["", "999.999.999.999", "256.1.0.0", "x.y.z.q", "ip"])
-    fun InvalidIp_Test(ip: String) {
+    fun `check invalid ip input`(ip: String) {
         val host = Host("host", ip)
         val violations = validator.validate(host)
         Assertions.assertFalse(violations.isEmpty())
     }
 
     @Test
-    fun hostRules_Init_Test() {
+    fun `check initialization of collections in host`() {
         val host = Host("name", "192.168.1.1")
         Assertions.assertTrue(host.hostPercentRules.isEmpty())
+        Assertions.assertTrue(host.hostBasicRules.isEmpty())
+        Assertions.assertTrue(host.containers.isEmpty())
     }
 
     @Test
-    fun createHost_WithRule_Test() {
+    fun `create host with some rule`() {
         val host = Host(
             "name",
             "192.168.1.1",

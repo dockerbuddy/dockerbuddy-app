@@ -2,6 +2,9 @@
   "id": "f7e6f2a0-eca7-46df-90e2-15b3d0446920",
   "hostName": "host1",
   "ip": "149.156.96.52",
+  "timeoutInterval": 120,
+  "isTimedOut": false,
+  "creationDate": "2021-12-05T21:37:00Z",
   "hostPercentRules": [
     {
       "type": "CPU_USAGE",

@@ -6,7 +6,6 @@ import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 import pl.edu.agh.dockerbuddy.inmemory.InMemory
 import pl.edu.agh.dockerbuddy.model.HostWithSummary
-import pl.edu.agh.dockerbuddy.model.entity.BasicMetricRule
 import pl.edu.agh.dockerbuddy.model.entity.ContainerReport
 import pl.edu.agh.dockerbuddy.model.entity.Host
 import pl.edu.agh.dockerbuddy.model.enums.ReportStatus
@@ -15,7 +14,6 @@ import pl.edu.agh.dockerbuddy.model.metric.HostSummary
 import pl.edu.agh.dockerbuddy.repository.HostRepository
 import java.util.*
 import javax.persistence.EntityNotFoundException
-import kotlin.math.log
 
 @Service
 class HostService (
@@ -104,13 +102,16 @@ class HostService (
         logger.debug("Container report: $updatedContainerReport")
         val host = hostRepository.findByIdOrNull(id) ?: throw EntityNotFoundException("Host $id does not exist")
         val containerName = updatedContainerReport.containerName
-        host.containers.find { it.containerName == containerName }?.reportStatus = updatedContainerReport.reportStatus
         val hostSummary: HostSummary? = inMemory.getHostSummary(id)
         logger.debug("Host summary found in memory: $hostSummary")
+
+        host.containers.find { it.containerName == containerName }?.reportStatus = updatedContainerReport.reportStatus
+
         if (hostSummary != null) {
             hostSummary.containers.first { it.name == containerName }.reportStatus = updatedContainerReport.reportStatus
             inMemory.saveHostSummary(id, hostSummary)
         }
+
         return hostRepository.save(host)
     }
 

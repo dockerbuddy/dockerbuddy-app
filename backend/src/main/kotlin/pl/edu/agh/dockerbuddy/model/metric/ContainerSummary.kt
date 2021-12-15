@@ -10,7 +10,7 @@ data class ContainerSummary(
     val id: String,
     val name: String,
     val image: String,
-    val state: ContainerState,
+    var state: ContainerState, // FIXME ugly fix
     val metrics: List<PercentMetric>,
     var alertType: AlertType?,
     var reportStatus: ReportStatus?

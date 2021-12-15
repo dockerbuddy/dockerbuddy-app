@@ -1,7 +1,6 @@
 package pl.edu.agh.dockerbuddy.model.entity
 
 import com.fasterxml.jackson.annotation.JsonAlias
-import com.fasterxml.jackson.annotation.JsonIgnore
 import lombok.ToString
 import java.time.Instant
 import java.time.LocalDateTime
@@ -34,12 +33,12 @@ class Host(
     var containers: MutableSet<ContainerReport> = mutableSetOf(),
 
     @Column(name = "timeout_interval")
-    var timeoutInterval: Long? = null
+    var timeoutInterval: Int? = null // TODO ?
 
 ): BaseIdEntity() {
     @Column(name = "is_timed_out", nullable = false)
     var isTimedOut = false
 
     @Column(name = "creation_date", nullable = false)
-    var creationDate: Instant = LocalDateTime.now().toInstant(ZoneOffset.UTC)
+    var creationDate: String = LocalDateTime.now().toInstant(ZoneOffset.UTC).toString()
 }
