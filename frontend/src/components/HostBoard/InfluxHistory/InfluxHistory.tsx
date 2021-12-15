@@ -54,7 +54,7 @@ const InfluxHistory: React.FC<{ hostId: string, activeMetric: string}> = (props)
       start: (dateRange[0] != null ? dateRange[0] : yesterday).toISOString(),
       end: dateRange[1]?.toISOString(),
     };
-    const response = await fetch(`${proxy}/influxdb?` + paramsToString(query));
+    const response = await fetch(`${proxy}/metrics?` + paramsToString(query));
     const result: StandardApiResponse<InfluxBody[]> = await response.json();
     if (response.ok) {
       setHostHistory(result.body);

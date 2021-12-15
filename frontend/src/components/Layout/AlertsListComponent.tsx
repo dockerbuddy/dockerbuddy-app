@@ -43,7 +43,7 @@ const AlertsListComponent: React.FC<AlertsListProps> = ({
       read: false,
     };
     const response = await fetch(
-      `${proxy}/influxdb/alerts?` + paramsToString(params)
+      `${proxy}/alerts?` + paramsToString(params)
     );
     const result: StandardApiResponse<AlertsResponseElement[]> =
       await response.json();
@@ -58,7 +58,7 @@ const AlertsListComponent: React.FC<AlertsListProps> = ({
 
   const onClose = async () => {
     if (alertsToDelete.length > 0) {
-      const response = await fetch(`${proxy}/influxdb/alerts`, {
+      const response = await fetch(`${proxy}/alerts`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",

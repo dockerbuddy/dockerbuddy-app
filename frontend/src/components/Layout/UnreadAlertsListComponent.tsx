@@ -64,9 +64,7 @@ const UnreadAlertsListComponent: React.FC<AlertsListProps> = ({
       start: 1,
       read: false,
     };
-    const response = await fetch(
-      `${proxy}/influxdb/alerts?` + paramsToString(params)
-    );
+    const response = await fetch(`${proxy}/alerts?` + paramsToString(params));
     const result: StandardApiResponse<AlertsResponseElement[]> =
       await response.json();
     if (response.ok) {
@@ -82,7 +80,7 @@ const UnreadAlertsListComponent: React.FC<AlertsListProps> = ({
 
   const onClose = async () => {
     if (alertsToDelete.length > 0) {
-      const response = await fetch(`${proxy}/influxdb/alerts`, {
+      const response = await fetch(`${proxy}/alerts`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",

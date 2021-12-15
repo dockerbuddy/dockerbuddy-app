@@ -40,7 +40,7 @@ const AlertsDashboard: React.FC<AlertsDashboardProps> = ({
     setIsFetching(true);
     const hostIdParam = hostId ? `&hostId=${hostId}` : "";
     const response = await fetch(
-      `${proxy}/influxdb/alerts?start=-${parseInt(
+      `${proxy}/alerts?start=-${parseInt(
         days
       )}d&fetchAll=true${hostIdParam}`,
       {
