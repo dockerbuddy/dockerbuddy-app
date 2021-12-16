@@ -9,16 +9,19 @@ import { Host } from "../../../common/types";
 
 const useStyles = makeStyles(() => ({
   pieChartButton: {
-    paddingTop: "40px",
+    paddingTop: "20px",
+    clipPath: "inset(0% 0% 20% 0%)",
   },
   inactiveColor: {
-    backgroundColor: "transparent",
+    backgroundColor: "#0F0910",
   },
   activeColor: {
-    backgroundColor: "rgba(18,11,19,1)",
+    backgroundColor: "#19131A",
   },
   shortenTopMargin: {
-    marginTop: "-12px",
+    marginTop: "-114px",
+    paddingRight: "5px",
+    paddingLeft: "5px",
   },
 }));
 

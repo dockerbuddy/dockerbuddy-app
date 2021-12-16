@@ -128,9 +128,13 @@ const HostCardComponent: React.FC<{ host: Host }> = ({ host }) => {
                     metricRule={cpuRule}
                   />
                 </Grid>
-                <Grid item>
-                  <NetworkInfo networkIn={networkIn} networkOut={networkOut} />
-                </Grid>
+                {/* <Grid item> */}
+                <NetworkInfo
+                  networkIn={networkIn}
+                  networkOut={networkOut}
+                  rules={host.hostBasicRules}
+                />
+                {/* </Grid> */}
               </Grid>
               {host.hostSummary?.containers !== undefined ? (
                 <AggregatedContainersComponent

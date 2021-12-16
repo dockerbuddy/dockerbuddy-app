@@ -40,9 +40,7 @@ const AlertsDashboard: React.FC<AlertsDashboardProps> = ({
     setIsFetching(true);
     const hostIdParam = hostId ? `&hostId=${hostId}` : "";
     const response = await fetch(
-      `${proxy}/alerts?start=-${parseInt(
-        days
-      )}d&fetchAll=true${hostIdParam}`,
+      `${proxy}/alerts?start=-${parseInt(days)}d&fetchAll=true${hostIdParam}`,
       {
         headers: {
           "Content-Type": "application/json",
@@ -51,7 +49,6 @@ const AlertsDashboard: React.FC<AlertsDashboardProps> = ({
     );
 
     if (!response.ok) {
-      //DO SOMETHING
       return;
     }
 
@@ -78,13 +75,24 @@ const AlertsDashboard: React.FC<AlertsDashboardProps> = ({
   };
 
   return (
-    <Container maxWidth={hostId ? "lg" : "md"}>
+    <Container
+      maxWidth={hostId ? "lg" : "md"}
+      style={{
+        backgroundColor: "rgba(8,1,9,1)",
+        padding: "15px",
+      }}
+    >
       <Grid container direction="column" spacing={2}>
         {!onlyList && (
           <>
             {!onlyList && !hostId && (
               <Grid item>
-                <Typography variant="h4">Alerts</Typography>
+                <Typography
+                  variant="h4"
+                  style={{ color: "rgba(229, 209, 208, 1)" }}
+                >
+                  Alerts
+                </Typography>
               </Grid>
             )}
 

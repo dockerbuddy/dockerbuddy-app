@@ -1,8 +1,12 @@
 import { Grid, Typography } from "@material-ui/core";
 import React from "react";
-import { MetricType } from "../../../common/enums";
+import { MetricType, RuleType } from "../../../common/enums";
 import { Host } from "../../../common/types";
-import { extractMetricBasic, extractMetricPercent } from "../../../util/util";
+import {
+  extractHostRule,
+  extractMetricBasic,
+  extractMetricPercent,
+} from "../../../util/util";
 import NetworkInfo from "../../Dashboard/NetworkInfo";
 import ProgressBarComponent from "../../Dashboard/ProgressBarComponent";
 
@@ -36,22 +40,51 @@ const StatPanel: React.FC<StatPanelProps> = ({ hostData }) => {
     MetricType.NETWORK_IN
   );
 
+  const diskRule = extractHostRule(
+    hostData.hostPercentRules,
+    RuleType.DISK_USAGE
+  );
+  const memRule = extractHostRule(
+    hostData.hostPercentRules,
+    RuleType.MEMORY_USAGE
+  );
+  const cpuRule = extractHostRule(
+    hostData.hostPercentRules,
+    RuleType.CPU_USAGE
+  );
+
   return (
     <Grid container direction="column" spacing={2}>
       <Grid item>
         <Typography variant="h5">Current status</Typography>
       </Grid>
       <Grid item>
-        <ProgressBarComponent name={"Disk"} metric={diskUsage} />
+        <ProgressBarComponent
+          name={"Disk"}
+          metric={diskUsage}
+          metricRule={diskRule}
+        />
       </Grid>
       <Grid item>
-        <ProgressBarComponent name={"Memory"} metric={memoryUsage} />
+        <ProgressBarComponent
+          name={"Memory"}
+          metric={memoryUsage}
+          metricRule={memRule}
+        />
       </Grid>
       <Grid item>
-        <ProgressBarComponent name={"CPU"} metric={cpuUsage} />
+        <ProgressBarComponent
+          name={"CPU"}
+          metric={cpuUsage}
+          metricRule={cpuRule}
+        />
       </Grid>
       <Grid item>
-        <NetworkInfo networkIn={networkIn} networkOut={networkOut} />
+        <NetworkInfo
+          networkIn={networkIn}
+          networkOut={networkOut}
+          rules={hostData.hostBasicRules}
+        />
       </Grid>
     </Grid>
   );

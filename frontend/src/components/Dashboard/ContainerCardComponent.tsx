@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/ban-ts-comment */
 import React, { useState } from "react";
 import {
@@ -8,12 +7,12 @@ import {
   Divider,
   IconButton,
   Tooltip,
+  Link,
 } from "@material-ui/core";
 import { extractMetricPercent, statusTypeToColor } from "../../util/util";
 import { Container } from "../../common/types";
 import { AlertType, MetricType, ReportStatus } from "../../common/enums";
 import { AllOutOutlined, VisibilityOff, Visibility } from "@material-ui/icons";
-import { Link } from "react-router-dom";
 import { proxy } from "../../common/api";
 import { alertColors } from "../../util/alertStyle";
 import { Box } from "@mui/system";
@@ -53,7 +52,6 @@ const ContainerCardComponent: React.FC<{
   mock?: boolean;
 }> = ({ container, hostId, mock = false }) => {
   const classes = useStyles();
-  //todo useClasses, override colors if container is inactive
 
   const mem = extractMetricPercent(container.metrics, MetricType.MEMORY_USAGE);
   const cpu = extractMetricPercent(container.metrics, MetricType.CPU_USAGE);
@@ -124,7 +122,6 @@ const ContainerCardComponent: React.FC<{
 
   return (
     <Link
-      to={{}}
       onMouseEnter={
         isNew()
           ? disableNewContainer
@@ -160,14 +157,7 @@ const ContainerCardComponent: React.FC<{
               )}
             </IconButton>
           </Grid>
-          <Grid
-            item
-            container
-            justify="center"
-            alignItems="center"
-            // style={{ minHeight: "80px" }}
-          >
-            {/* {container.name.length <= 50 ? ( */}
+          <Grid item container justify="center" alignItems="center">
             <Typography
               variant="subtitle1"
               align="center"
@@ -180,38 +170,6 @@ const ContainerCardComponent: React.FC<{
             >
               {container.name}
             </Typography>
-            {/* ) : (
-              <>
-                <Typography
-                  variant="subtitle1"
-                  align="center"
-                  style={{
-                    padding: 10,
-                    marginTop: -20,
-                    color: imgColor,
-                    wordWrap: "break-word",
-                  }}
-                  // noWrap
-                  // gutterBottom
-                >
-                  {container.name.substring(0, 25)}
-                </Typography>
-                <Typography
-                  variant="subtitle1"
-                  align="center"
-                  style={{
-                    padding: 10,
-                    marginTop: -20,
-                    color: imgColor,
-                    wordWrap: "break-word",
-                  }}
-                  noWrap
-                  // gutterBottom
-                >
-                  {container.name.substring(25)}
-                </Typography>
-              </>
-            )} */}
           </Grid>
         </Grid>
 
@@ -224,7 +182,6 @@ const ContainerCardComponent: React.FC<{
               style={{ height: 3 }}
             />
           </Grid>
-          {/* or space-between */}
           <Grid item xs={6}>
             <Tooltip arrow title={cpu?.value + "/" + cpu?.total}>
               <Box textAlign="center">
