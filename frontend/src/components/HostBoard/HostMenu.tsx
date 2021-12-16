@@ -24,7 +24,6 @@ const HostMenu: React.FC<HostMenuProps> = ({
     });
 
     if (!response.ok) {
-      //todo DO SOMETHING
       return;
     }
 

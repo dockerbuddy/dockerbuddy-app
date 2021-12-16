@@ -4,7 +4,7 @@ import { Notifications } from "@material-ui/icons";
 import { useAppDispatch, useAppSelector } from "../../redux/hooks";
 import {
   selectCounter,
-  updateAlertCounter,
+  updateAlertCounterAsync,
 } from "../../redux/alertCounterSlice";
 import AlertsListComponent from "./AlertsListComponent";
 
@@ -16,7 +16,7 @@ const DropdownAlertsComponent: React.FC = () => {
 
   const dispatch = useAppDispatch();
   useEffect(() => {
-    dispatch(updateAlertCounter());
+    dispatch(updateAlertCounterAsync());
   }, []);
 
   const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {

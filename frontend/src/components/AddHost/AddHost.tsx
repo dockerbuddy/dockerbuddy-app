@@ -196,13 +196,19 @@ const AddHost: React.FC<AddHostProps> = ({
   };
 
   return (
-    <Container maxWidth="md">
+    <Container
+      maxWidth="md"
+      style={{
+        backgroundColor: "rgba(8,1,9,1)",
+        padding: "10px 15px 15px 15px",
+      }}
+    >
       <Box textAlign="center" m={2}>
-        <Typography variant="h4">
+        <Typography variant="h4" style={{ color: "rgba(229, 209, 208, 1)" }}>
           {method === "PUT" ? "Edit" : "Add new"} host
         </Typography>
       </Box>
-      <Box>
+      <Box style={{ backgroundColor: "#0F0910", padding: "15px" }}>
         <form onSubmit={handleSubmit(handleAdd)}>
           {hostId ? (
             <>

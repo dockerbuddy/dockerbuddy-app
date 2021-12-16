@@ -15,7 +15,6 @@ const renderActiveShape = (
   const { cx, cy, innerRadius, outerRadius, startAngle, endAngle, fill } =
     props;
 
-  //todo - dont hardcode fontSize, test on 1920x1080
   return (
     <g>
       <text
@@ -101,7 +100,7 @@ const MetricPieChart: React.FC<{
 
   return (
     <>
-      <ResponsiveContainer width="100%" height={500}>
+      <ResponsiveContainer width="100%" height={450}>
         <PieChart style={{ cursor: "pointer" }}>
           <Pie
             startAngle={200}

@@ -1,14 +1,11 @@
-/* eslint-disable */
 /* eslint-disable @typescript-eslint/ban-ts-comment */
 import {
   Button,
   Divider,
   Grid,
   InputLabel,
-  makeStyles,
   Select,
   TextField,
-  Theme,
   Typography,
 } from "@material-ui/core";
 import {
@@ -23,7 +20,10 @@ import MainChart, { InfluxBody } from "./MainChart";
 import AdapterDateFns from "@mui/lab/AdapterDateFns";
 import { DateRange } from "@mui/lab/DateRangePicker/RangeTypes";
 import plLocale from "date-fns/locale/pl";
-import { paramsToString } from "../../../util/util";
+import { extractMetricPercent, paramsToString } from "../../../util/util";
+import { useAppSelector } from "../../../redux/hooks";
+import { selectHost } from "../../../redux/hostsSlice";
+import { MetricType } from "../../../common/enums";
 
 type QueryParams = {
   metricType: string;
@@ -36,8 +36,18 @@ type AllMetricQueries = {
   Metric: string[];
 };
 
-const InfluxHistory: React.FC<{ hostId: string, activeMetric: string}> = (props) => {
+const InfluxHistory: React.FC<{ hostId: string; activeMetric: string }> = (
+  props
+) => {
   const hostId: string = props.hostId.toString();
+  const rules = useAppSelector(selectHost).hosts[hostId].hostPercentRules;
+  const currentRule = rules.find((e) => e.type == props.activeMetric);
+
+  const totalVal = extractMetricPercent(
+    useAppSelector(selectHost).hosts[hostId].hostSummary.percentMetrics,
+    //@ts-ignore
+    MetricType[props.activeMetric]
+  )?.total;
 
   const allMetricQueries: AllMetricQueries = {
     Metric: ["Percent", "Value", "Total"],
@@ -81,7 +91,9 @@ const InfluxHistory: React.FC<{ hostId: string, activeMetric: string}> = (props)
     return Math.ceil(diff / (1000 * 3600 * 24));
   };
 
-  useEffect(() => {handleQuery()}, [props.activeMetric]);
+  useEffect(() => {
+    handleQuery();
+  }, [props.activeMetric, metricType]);
 
   return (
     <LocalizationProvider dateAdapter={AdapterDateFns} locale={plLocale}>
@@ -203,7 +215,12 @@ const InfluxHistory: React.FC<{ hostId: string, activeMetric: string}> = (props)
         </Grid>
         <Grid item xs={12}>
           {typeof hostHistory !== "undefined" && error == "" && (
-            <MainChart body={hostHistory} />
+            <MainChart
+              body={hostHistory}
+              rule={currentRule}
+              metricType={metricType}
+              totalValue={totalVal != undefined ? totalVal : 0}
+            />
           )}
         </Grid>
       </Grid>

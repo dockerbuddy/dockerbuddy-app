@@ -84,7 +84,7 @@ const Dashboard: React.FC = () => {
                 .includes(filterName.toLowerCase()) ||
                 obj.ip.includes(filterName) ? (
                 <Grid item xs={12} md={6} key={obj.ip}>
-                  <HostCardComponent host={obj} />
+                  <HostCardComponent host={obj} key={obj.ip} />
                 </Grid>
               ) : (
                 <></>
@@ -93,7 +93,7 @@ const Dashboard: React.FC = () => {
           </Grid>
         ))}
       {hostsData.status === "LOADING" &&
-        Object.keys(hostsData.hosts).length == 0 && <p>LOADING</p>}
+        Object.keys(hostsData.hosts).length == 0 && <></>}
     </Container>
   );
 };

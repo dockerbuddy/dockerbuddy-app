@@ -10,7 +10,7 @@ const initialState: AlertCounterState = {
   value: 0,
 };
 
-export const updateAlertCounter = createAsyncThunk(
+export const updateAlertCounterAsync = createAsyncThunk(
   "counter/update",
   async () => {
     const response = await fetchCounter();
@@ -36,10 +36,10 @@ export const alertCounterSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder
-      .addCase(updateAlertCounter.pending, (state) => {
+      .addCase(updateAlertCounterAsync.pending, (state) => {
         state.value = 0;
       })
-      .addCase(updateAlertCounter.fulfilled, (state, action) => {
+      .addCase(updateAlertCounterAsync.fulfilled, (state, action) => {
         state.value = action.payload.body;
       });
   },

@@ -4,7 +4,7 @@ import { Notifications } from "@material-ui/icons";
 import AlertsListComponent from "./UnreadAlertsListComponent";
 import {
   selectCounter,
-  updateAlertCounter,
+  updateAlertCounterAsync,
 } from "../../redux/alertCounterSlice";
 import { useAppSelector, useAppDispatch } from "../../redux/hooks";
 import { Badge } from "@material-ui/core";
@@ -25,7 +25,7 @@ const UnreadAlertsBellComponent: React.FC = () => {
 
   const dispatch = useAppDispatch();
   React.useEffect(() => {
-    dispatch(updateAlertCounter());
+    dispatch(updateAlertCounterAsync());
   }, []);
 
   const handleClick = (event: React.MouseEvent<HTMLElement>) => {
