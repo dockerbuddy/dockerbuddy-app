@@ -18,7 +18,6 @@ java -jar dockerbuddy.jar
 See [Environment variables](#environment-variables).
 ### Requirements
 - java 11
-- ???  
 
 ## Running with docker-compose
 Since Docker Buddy requires InflxuDB to work properly, we prepared docker-compose with example configuration [Link](https://github.com/agh-docker-monitoring/dockiera-app/blob/main/docker-compose-local.yml). 
@@ -66,7 +65,6 @@ For realeasing we are using bash script `build.sh`. You need to provide version 
 - Apache Maven 3.8.3
 - Yarn 1.22.10
 - Docker
-- ???
 ### Artifacts
 Bash script is creating a jar file `dockerbuddy-verison` which is containing both backend and frontend. It also creates a docker image `dockerbuddy`.
 
