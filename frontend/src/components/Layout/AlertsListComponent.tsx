@@ -1,4 +1,3 @@
-/* eslint-disable */
 import { Menu, MenuItem, ListItemText, Divider } from "@material-ui/core";
 import React, { useEffect, useState } from "react";
 import { proxy } from "../../common/api";
@@ -7,7 +6,6 @@ import { reduceBy } from "../../redux/alertCounterSlice";
 import { useAppDispatch } from "../../redux/hooks";
 import { paramsToString, parseDateToDDMMYYYY } from "../../util/util";
 import AlertElement from "../AlertsDashboard/AlertElement";
-// import AlertElement from "../AlertsDashboard/AlertElement";
 
 interface AlertsListProps {
   anchorEl: null | HTMLElement;
@@ -42,16 +40,16 @@ const AlertsListComponent: React.FC<AlertsListProps> = ({
       start: 1,
       read: false,
     };
-    const response = await fetch(
-      `${proxy}/alerts?` + paramsToString(params)
-    );
+    const response = await fetch(`${proxy}/alerts?` + paramsToString(params));
     const result: StandardApiResponse<AlertsResponseElement[]> =
       await response.json();
     if (response.ok) {
-      const alertsParsed: AlertsResponseElement[] = result.body.map((alert) => ({
-        ...alert,
-        time: new Date(alert.time),
-      }));
+      const alertsParsed: AlertsResponseElement[] = result.body.map(
+        (alert) => ({
+          ...alert,
+          time: new Date(alert.time),
+        })
+      );
       setAlerts(alertsParsed);
     }
   };
@@ -68,8 +66,6 @@ const AlertsListComponent: React.FC<AlertsListProps> = ({
       if (response.ok) {
         dispatch(reduceBy(alertsToDelete.length));
         setAlertsToDelete([]);
-      } else {
-        //todo do something
       }
     }
   };
@@ -83,14 +79,13 @@ const AlertsListComponent: React.FC<AlertsListProps> = ({
   };
 
   const handleAll = () => {
-    if(isAll) {
+    if (isAll) {
       setAlertsToDelete([]);
     } else {
       setAlertsToDelete(alerts);
     }
-    setIsAll((isAll) => !isAll)
-  }
-
+    setIsAll((isAll) => !isAll);
+  };
 
   let prev = "";
 
@@ -107,8 +102,8 @@ const AlertsListComponent: React.FC<AlertsListProps> = ({
       {Object.values(alerts).map((alert: AlertsResponseElement) => {
         let showDate = false;
         if (parseDateToDDMMYYYY(alert.time) != prev) {
-        prev = parseDateToDDMMYYYY(alert.time);
-        showDate = true;
+          prev = parseDateToDDMMYYYY(alert.time);
+          showDate = true;
         }
         return (
           <MenuItem
@@ -123,9 +118,6 @@ const AlertsListComponent: React.FC<AlertsListProps> = ({
               key={alert.time.getTime()}
               showDate={showDate}
             />
-            {/* <ListItemIcon>
-              <Edit />
-            </ListItemIcon> */}
           </MenuItem>
         );
       })}

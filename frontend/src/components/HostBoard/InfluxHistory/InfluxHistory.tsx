@@ -44,7 +44,7 @@ const InfluxHistory: React.FC<{ hostId: string; activeMetric: string }> = (
   const currentRule = rules.find((e) => e.type == props.activeMetric);
 
   const totalVal = extractMetricPercent(
-    useAppSelector(selectHost).hosts[hostId].hostSummary.percentMetrics,
+    useAppSelector(selectHost).hosts[hostId].hostSummary?.percentMetrics,
     //@ts-ignore
     MetricType[props.activeMetric]
   )?.total;
@@ -102,7 +102,6 @@ const InfluxHistory: React.FC<{ hostId: string; activeMetric: string }> = (
         direction="column"
         alignItems="stretch"
         justify="center"
-        // style={{backgroundColor: "transparent", border: "3px solid", borderColor: "rgb(47, 40, 49)"}}
         spacing={3}
       >
         <Grid
@@ -166,7 +165,7 @@ const InfluxHistory: React.FC<{ hostId: string; activeMetric: string }> = (
             variant="fullWidth"
             orientation="vertical"
             flexItem
-            style={{ width: 3 }}
+            style={{ width: 3, marginTop: 3 }}
           />
           <Grid item>
             <InputLabel
@@ -219,6 +218,7 @@ const InfluxHistory: React.FC<{ hostId: string; activeMetric: string }> = (
               body={hostHistory}
               rule={currentRule}
               metricType={metricType}
+              metricName={props.activeMetric}
               totalValue={totalVal != undefined ? totalVal : 0}
             />
           )}

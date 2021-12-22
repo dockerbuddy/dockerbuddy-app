@@ -66,7 +66,7 @@ const AlertsDashboard: React.FC<AlertsDashboardProps> = ({
 
   useEffect(() => {
     fetchAlerts();
-  }, [counterData?.value]);
+  }, [counterData?.value, hostId]);
 
   const refresh = async () => {
     const value = parseInt(days);

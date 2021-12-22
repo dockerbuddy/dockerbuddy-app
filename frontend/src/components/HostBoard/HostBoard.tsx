@@ -34,6 +34,7 @@ const HostBoard: React.FC<RouteComponentProps<HParam>> = ({ match }) => {
 
   const hostId = match.params.id;
   const hostData = useAppSelector(selectHost).hosts[hostId];
+  const isLoading = useAppSelector(selectHost).status == "LOADING";
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
 
@@ -132,11 +133,11 @@ const HostBoard: React.FC<RouteComponentProps<HParam>> = ({ match }) => {
             />
           </Card>
         ) : (
-          <Alert severity="error"> Host not found </Alert>
+          !isLoading && <Alert severity="error"> Host not found </Alert>
         )}
       </Container>
 
-      {hostData.isTimedOut && (
+      {hostData != undefined && hostData.isTimedOut && (
         <div
           style={{
             position: "absolute",

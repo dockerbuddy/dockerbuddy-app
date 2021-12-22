@@ -1,5 +1,4 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
-import { Typography } from "@material-ui/core";
+import { Paper, Typography } from "@material-ui/core";
 import React from "react";
 import {
   Area,
@@ -13,6 +12,7 @@ import {
 } from "recharts";
 import { HostPercentRule } from "../../../common/types";
 import { alertColors } from "../../../util/alertStyle";
+import { humanFileSize } from "../../../util/util";
 
 export type InfluxBody = {
   time: string;
@@ -23,8 +23,27 @@ const MainChart: React.FC<{
   body: InfluxBody[];
   rule: HostPercentRule | undefined;
   metricType: string;
+  metricName: string;
   totalValue: number;
-}> = ({ body, rule, metricType, totalValue }) => {
+}> = ({ body, rule, metricType, metricName, totalValue }) => {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const BetterTooltip = ({ active, payload, label }: any) => {
+    if (active && payload && payload.length) {
+      const data =
+        metricType == "Percent" || metricName == "CPU_USAGE"
+          ? payload[0].value + "%"
+          : humanFileSize(payload[0].value);
+      return (
+        <Paper style={{ padding: "15px", backgroundColor: "rgba(8,1,9,0.8)" }}>
+          <Typography>{`${metricType}: ${data}`}</Typography>
+          <Typography>{`Time: ${new Date(label).toUTCString()}`}</Typography>
+        </Paper>
+      );
+    }
+
+    return null;
+  };
+
   const criticalOffset = () => {
     if (rule == undefined || metricType == "Total") {
       return 0;
@@ -64,13 +83,28 @@ const MainChart: React.FC<{
         <AreaChart data={body} margin={{ right: 40 }}>
           <Typography>No data to show :(</Typography>
           <CartesianGrid strokeDasharray="7 7" stroke={alertColors.disabled} />
-          <XAxis dataKey="time" />
-          {metricType == "Percent" ? (
-            <YAxis type="number" domain={[0, 100]} />
+          <XAxis
+            dataKey="time"
+            tickFormatter={(e) => new Date(e).toUTCString()}
+            interval="preserveStartEnd"
+            domain={body.length > 0 ? ["dataMin", "dataMax"] : ["", ""]}
+          />
+          {metricType == "Percent" || metricName == "CPU_USAGE" ? (
+            <YAxis
+              width={80}
+              type="number"
+              domain={[0, 100]}
+              tickFormatter={(e) => e + "%"}
+            />
           ) : (
-            <YAxis type="number" domain={[0, totalValue]} />
+            <YAxis
+              width={80}
+              type="number"
+              domain={[0, totalValue]}
+              tickFormatter={humanFileSize}
+            />
           )}
-          <Tooltip />
+          <Tooltip content={<BetterTooltip />} />
           <defs>
             <linearGradient id="splitColor" x1="0" y1="0" x2="0" y2="1">
               {rule != undefined ? (
