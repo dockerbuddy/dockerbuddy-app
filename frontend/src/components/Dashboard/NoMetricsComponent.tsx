@@ -5,7 +5,7 @@ const useStyles = makeStyles(() => ({
   box: {
     borderColor: "#1A1C19",
     backgroundColor: "rgba(8,1,9,1)",
-    padding: "195px 0px",
+    padding: "223px 0px",
   },
 }));
 
@@ -16,7 +16,7 @@ const NoMetricsComponent: React.FC<{ hostId: string }> = ({ hostId }) => {
     <Box className={classes.box} boxShadow={10}>
       <Grid container direction="column" alignItems="center">
         <Typography variant="h6">
-          This host has not yet sent any metrics.
+          This host has not yet sent any metrics
         </Typography>
         <Typography variant="body1" style={{ marginTop: "10px" }}>
           Please use its id:

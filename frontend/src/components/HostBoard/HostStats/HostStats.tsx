@@ -23,6 +23,9 @@ const useStyles = makeStyles(() => ({
     paddingRight: "5px",
     paddingLeft: "5px",
   },
+  addBottomMargin: {
+    marginBottom: "114px",
+  },
 }));
 
 interface HostStatsProps {
@@ -81,7 +84,10 @@ const HostStats: React.FC<HostStatsProps> = ({ hostData }) => {
             }}
           >
             {mem == undefined ? (
-              <Alert severity="error"> No CPU data to show </Alert>
+              <Alert severity="error" className={classes.addBottomMargin}>
+                {" "}
+                No CPU data to show{" "}
+              </Alert>
             ) : (
               <MetricPieChart metric={cpu} name="CPU" rule={cpuRule} />
             )}
@@ -103,7 +109,10 @@ const HostStats: React.FC<HostStatsProps> = ({ hostData }) => {
             }}
           >
             {mem == undefined ? (
-              <Alert severity="error"> No memory data to show </Alert>
+              <Alert severity="error" className={classes.addBottomMargin}>
+                {" "}
+                No memory data to show{" "}
+              </Alert>
             ) : (
               <MetricPieChart metric={mem} name="MEMORY" rule={memRule} />
             )}
@@ -125,7 +134,10 @@ const HostStats: React.FC<HostStatsProps> = ({ hostData }) => {
             }}
           >
             {mem == undefined ? (
-              <Alert severity="error"> No disk data to show </Alert>
+              <Alert severity="error" className={classes.addBottomMargin}>
+                {" "}
+                No disk data to show{" "}
+              </Alert>
             ) : (
               <MetricPieChart metric={disk} name="DISK" rule={diskRule} />
             )}

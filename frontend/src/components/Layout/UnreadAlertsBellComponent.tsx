@@ -7,7 +7,7 @@ import {
   updateAlertCounterAsync,
 } from "../../redux/alertCounterSlice";
 import { useAppSelector, useAppDispatch } from "../../redux/hooks";
-import { Badge } from "@material-ui/core";
+import { Badge, Tooltip } from "@material-ui/core";
 import { makeStyles } from "@material-ui/styles";
 
 const useStyles = makeStyles(() => ({
@@ -45,13 +45,18 @@ const UnreadAlertsBellComponent: React.FC = () => {
         aria-haspopup="true"
         onClick={handleClick}
       >
-        <Badge
-          color="secondary"
-          badgeContent={counterData.value}
-          overlap="circle"
+        <Tooltip
+          arrow
+          title="View unread alerts. Click on alert to mark it as read"
         >
-          <Notifications color="primary" />
-        </Badge>
+          <Badge
+            color="secondary"
+            badgeContent={counterData.value}
+            overlap="circle"
+          >
+            <Notifications color="primary" />
+          </Badge>
+        </Tooltip>
       </IconButton>
       <AlertsListComponent
         anchorEl={anchorEl}

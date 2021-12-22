@@ -7,6 +7,7 @@ import { alertColors } from "../../../util/alertStyle";
 import { alertTypeToColor, humanFileSize } from "../../../util/util";
 
 const renderActiveShape = (
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   props: any,
   metric: PercentMetric | undefined,
   name: string

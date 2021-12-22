@@ -91,8 +91,6 @@ const UnreadAlertsListComponent: React.FC<AlertsListProps> = ({
       if (response.ok) {
         dispatch(setCounter(result.body));
         setAlertsToDelete([]);
-      } else {
-        //todo do something
       }
     }
   };

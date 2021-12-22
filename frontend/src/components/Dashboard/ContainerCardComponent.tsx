@@ -9,7 +9,11 @@ import {
   Tooltip,
   Link,
 } from "@material-ui/core";
-import { extractMetricPercent, statusTypeToColor } from "../../util/util";
+import {
+  extractMetricPercent,
+  humanFileSize,
+  statusTypeToColor,
+} from "../../util/util";
 import { Container } from "../../common/types";
 import { AlertType, MetricType, ReportStatus } from "../../common/enums";
 import { AllOutOutlined, VisibilityOff, Visibility } from "@material-ui/icons";
@@ -183,7 +187,7 @@ const ContainerCardComponent: React.FC<{
             />
           </Grid>
           <Grid item xs={6}>
-            <Tooltip arrow title={cpu?.value + "/" + cpu?.total}>
+            <Tooltip arrow title={cpu?.value + "%"}>
               <Box textAlign="center">
                 <Typography
                   variant="subtitle1"
@@ -215,7 +219,12 @@ const ContainerCardComponent: React.FC<{
             style={{ width: 1.5, marginRight: -1.5 }}
           />
           <Grid item xs={6}>
-            <Tooltip arrow title={mem?.value + "/" + mem?.total}>
+            <Tooltip
+              arrow
+              title={
+                humanFileSize(mem?.value) + " / " + humanFileSize(mem?.total)
+              }
+            >
               <Box textAlign="center">
                 <Typography
                   variant="subtitle1"
