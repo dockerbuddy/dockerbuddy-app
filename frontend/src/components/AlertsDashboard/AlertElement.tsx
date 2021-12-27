@@ -3,7 +3,7 @@ import { Alert } from "@material-ui/lab";
 import React from "react";
 import { Link } from "react-router-dom";
 import { AlertsResponseElement } from "../../common/types";
-import { parseDateToDDMMYYYY, parseDateToHour } from "../../util/util";
+import { parseDateToDDMMYYYY, parseDateToHour } from "../../common/util";
 import { AlertType } from "../../common/enums";
 
 interface AlertElementProps {

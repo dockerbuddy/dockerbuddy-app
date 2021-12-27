@@ -8,7 +8,7 @@ import Navigation from "./components/Navigation/Navigation";
 import { SnackbarProvider } from "notistack";
 import { Provider } from "react-redux";
 import { store } from "./redux/store";
-import WebSocketProvider from "./hosts/WebSocket";
+import WebSocketProvider from "./socket/WebSocket";
 
 const App: React.FC = () => {
   return (

@@ -14,14 +14,14 @@ import {
   extractMetricPercent,
   extractMetricBasic,
   extractHostRule,
-} from "../../util/util";
-import ProgressBarComponent from "./ProgressBarComponent";
+} from "../../common/util";
+import ProgressBarComponent from "./HostComponents/ProgressBarComponent";
 import { Host } from "../../common/types";
 import { Link } from "react-router-dom";
 import { MetricType, RuleType } from "../../common/enums";
-import NetworkInfo from "./NetworkInfo";
-import AggregatedContainersComponent from "./AggregatedContainersComponent";
-import NoMetricsComponent from "./NoMetricsComponent";
+import NetworkInfo from "./HostComponents/NetworkInfo";
+import AggregatedContainersComponent from "./HostComponents/AggregatedContainersComponent";
+import NoMetricsComponent from "./HostComponents/NoMetricsComponent";
 
 const useStyles = makeStyles((theme) => ({
   inactiveHost: {

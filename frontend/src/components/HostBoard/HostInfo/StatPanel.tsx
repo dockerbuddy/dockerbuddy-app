@@ -6,9 +6,9 @@ import {
   extractHostRule,
   extractMetricBasic,
   extractMetricPercent,
-} from "../../../util/util";
-import NetworkInfo from "../../Dashboard/NetworkInfo";
-import ProgressBarComponent from "../../Dashboard/ProgressBarComponent";
+} from "../../../common/util";
+import NetworkInfo from "../../Dashboard/HostComponents/NetworkInfo";
+import ProgressBarComponent from "../../Dashboard/HostComponents/ProgressBarComponent";
 
 interface StatPanelProps {
   hostData: Host;

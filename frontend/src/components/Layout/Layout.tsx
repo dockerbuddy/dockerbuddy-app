@@ -1,6 +1,6 @@
 import { makeStyles, createStyles, Box, Toolbar } from "@material-ui/core";
 import React from "react";
-import Header from "./Header";
+import Header from "./Header/Header";
 import PageWrapper from "./PageWrapper";
 
 const useStyles = makeStyles((_theme) =>

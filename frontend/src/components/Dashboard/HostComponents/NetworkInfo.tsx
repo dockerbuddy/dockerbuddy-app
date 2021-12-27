@@ -1,10 +1,10 @@
 import { makeStyles, Theme } from "@material-ui/core";
 import { Alert, Box, Grid, Typography } from "@mui/material";
 import React from "react";
-import { AlertType, RuleType } from "../../common/enums";
-import { BasicMetric, HostBasicRule } from "../../common/types";
-import { alertColors } from "../../util/alertStyle";
-import { alertTypeToColor, humanFileSize } from "../../util/util";
+import { AlertType, RuleType } from "../../../common/enums";
+import { BasicMetric, HostBasicRule } from "../../../common/types";
+import { alertColors } from "../../../common/alertStyle";
+import { alertTypeToColor, humanFileSize } from "../../../common/util";
 import { CloudDownload, CloudUpload } from "@material-ui/icons";
 
 interface NetworkInfoProps {

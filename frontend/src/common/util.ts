@@ -1,5 +1,5 @@
-import { MetricType, AlertType, RuleType, ReportStatus } from "../common/enums";
-import { PercentMetric, HostPercentRule, BasicMetric } from "../common/types";
+import { MetricType, AlertType, RuleType, ReportStatus } from "./enums";
+import { PercentMetric, HostPercentRule, BasicMetric } from "./types";
 import { alertColors } from "./alertStyle";
 
 /* eslint-disable @typescript-eslint/no-explicit-any */

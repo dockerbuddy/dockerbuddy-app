@@ -2,9 +2,9 @@ import { Grid, ButtonBase, makeStyles } from "@material-ui/core";
 import { Alert } from "@mui/material";
 import React from "react";
 import { MetricType, RuleType } from "../../../common/enums";
-import { extractHostRule, extractMetricPercent } from "../../../util/util";
+import { extractHostRule, extractMetricPercent } from "../../../common/util";
 import MetricPieChart from "./MetricPieChart";
-import InfluxHistory from "../InfluxHistory/InfluxHistory";
+import MetricHistory from "./MetricHistory";
 import { Host } from "../../../common/types";
 
 const useStyles = makeStyles(() => ({
@@ -150,7 +150,7 @@ const HostStats: React.FC<HostStatsProps> = ({ hostData }) => {
           .filter((e) => !!e)
           .join(" ")}
       >
-        <InfluxHistory hostId={hostId} activeMetric={activeMetric} />
+        <MetricHistory hostId={hostId} activeMetric={activeMetric} />
       </Grid>
     </>
   );

@@ -8,7 +8,7 @@ import {
   HostPercentRule,
   StandardApiResponse,
 } from "../../common/types";
-import { humanFileSizeSimple } from "../../util/util";
+import { humanFileSizeSimple } from "../../common/util";
 import AddHost, { AddHostFormData, PostHostResponse } from "./AddHost";
 
 type HParam = { id: string };
