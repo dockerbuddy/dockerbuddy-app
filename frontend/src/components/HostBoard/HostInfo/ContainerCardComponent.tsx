@@ -13,12 +13,12 @@ import {
   extractMetricPercent,
   humanFileSize,
   statusTypeToColor,
-} from "../../util/util";
-import { Container } from "../../common/types";
-import { AlertType, MetricType, ReportStatus } from "../../common/enums";
+} from "../../../common/util";
+import { Container } from "../../../common/types";
+import { AlertType, MetricType, ReportStatus } from "../../../common/enums";
 import { AllOutOutlined, VisibilityOff, Visibility } from "@material-ui/icons";
-import { proxy } from "../../common/api";
-import { alertColors } from "../../util/alertStyle";
+import { proxy } from "../../../common/api";
+import { alertColors } from "../../../common/alertStyle";
 import { Box } from "@mui/system";
 
 const useStyles = makeStyles(() => ({

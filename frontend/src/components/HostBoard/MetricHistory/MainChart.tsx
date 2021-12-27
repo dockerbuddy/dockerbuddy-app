@@ -11,8 +11,8 @@ import {
   YAxis,
 } from "recharts";
 import { HostPercentRule } from "../../../common/types";
-import { alertColors } from "../../../util/alertStyle";
-import { humanFileSize } from "../../../util/util";
+import { alertColors } from "../../../common/alertStyle";
+import { humanFileSize } from "../../../common/util";
 
 export type InfluxBody = {
   time: string;

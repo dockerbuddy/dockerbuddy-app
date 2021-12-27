@@ -3,8 +3,8 @@ import { Cell, Pie, PieChart, ResponsiveContainer, Sector } from "recharts";
 import { AlertType } from "../../../common/enums";
 import theme from "../../../common/theme";
 import { PercentMetric, HostPercentRule } from "../../../common/types";
-import { alertColors } from "../../../util/alertStyle";
-import { alertTypeToColor, humanFileSize } from "../../../util/util";
+import { alertColors } from "../../../common/alertStyle";
+import { alertTypeToColor, humanFileSize } from "../../../common/util";
 
 const renderActiveShape = (
   // eslint-disable-next-line @typescript-eslint/no-explicit-any

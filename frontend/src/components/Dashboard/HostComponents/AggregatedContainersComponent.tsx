@@ -2,9 +2,9 @@
 import { Grid } from "@mui/material";
 import { makeStyles, Paper, Theme, Typography } from "@material-ui/core";
 import React from "react";
-import { AlertType, ReportStatus } from "../../common/enums";
-import { Container } from "../../common/types";
-import { alertColors } from "../../util/alertStyle";
+import { AlertType, ReportStatus } from "../../../common/enums";
+import { Container } from "../../../common/types";
+import { alertColors } from "../../../common/alertStyle";
 
 const useStyles = makeStyles((theme: Theme) => ({
   container: {

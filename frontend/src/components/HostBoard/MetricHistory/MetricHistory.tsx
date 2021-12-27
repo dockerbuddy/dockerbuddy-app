@@ -20,7 +20,7 @@ import MainChart, { InfluxBody } from "./MainChart";
 import AdapterDateFns from "@mui/lab/AdapterDateFns";
 import { DateRange } from "@mui/lab/DateRangePicker/RangeTypes";
 import plLocale from "date-fns/locale/pl";
-import { extractMetricPercent, paramsToString } from "../../../util/util";
+import { extractMetricPercent, paramsToString } from "../../../common/util";
 import { useAppSelector } from "../../../redux/hooks";
 import { selectHost } from "../../../redux/hostsSlice";
 import { MetricType } from "../../../common/enums";
@@ -36,7 +36,7 @@ type AllMetricQueries = {
   Metric: string[];
 };
 
-const InfluxHistory: React.FC<{ hostId: string; activeMetric: string }> = (
+const MetricHistory: React.FC<{ hostId: string; activeMetric: string }> = (
   props
 ) => {
   const hostId: string = props.hostId.toString();
@@ -228,4 +228,4 @@ const InfluxHistory: React.FC<{ hostId: string; activeMetric: string }> = (
   );
 };
 
-export default InfluxHistory;
+export default MetricHistory;

@@ -9,7 +9,7 @@ import {
 
 import React from "react";
 import { Link } from "react-router-dom";
-import UnreadAlertsBellComponent from "./UnreadAlertsBellComponent";
+import UnreadAlertsBellComponent from "./UnreadAlerts/UnreadAlertsBellComponent";
 
 const useStyles = makeStyles((theme) => ({
   appBar: {

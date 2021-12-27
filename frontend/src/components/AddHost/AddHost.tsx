@@ -21,7 +21,7 @@ import { Link } from "react-router-dom";
 import { useAppDispatch } from "../../redux/hooks";
 import { updateHostsAsync } from "../../redux/hostsSlice";
 import { RuleType } from "../../common/enums";
-import { fromHumanFileSize } from "../../util/util";
+import { fromHumanFileSize } from "../../common/util";
 
 export interface Rule {
   ruleType: RuleType;

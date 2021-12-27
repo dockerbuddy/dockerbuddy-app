@@ -10,7 +10,7 @@ import { Search } from "@material-ui/icons";
 import React, { useState } from "react";
 import { Container, Host } from "../../../common/types";
 import AlertsDashboard from "../../AlertsDashboard/AlertsDashboard";
-import ContainerCardComponent from "../../Dashboard/ContainerCardComponent";
+import ContainerCardComponent from "./ContainerCardComponent";
 import StatPanel from "./StatPanel";
 import { HelpOutline } from "@material-ui/icons";
 import HelpDialog from "./HelpDialog/HelpDialog";

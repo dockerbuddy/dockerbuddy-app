@@ -1,7 +1,7 @@
 import { Grid } from "@material-ui/core";
 import React from "react";
 import { AlertsResponseElement } from "../../common/types";
-import { parseDateToDDMMYYYY } from "../../util/util";
+import { parseDateToDDMMYYYY } from "../../common/util";
 import AlertElement from "./AlertElement";
 
 interface AlertsListProps {

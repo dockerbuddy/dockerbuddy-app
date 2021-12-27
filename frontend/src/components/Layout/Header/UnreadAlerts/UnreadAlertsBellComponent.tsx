@@ -5,8 +5,8 @@ import AlertsListComponent from "./UnreadAlertsListComponent";
 import {
   selectCounter,
   updateAlertCounterAsync,
-} from "../../redux/alertCounterSlice";
-import { useAppSelector, useAppDispatch } from "../../redux/hooks";
+} from "../../../../redux/alertCounterSlice";
+import { useAppSelector, useAppDispatch } from "../../../../redux/hooks";
 import { Badge, Tooltip } from "@material-ui/core";
 import { makeStyles } from "@material-ui/styles";
 

@@ -11,12 +11,15 @@ import { makeStyles } from "@material-ui/styles";
 import { Menu } from "@mui/material";
 import React, { useEffect, useState } from "react";
 import { useHistory } from "react-router-dom";
-import { proxy } from "../../common/api";
-import { AlertsResponseElement, StandardApiResponse } from "../../common/types";
-import { setCounter } from "../../redux/alertCounterSlice";
-import { useAppDispatch } from "../../redux/hooks";
-import { paramsToString, parseDateToDDMMYYYY } from "../../util/util";
-import AlertElement from "../AlertsDashboard/AlertElement";
+import { proxy } from "../../../../common/api";
+import {
+  AlertsResponseElement,
+  StandardApiResponse,
+} from "../../../../common/types";
+import { setCounter } from "../../../../redux/alertCounterSlice";
+import { useAppDispatch } from "../../../../redux/hooks";
+import { paramsToString, parseDateToDDMMYYYY } from "../../../../common/util";
+import AlertElement from "../../../AlertsDashboard/AlertElement";
 
 const useStyles = makeStyles(() => ({
   disableHover: {

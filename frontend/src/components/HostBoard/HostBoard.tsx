@@ -17,7 +17,7 @@ import { RouteComponentProps } from "react-router-dom";
 import { selectHost } from "../../redux/hostsSlice";
 import { useAppSelector } from "../../redux/hooks";
 import HostMenu from "./HostMenu";
-import HostStats from "./HostStats/HostStats";
+import HostStats from "./MetricHistory/HostStats";
 import HostInfo from "./HostInfo/HostInfo";
 import AlertsDashboard from "../AlertsDashboard/AlertsDashboard";
 

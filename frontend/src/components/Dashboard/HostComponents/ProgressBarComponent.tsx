@@ -8,11 +8,11 @@ import {
   Theme,
   makeStyles,
 } from "@material-ui/core";
-import { HostPercentRule, PercentMetric } from "../../common/types";
-import { alertTypeToColor, humanFileSize } from "../../util/util";
-import { AlertType } from "../../common/enums";
+import { HostPercentRule, PercentMetric } from "../../../common/types";
+import { alertTypeToColor, humanFileSize } from "../../../common/util";
+import { AlertType } from "../../../common/enums";
 import { Alert } from "@mui/material";
-import { alertColors } from "../../util/alertStyle";
+import { alertColors } from "../../../common/alertStyle";
 
 function LinearProgressWithLabel(
   props: LinearProgressProps & {

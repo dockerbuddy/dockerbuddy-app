@@ -7,7 +7,7 @@ import {
   Typography,
 } from "@material-ui/core";
 import React from "react";
-import ContainerCardComponent from "../../../Dashboard/ContainerCardComponent";
+import ContainerCardComponent from "../ContainerCardComponent";
 import BootstrapDialogTitle from "./BootstrapDialogTitle";
 import { cont1, cont2, cont3, cont4 } from "./mockContainers";
 import { Visibility } from "@material-ui/icons";
