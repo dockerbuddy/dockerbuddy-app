@@ -8,5 +8,5 @@ mvn clean
 mvn -DskipTests package
 cd ..
 docker build . -t kraleppa/dockerbuddy:${1:-latest}
-cp ./backend/target/dockerbuddy-0.0.1-SNAPSHOT.jar ./dockerbuddy-${1:-latest}.jar
+cp ./backend/target/dockerbuddy-1.0.0.jar ./dockerbuddy-${1:-latest}.jar
 docker push kraleppa/dockerbuddy:${1:-latest}
