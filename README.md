@@ -1,5 +1,6 @@
 # Docker Buddy
-Buddy for everybody
+<img width="521" alt="Screenshot 2023-01-25 at 20 50 02" src="https://user-images.githubusercontent.com/56135216/214673947-1200d1b4-7391-4134-8270-a8cea04c1fa8.png">
+
 ## Running app with docker
 Image of Docker Buddy is available on [DockerHub](https://hub.docker.com/repository/docker/kraleppa/dockerbuddy)
 ```
